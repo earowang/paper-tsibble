@@ -14,8 +14,8 @@ author:
     othernames: Rob J
     address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia.
     email : rob.hyndman@monash.edu
-abstract: "ATemporal-context data is often rich with information, which is not supported by current time series model objects. The data may have heterogeneous variable types, implicit missings, multiple levels of of temporal structure, many different grouping variables.  The conventional matrix structure that underlies time series models requires numerical variables, and implicit times, which have the effect of discarding some elements of the rich data available. This work addresses the broader issues of better data structures and modern data pipelines for analysing and visualising temporal-context data. We extend the tidy data concept to temporal data, and note that the 'molten' data structure is flexible enough to handle heterogeneity, low time resolutions, and implicit missing values. There are two supporting components required to turn  'molten' data into a valid temporal data: (1) an explicitly declared index variable containing time-stamps; and (2) a unique identifier the multiple groups of measurements, which is referred to as a 'key'. A syntactical approach is introduced to describe nested or crossed data structures, which employ the 'key'. The tidy data structure also supports thinking of operations on the data as part of a data pipeline, which facilitates the workflow for analysis of temporal data. A case study is included to illustrate the tidy structure, the data pipeline ideas and usage. A new representation of tidy temporal data along with the supporting methods has been implemented in the R package **tsibble**."
-keywords: "blah, blah"
+abstract: 'Temporal-context data is often rich with information and time formats, for example multiple units, fine time resolutions, heterogeneous data types, nested and crossed structures and etc. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and modelling routines. Tidy data principles are applied and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) an explicitly declared variable representing time index, (3) single or multiple identifiers separating multiple units over time, which are referred to as a "key". A syntax is proposed to describe nested or crossed data structures, which employ the "key". The tidy temporal data structure most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline". A sound pipeline practice facilitates a transparent and human-readable workflow for analyzing temporal data. Applications are included to illustrate the tidy temporal data, data pipeline ideas and usage. A new representation of tidy temporal data along with the supporting methods has been implemented in the R package **tsibble**.'
+keywords: "temporal context, time series, data structure, R"
 wpnumber: no/yr
 jelcodes: C10,C14,C22
 blind: false
@@ -47,7 +47,7 @@ opts_chunk$set(
 
 # Introduction
 
-Data measured or collected at different time points are referred to as temporal-context data or time series. Figure \@ref(fig:data-snapshot) shows a glimpse of on-time performance of domestic flights in U.S.A from 2016 to 2017. It keeps track of on-time records for each flight's at its scheduled time over years. This dataset arrives in a rectangular form, which features:
+Data measured or collected at different time points are referred to as temporal-context data or time series. This dataset arrives in a rectangular form, which features:
 
 * heterogeneous data columns, such as numbers, characters and timestamps;
 * multiple measured variables including departure/arrival delay in minutes, flight time, distance between origin and destination, and etc.;
@@ -56,7 +56,7 @@ Data measured or collected at different time points are referred to as temporal-
 
 However, there is lack of data management tools for time series involving those characteristics in most statistical software, for example data wrangling, visualisation, analysing and forecasting in time-based context. It becomes more challenging in handling time series as increased data complications. The bottleneck that makes time series data frustrating to work with is the conventional data structure that a vector or matrix underlies.
 
-Although a matrix is a tabular form, it assumes homogeneity (that is, all the columns must be real values.) and time indices implicitly inferred as attributes (or meta-information). This format of data input is model-oriented rather than data-oriented as it proves computationally efficient for many statistical models when doing matrix operations. However, it is has the effect of discarding intersting information in the data, is more opaque in the handling of the temporal components, and less efficient for many other data analysis tasks, such as data transformation, visualisation and model diagnostics, like forcing the fitting of a square peg into a round hole.
+Although a matrix is a tabular form, it assumes homogeneity (that is, all the columns must be real values.) and time indices implicitly inferred as attributes (or meta-information). This format of data input is model-oriented rather than data-oriented as it proves computationally efficient for many statistical models when doing matrix operations. However, it is has the effect of discarding interesting information in the data, is more opaque in the handling of the temporal components, and less efficient for many other data analysis tasks, such as data transformation, visualisation and model diagnostics, like forcing the fitting of a square peg into a round hole.
 
 In addition, time indices form the basis of temporal data and the source of contextual information to understand temporal dependence. Time as attributes limits the use of time context, since it is difficult to access and manipulate. For example, the components of date-times, such as months, day of week, and time of day, cannot be easily extracted in order to examine seasonal fluctuations. It is also impossible to switch between different time zones and daylight savings to compare time across places when needed.
 
@@ -66,13 +66,13 @@ This paper proposes a tidy data structure and a modern data pipeline for storing
 
 # Tidy temporal-context data
 
-A modern reimagining of time series should provide heterogeneous data types and time indices as explicitly declared data column. This can be achieved using a "data frame" in R or other statistical languages to represent a tabular format, instead of "matrix". Tidy temporal-context data at least consists of:
+A modern re-imagining of time series should provide heterogeneous data types and time indices as explicitly declared data column. This can be achieved using a "data frame" in R or other statistical languages to represent a tabular format, instead of "matrix". Tidy temporal-context data at least consists of:
 
 1. index: an explicitly declared data variable contains time indices, such as date-times, year-months, years and etc.
 2. key: a set of grouping factors uniquely identifies each unit that measurements take place on over time, which may include single or multiple columns.
 3. interval: data with regular time interval results in a common time interval in one table.
 
-In SQL database, a primary key, which uniquely defines each record in a database table, is equivalent to the composition of "index" and "key". In multivariate time series notation as Equation \@ref(eq:mts), $X_{jt}$ represents series $j$, for $j = 1, \dots, p$ and $1 \leq t \leq T$, in the form of a $T \times p$ matrix.
+In SQL database, a primary key [@codd_relational_1970], which uniquely defines each record in a database table, is equivalent to the composition of "index" and "key". In multivariate time series notation as Equation \@ref(eq:mts), $X_{jt}$ represents series $j$, for $j = 1, \dots, p$ and $1 \leq t \leq T$, in the form of a $T \times p$ matrix.
 
 \begin{equation}
   \begin{bmatrix}
