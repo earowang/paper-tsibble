@@ -1,5 +1,5 @@
 ---
-title: "Tidy data structures to support exploration and modeling of temporal-context data"
+title: "Tidy data structure to support exploration and modeling of temporal-context data"
 author:
   - familyname: Wang
     othernames: Earo
@@ -14,7 +14,7 @@ author:
     othernames: Rob J
     address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia.
     email : rob.hyndman@monash.edu
-abstract: 'Temporal-context data is often rich with information and time formats, for example multiple units, fine time resolutions, heterogeneous data types, nested and crossed structures and etc. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and modelling routines. Tidy data principles are applied and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) an explicitly declared variable representing time index, (3) single or multiple identifiers separating multiple units over time, which are referred to as a "key". A syntax is proposed to describe nested or crossed data structures, which employ the "key". The tidy temporal data structure most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline". A sound pipeline practice facilitates a transparent and human-readable workflow for analyzing temporal data. Applications are included to illustrate the tidy temporal data, data pipeline ideas and usage. A new representation of tidy temporal data along with the supporting methods has been implemented in the R package **tsibble**.'
+abstract: 'Temporal-context data is often rich with information and time formats, for example multiple observational units, different time lengths, heterogeneous data types, nested and crossed factors and etc. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and modelling routines. Tidy data principles are applied and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) an explicitly declared index variable representing time, (3) a "key" comprised of single or multiple variables to uniquely identify units over time, using a syntatical and user-oriented approach in which it imposes nested or crossed structures on the data. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based context. A sound pipeline practice facilitates a transparent and human-readable workflow for analyzing temporal data. Applications are included to illustrate tidy temporal data structure, data pipeline ideas and usage. The tidy temporal data along with its supporting methods has been implemented in the R package **tsibble**.'
 keywords: "temporal context, time series, data structure, R"
 wpnumber: no/yr
 jelcodes: C10,C14,C22
@@ -47,24 +47,17 @@ opts_chunk$set(
 
 # Introduction
 
-Data measured or collected at different time points are referred to as temporal-context data or time series. This dataset arrives in a rectangular form, which features:
-
-* heterogeneous data columns, such as numbers, characters and timestamps;
-* multiple measured variables including departure/arrival delay in minutes, flight time, distance between origin and destination, and etc.;
-* low time resolutions, for example scheduled departure time in minutes;
-* multi-levels of grouping like airports nested within cities, and cities further nested within states.
-
-However, there is lack of data management tools for time series involving those characteristics in most statistical software, for example data wrangling, visualisation, analysing and forecasting in time-based context. It becomes more challenging in handling time series as increased data complications. The bottleneck that makes time series data frustrating to work with is the conventional data structure that a vector or matrix underlies.
+Temporal-context data consist of observational units indexed at different time points $X_{jt}$, where the $j$\textsuperscript{th} unit takes measurements of $X$ on over time $t$, for $j = 1, \cdots, N$ and $1 \le t \le T$. Time primarily forms the contextual basis of temporal data, but it could arrive in many possible formats. For example, data recorded at fine time resolutions (hours, minutes, and seconds) are typically associated with different time zones and daylight savings. Temporal data often carries with rich information other than the time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping variables exhibiting nested or crossed structures, linking to other data tables, and etc.
 
 Although a matrix is a tabular form, it assumes homogeneity (that is, all the columns must be real values.) and time indices implicitly inferred as attributes (or meta-information). This format of data input is model-oriented rather than data-oriented as it proves computationally efficient for many statistical models when doing matrix operations. However, it is has the effect of discarding interesting information in the data, is more opaque in the handling of the temporal components, and less efficient for many other data analysis tasks, such as data transformation, visualisation and model diagnostics, like forcing the fitting of a square peg into a round hole.
 
 In addition, time indices form the basis of temporal data and the source of contextual information to understand temporal dependence. Time as attributes limits the use of time context, since it is difficult to access and manipulate. For example, the components of date-times, such as months, day of week, and time of day, cannot be easily extracted in order to examine seasonal fluctuations. It is also impossible to switch between different time zones and daylight savings to compare time across places when needed.
 
-@wickham2014tidy developed and formulated the conceptual framework of tidy data: (1) each variable forms a column; (2) each observation forms a row; (3) each type of observational unit forms a table. These principles attempt to standardise the mapping from the semantics of a dataset to its structure and facilitate data analysis in a coherent way. We shall extend "tidy data" into the time series domain.
-
 This paper proposes a tidy data structure and a modern data pipeline for storing, managing and analysing time series data, using a collection of fluent and fluid tools to help with exploitation in temporal context.
 
-# Tidy temporal-context data
+# Data semantics
+
+@wickham2014tidy developed and formulated the conceptual framework of tidy data: (1) each variable forms a column; (2) each observation forms a row; (3) each type of observational unit forms a table. These principles attempt to standardise the mapping from the semantics of a dataset to its structure and facilitate data analysis in a coherent way. We shall extend "tidy data" into the time series domain.
 
 A modern re-imagining of time series should provide heterogeneous data types and time indices as explicitly declared data column. This can be achieved using a "data frame" in R or other statistical languages to represent a tabular format, instead of "matrix". Tidy temporal-context data at least consists of:
 
