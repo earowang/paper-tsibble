@@ -49,7 +49,7 @@ opts_chunk$set(
 
 Temporal-context data consist of observational units indexed at different time points $X_{jt}$, where the $j$\textsuperscript{th} unit takes measurements of $X$ on over time $t$, for $j = 1, \cdots, N$ and $1 \le t \le T$. Time primarily forms the contextual basis of temporal data, but it could arrive in many possible formats. For example, data recorded at fine time resolutions (hours, minutes, and seconds) are typically associated with different time zones and daylight savings. Temporal data often carries with rich information other than the time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors involving nested or crossed structures, linking to other data tables, and etc.
 
-However, such richness in temporal data cannot be easily accommodated by currently available data structures in any statistical computing package. In the literature, time series and panel (longitudinal) data are common terms referred to temporal-context data, depending on the research fields. Researchers who are concerned with modelling large $T$ and small $N$ would name as "time series" (serial correlation); those who are interested in modelling small $T$ and large $N$ as "panel data" (asymptotic). The data format is two-dimensional array, but different modelling focuses lend the data input to column types. A matrix is used to represent multivariate time series, assuming homogeneity (that is, all the columns must be of same type.) and time indices implicitly inferred as attributes (or meta-information).
+However, such richness in temporal data cannot be easily accommodated by currently available data structures in any statistical computing package. In the literature, time series and panel (longitudinal) data are common terms referred to temporal-context data, depending on the research fields. Researchers who are concerned with modelling large $T$ and small $N$ would name as "time series" (serial correlation); those who are interested in modelling small $T$ and large $N$ as "panel data" (asymptotic). The data format is two-dimensional array, but different modelling focuses lend the data input to column types. A matrix is used to represent multivariate time series where each row represents observations measured at a time point and each column represents a series. This matrix representation requires homogeneity (that is, all the columns must be of same type.), time indices implicitly inferred as attributes or meta-information, series of same time length, and explicit missingness. By contrast, panel data are organised in two-dimensional array of heterogeneous column types where multiple study subjects are stacked and repeated for its time indices in a single column, due to commonly arisen unbalanced panels. This specification requires explicitly declared panel variable and index, which has been implemented in Stata's **tsset** and R package **plm**. This data organisation appears more advantageous than matrix in supporting explicit time index, multiple subjects of different time lengths.
 
 This paper proposes a tidy and unified data structure and a modern data pipeline for storing, managing and analysing time series data, using a collection of fluent and fluid tools to help with exploitation in temporal context.
 
@@ -63,17 +63,7 @@ A modern re-imagining of time series should provide heterogeneous data types and
 2. key: a set of grouping factors uniquely identifies each unit that measurements take place on over time, which may include single or multiple columns.
 3. interval: data with regular time interval results in a common time interval in one table.
 
-In SQL database, a primary key [@codd_relational_1970], which uniquely defines each record in a database table, is equivalent to the composition of "index" and "key". In multivariate time series notation as Equation \@ref(eq:mts), $X_{jt}$ represents series $j$, for $j = 1, \dots, p$ and $1 \leq t \leq T$, in the form of a $T \times p$ matrix.
-
-\begin{equation}
-  \begin{bmatrix}
-  X_{11} & X_{21} & \cdots & X_{p1} \\
-  X_{12} & X_{22} & \cdots & X_{p2} \\
-  \vdots & \vdots & \ddots & \vdots \\
-  X_{1T} & X_{2T} & \cdots & X_{pT}
-  \end{bmatrix}
-\label{eq:mts}
-\end{equation}
+In SQL database, a primary key [@codd_relational_1970], which uniquely defines each record in a database table, is equivalent to the composition of "index" and "key". 
 
 ## Time index and interval
 
