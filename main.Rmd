@@ -59,7 +59,9 @@ This paper proposes a unified data representation of temporal-context data, blen
 
 # Data semantics
 
-The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. Firstly, a data set must be structured in a "tidy" layout. Secondly, declaring the data set to contain temporal observations is determined by "index" that represent time and "key" that uniquely identifies each unit that measurements take place on over time. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
+The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. Firstly, a data set must be structured in a "tidy" layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
+
+Given the nature of temporal ordering, a temporal data set must be sorted by time index. If a key is explicitly declared, the key will be sorted followed by arranging time in ascending order.
 
 ## Time index and interval
 
