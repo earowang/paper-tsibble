@@ -59,21 +59,19 @@ This paper proposes a unified data representation of temporal-context data, blen
 
 # Data semantics
 
-The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. Firstly, a data set must be structured in a "tidy" layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
+The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
 
-Given the nature of temporal ordering, a temporal data set must be sorted by time index. If a key is explicitly declared, the key will be sorted followed by arranging time in ascending order.
+Given the nature of temporal ordering, a temporal data set must be sorted by time index. If a key is explicitly declared, the key will be sorted first and followed by arranging time in ascending order.
 
 ## Time index and interval
 
 <!-- note to self: There's a trade-off between data column and attributes. Data column is easily accessible, which gives greater flexibility; however, once the value in the data column is modified, no way to validate for any static approach. Generally, not recommended to modify attributes. -->
 
-Time index forms an integral component and contextual base of temporal data. In temporal data frame, time-based index must be clearly stated as a data column rather than inferred as attributes, and thus can be accessible. This creates flexibility in handling time indices.
+Time forms an integral component and a contextual basis of temporal data. A variable representing time needs explicitly declared at the process of constructing a temporal data, referred to as "index". This accessibility of index promotes transparency and unambiguity while manipulating time. For example, subsetting a certain time period of data, extracting time components (like time of day and day of week), or converting time zones are directly dealt with index. It is also often to join other data tables based on the common time indices. Tools are provided to work with time, rather than wrappers to work with a whole data set. This sets the tone on methods design philosophy: well-structured, verbose and unambiguous workflow.
 
-(1) temporal elements can be created, and then exploratory data visualisation and analysis (not specialist plotting) and multiple seasonality modelling for sub-daily data
-(2) convert to the same time zone and thus compare
-(3) join other data tables using the index as common key
+Time representation: year, year-quarter, year-month, year-week, dates, date-times.
 
-For data indexed in regular time space, the time interval is obtained by computing the minimal positive time distance in a data table. This suggests that each observational unit collected at the same interval forms a table.
+For data indexed in regular time space, the time interval is obtained by computing the greatest common divisor from positive time distances in a data table. This suggests that each observational unit collected at the same interval forms a table.
 
 ## Keys
 
