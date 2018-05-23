@@ -59,25 +59,30 @@ This paper proposes a unified data representation of temporal-context data, blen
 
 # Data semantics
 
-The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
+The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
 
 Given the nature of temporal ordering, a temporal data set must be sorted by time index. If a key is explicitly declared, the key will be sorted first and followed by arranging time in ascending order.
+
+This high-level data abstraction is semantically structured, which shed lights on time index and what we call "key".
 
 ## Time index and interval
 
 <!-- note to self: There's a trade-off between data column and attributes. Data column is easily accessible, which gives greater flexibility; however, once the value in the data column is modified, no way to validate for any static approach. Generally, not recommended to modify attributes. -->
 
-Time forms an integral component and a contextual basis of temporal data. A variable representing time needs explicitly declared at the process of constructing a temporal data, referred to as "index". This accessibility of index promotes transparency and unambiguity while manipulating time. For example, subsetting a certain time period of data, extracting time components (like time of day and day of week), or converting time zones are directly dealt with index. It is also often to join other data tables based on the common time indices. Tools are provided to work with time, rather than wrappers to work with a whole data set. This sets the tone on methods design philosophy: well-structured, verbose and unambiguous workflow.
+Time forms an integral component and a contextual basis of temporal data. A variable representing time needs explicitly declared at the process of constructing a temporal data, referred to as "index". This accessibility of index promotes transparency and unambiguity while manipulating time. For example, subsetting a certain time period of data, extracting time components (like time of day and day of week), or converting time zones are directly dealt with index. It is also often to join other data tables based on the common time indices. Tools are provided to work with time, rather than wrappers to work with a whole data set. This sets the tone on methods design philosophy: well-structured, expressive and unambiguous workflow.
 
 Time representation: year, year-quarter, year-month, year-week, dates, date-times.
 
 For data indexed in regular time space, the time interval is obtained by computing the greatest common divisor from positive time distances in a data table. This suggests that each observational unit collected at the same interval forms a table.
 
-## Keys
+## Key
 
-Key variables are usually discrete descriptors, and are typically variables that were created during the data collection to uniquely define the measured values. For instance, to distinguish the performance of each flight in the dataset, the "key" is the `flight` variable, allowing separation of multiple time series in one data table. The "key" not only identifies the unit to be measured over time, but also incorporates structures of data. Without a key, a data table can be considered as a univariate time series; in other words, the key is implicit. With a single key of more than one categories, it lends itself to a collection of time series in a table. But when there are at least two keys in the table, it indicates nested or crossed structures.
+The "key" identifies units or subjects that are observed over time in a data table, which are typically known in advance by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification. The key is not constrained to a single column, but is comprised of multiple columns. When involving multiple variables, one need to distinguish nesting and crossing data variables. "Nesting" refers to a scenario where a variable is nested within another when each category of the former variable co-occurs with only one category of the latter; on the other hand, "crossing" means that a variable is crossed with another when every category of one variable co-occurs with every category of the other. Nesting is a special case of crossing. Whilst constructing tidy temporal data, users also need to specify the key that identifies the structure on the data. Rather than creating a separate object that contains the data structure, like what the **hts** does, we propose a syntax-based interface to directly deal with variables, so that it takes advantage of data semantics. The separator `|` is used to indicate nesting variables, while comma `,` for crossing variables.
 
-In experimental designs, a variable is crossed with another when every category of one variable co-occurs with every category of the other, while a variable is nested within another when each category of the former variable co-occurs with only one category of the latter. It appears more useful in making this distinction in statistical analysis including visualisation and modeling, compared to data manipulation.
+What I'd like to expand:
+
+1. syntax, user-oriented approach.
+2. structure construction only use observations found in the data. For example, crossing variables will not expand the unique combination that are not found in the data.
 
 # Data pipeline
 
@@ -88,9 +93,11 @@ A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) v
 Tidy data builds a concrete foundation to enable pipeline data analysis, which provides a coherent and fluent framework to work with data. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
 
 * **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
-* **column-wise**: `mutate()`, `select()`, `summarise()`, `tsummarise()`
+* **column-wise**: `mutate()`, `select()`, `summarise()`
+* **group-wise**: `index_by()`, `group_by()`
+* **reshape**: `gather()`, `spread()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
-* **time-wise**: `lag()`, `diff()`, `acf()`
+* **time-wise**: `lead()`, `lag()`, `difference()`
 
 # Application: U.S.A domestic flights on-time performance (2016-2017)
 
