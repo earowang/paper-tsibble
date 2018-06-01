@@ -75,12 +75,7 @@ For data indexed in regular time space, the time interval is obtained by computi
 
 ## Key
 
-The "key" identifies units or subjects that are observed over time in a data table, which are typically known in advance by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification. The key is not constrained to a single column, but is comprised of multiple columns. When involving multiple variables, one need to distinguish nesting and crossing data variables. "Nesting" refers to a scenario where a variable is nested within another when each category of the former variable co-occurs with only one category of the latter; on the other hand, "crossing" means that a variable is crossed with another when every category of one variable co-occurs with every category of the other. Nesting is a special case of crossing. Whilst constructing tidy temporal data, users also need to specify the key that identifies the structure on the data. Rather than creating a separate object that contains the data structure, like what the **hts** does, we propose a syntax-based interface to directly deal with variables, so that it takes advantage of data semantics. The separator `|` is used to indicate nesting variables, while comma `,` for crossing variables.
-
-What I'd like to expand:
-
-1. syntax, user-oriented approach.
-2. structure construction only use observations found in the data. For example, crossing variables will not expand the unique combination that are not found in the data.
+The "key" identifies units or subjects that are observed over time in a data table, which are typically known in advance by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification. The key is not constrained to a single column, but is comprised of multiple columns. When involving multiple variables, one need to distinguish nesting and crossing data variables. "Nesting" refers to a scenario where a variable is nested within another when each category of the former variable co-occurs with only one category of the latter; on the other hand, "crossing" means that a variable is crossed with another when every category of one variable co-occurs with every category of the other. Nesting is a special case of crossing. The former exhibits a hierarchical ordering with lower-level category (children) nested within higher-level category (parent); whereas the ordering of the latter makes no difference. Whilst constructing tidy temporal data, users also need to specify the key that identifies the structure on the data. Rather than creating a separate object that contains the data structure, like what the **hts** does, we propose a syntax-based interface to directly deal with variables, so that it takes advantage of data semantics. The expression of a vertical bar (`|`) is used to indicate nesting variables, while a comma (`,`) for crossing variables. @wilkinson2006grammar discussed the distinction between nesting and crossing with respect to facets in graphics, and he used `/` and `*` instead for nested and crossed expressions. A crossing structure displays all unique combinations of crossed variables, including those not found in the data, in a graphical layout. However, tidy temporal data finds only the combinations that occur in the data and intentionally respects the structure of missing combinations.
 
 # Data pipeline
 
@@ -93,7 +88,6 @@ Tidy data builds a concrete foundation to enable pipeline data analysis, which p
 * **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
 * **column-wise**: `mutate()`, `select()`, `summarise()`
 * **group-wise**: `index_by()`, `group_by()`
-* **reshape**: `gather()`, `spread()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
 * **time-wise**: `lead()`, `lag()`, `difference()`
 
