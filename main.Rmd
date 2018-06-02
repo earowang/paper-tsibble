@@ -53,13 +53,15 @@ In the literature, time series and panel (longitudinal) data are common terms re
 
 Temporal data can often be aggregated in a manner that exhibits a nested or crossed structure, also known as hierarchical or grouped time series [@fpp]. For example, in a manufacturing setting, a company can add up every store’s sales by region, by state and by country, which gives a strictly hierarchical time series; alternatively they can group the sales for each product together based on common attributes such as store, brand, price range and so forth, which leads to a non-hierarchical structure---a grouped time series. The R package **hts** is the implementation of this type of time series. But it is frustrating to create and work with such data objects due to non-extensible and non-modified. Variational data aggregation (some groups no need aggregation). [R]
 
-@wickham2014tidy coined the term "tidy data" and formalized the processing from messy data to "tidy data". These principles attempt to standardize the mapping from the semantics of a dataset to its structure and facilitate data analysis in a coherent way. Based on the systematic structuring principles, a grammar of data manipulation. [R]
+@wickham2014tidy coined the term "tidy data" and formalized the processing from messy data to "tidy data". These principles attempt to standardize the mapping from the semantics of a dataset to its structure and facilitate data analysis in a coherent way. Based on the systematic structuring principles, a grammar of data manipulation. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R]
 
 This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
 
 # Data semantics
 
 The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
+
+[A toy example is needed here and will referenced for index and key]
 
 Given the nature of temporal ordering, a temporal data set must be sorted by time index. If a key is explicitly declared, the key will be sorted first and followed by arranging time in ascending order.
 
@@ -75,21 +77,30 @@ For data indexed in regular time space, the time interval is obtained by computi
 
 ## Key
 
-The "key" identifies units or subjects that are observed over time in a data table, which are typically known in advance by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification. The key is not constrained to a single column, but is comprised of multiple columns. When involving multiple variables, one need to distinguish nesting and crossing data variables. "Nesting" refers to a scenario where a variable is nested within another when each category of the former variable co-occurs with only one category of the latter; on the other hand, "crossing" means that a variable is crossed with another when every category of one variable co-occurs with every category of the other. Nesting is a special case of crossing. The former exhibits a hierarchical ordering with lower-level category (children) nested within higher-level category (parent); whereas the ordering of the latter makes no difference. Whilst constructing tidy temporal data, users also need to specify the key that identifies the structure on the data. Rather than creating a separate object that contains the data structure, like what the **hts** does, we propose a syntax-based interface to directly deal with variables, so that it takes advantage of data semantics. The expression of a vertical bar (`|`) is used to indicate nesting variables, while a comma (`,`) for crossing variables. @wilkinson2006grammar discussed the distinction between nesting and crossing with respect to facets in graphics, and he used `/` and `*` instead for nested and crossed expressions. A crossing structure displays all unique combinations of crossed variables, including those not found in the data, in a graphical layout. However, tidy temporal data finds only the combinations that occur in the data and intentionally respects the structure of missing combinations.
+The "key" identifies units or subjects that are observed over time in a data table, which are typically known in advance by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification. The key is not constrained to a single column, but is comprised of multiple columns. When involving multiple variables, one need to distinguish nesting and crossing data variables. "Nesting" refers to a scenario where a variable is nested within another when each category of the former variable co-occurs with only one category of the latter; on the other hand, "crossing" means that a variable is crossed with another when every category of one variable co-occurs with every category of the other. Nesting is a special case of crossing. The former exhibits a hierarchical ordering with lower-level category (children) nested within higher-level category (parent); whereas the ordering of the latter makes no difference. Whilst constructing tidy temporal data, users also need to specify the key that identifies the structure on the data. Rather than creating a separate object that contains the data structure, like what the **hts** does, we propose a syntax-based interface to directly deal with variables, so that it takes advantage of data semantics. The expression of a vertical bar (`|`) is used to indicate nesting variables, while a comma (`,`) for crossing variables. @wilkinson2006grammar discussed the distinction between nesting and crossing with respect to facets in graphics, and he used `/` and `*` instead for nested and crossed expressions. A crossing structure displays all unique and possible combinations of crossed variables, including those not found in the data, in a graphical layout. However, tidy temporal data finds only the combinations that occur in the data and intentionally respects the structure of incomplete combinations.
 
 # Data pipeline
 
-Literature about data pipeline.
+## Literature review
 
-A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips. (UNIX pipe)
+* A collection of intuitive and consistent programming interfaces empowers users to focus on the primary goal of data analysis and modelling problems, and frees users from computational implementation details.
+* [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R]
+* Unix philosophy [@unix; @unix-philosophy]: each do one simple thing, do it well, and most importantly, work well with each other.
+* "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
+
+* Pipelines in interactive settings [@viewing-pipeline; @plumbing; @xie2014reactive]: Model-View-Controller paradigm.
+
+## Time-based pipeline analysis
+
+A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips.
 
 Tidy data builds a concrete foundation to enable pipeline data analysis, which provides a coherent and fluent framework to work with data. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
 
 * **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
 * **column-wise**: `mutate()`, `select()`, `summarise()`
 * **group-wise**: `index_by()`, `group_by()`
-* **rolling window**: `slide()`, `tile()`, `stretch()`
 * **time-wise**: `lead()`, `lag()`, `difference()`
+* **rolling window**: `slide()`, `tile()`, `stretch()`
 
 # Application: U.S.A domestic flights on-time performance (2016-2017)
 
