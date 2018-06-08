@@ -57,9 +57,11 @@ Temporal data can often be aggregated in a manner that exhibits a nested or cros
 
 This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
 
+The rest of the paper is structured as follows.
+
 # Data semantics
 
-The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
+The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout each row has the same schema and each field has a single value. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
 
 [A toy example is needed here and will referenced for index and key]
 
@@ -71,9 +73,11 @@ This high-level data abstraction is semantically structured, which shed lights o
 
 <!-- note to self: There's a trade-off between data column and attributes. Data column is easily accessible, which gives greater flexibility; however, once the value in the data column is modified, no way to validate for any static approach. Generally, not recommended to modify attributes. -->
 
-Time forms an integral component and a contextual basis of temporal data. A variable representing time needs explicitly declared at the process of constructing a temporal data, referred to as "index". This accessibility of index promotes transparency and unambiguity while manipulating time. For example, subsetting a certain time period of data, extracting time components (like time of day and day of week), or converting time zones are directly dealt with index. It is also often to join other data tables based on the common time indices. Tools are provided to work with time, rather than wrappers to work with a whole data set. This sets the tone on methods design philosophy: well-structured, expressive and unambiguous workflow.
+Time forms an integral component and a contextual basis of temporal data. A variable representing time needs explicitly declared at the process of constructing a temporal data, referred to as "index". This accessibility of index promotes transparency and unambiguity while manipulating time. For example, subsetting a certain time period of data, extracting time components (like time of day and day of week), or converting time zones are directly dealt with index. It is also often to join other data tables based on the common time indices. Tools are provided to work with time itself, rather than wrappers to work with a whole data set. This promotes transparency and visibility to make inspection easier. This sets the tone on methods design philosophy: well-structured, expressive and unambiguous workflow.
 
 For data indexed in regular time space, the time interval is obtained by computing the greatest common divisor based on the non-negative differences of a given time index, although the data may include implicit time gaps. This implies that all the units in the table must share a common interval. It is relatively easy to determine if the data is daily or sub-daily since most statistical packages have built-in time representations for date-times and dates, for example their corresponding classes `POSIXct` and `Date` in R. However these turn out inappropriate for weekly, monthly and quarterly data. For example, the smallest time unit of monthly data is months in a year, which is equispaced points in a year. However, using the first day of the month can range from 28 to 31 days, which is irregularly spaced. A genuine year-month representation should avoid associating days with its format. Displaying the year and month components suffice to signal its monthly aggregated values instead of observed values at a particular timestamp.
+
+Extensible. Custom index classes can be supported.
 
 ## Key
 
@@ -81,16 +85,27 @@ The "key" identifies units or subjects that are observed over time in a data tab
 
 # Data pipeline
 
+This representation choice will prove suitable for almost all conceivable applications of temporal data. But the data abstraction cannot live alone with an additional toolchain in order to be able to have insight and knowledge about the data itself. A desirable toolchain glues transformation, visualisation, and modelling as a data science pipeline. Each component itself is also a self-contained pipeline that can be decomposed into many individual operations. This paper will focus on part of the general pipeline---data transformation, for example filtering, subsetting and summarising. We shall see how this data abstraction breeds a consistent data process.
+
 ## Literature review
 
-* A collection of intuitive and consistent programming interfaces empowers users to focus on the primary goal of data analysis and modelling problems, and frees users from computational implementation details.
-* [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R]
-* Unix philosophy [@unix; @unix-philosophy]: each do one simple thing, do it well, and most importantly, work well with each other.
-* "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
+There has been a long history of pipeline discussions and implementation centering around data in various aspects. The Extract, Transform, and Load (ETL) process is most commonly deployed pipeline in data science. However, building a sound data pipeline can be technically difficult, which involves many implementation decisions including interface, input/output, functionality and so on to be made.
+
+@unix coined the term "pipelines" in software development, while developing Unix at Bell Labs. In Unix-based computer operating systems, a pipeline chains a sequence of operations together on the basis of their standard streams, so that the output of each programme becomes the input to another. This shapes the Unix toolbox philosophy: "each do one simple thing, do it well, and most importantly, work well with each other" [@unix-philosophy].
 
 * Pipelines in interactive settings [@viewing-pipeline; @plumbing; @xie2014reactive]: Model-View-Controller paradigm.
 
 ## Time-based pipeline analysis
+
+* A collection of intuitive and consistent programming interfaces empowers users to focus on the primary goal of data analysis and modelling problems, and frees users from computational implementation details.
+<!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
+* "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
+
+
+* error-prone
+* The resulting code is well-structured, unambiguous, easier to read, comprehend and maintain.
+
+Individual operations can talk to each other.
 
 A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips.
 
