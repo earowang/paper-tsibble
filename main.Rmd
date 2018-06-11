@@ -14,14 +14,14 @@ author:
     othernames: Rob J
     address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia.
     email : rob.hyndman@monash.edu
-abstract: 'Temporal-context data is often rich with information and time formats, for example multiple observational units, different time lengths, heterogeneous data types, nested and crossed factors and etc. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and modelling routines. Tidy data principles are applied and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) an explicitly declared index variable representing time, (3) a "key" comprised of single or multiple variables to uniquely identify units over time, using a syntactical and user-oriented approach in which it imposes nested or crossed structures on the data. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based context. A sound pipeline practice facilitates a succinct and transparent workflow for analyzing temporal data. Applications are included to illustrate tidy temporal data structure, data pipeline ideas and usage. The architecture of tidy temporal data has been implemented in the R package **tsibble**.'
+abstract: 'Temporal-context data is often rich with information and time formats, for example multiple observational units, different time lengths, heterogeneous data types, nested and crossed factors and etc. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and forecasting routines. Tidy data principles are applied and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) an explicitly declared index variable representing time, (3) a "key" comprised of single or multiple variables to uniquely identify units over time, using a syntactical and user-oriented approach in which it imposes nested or crossed structures on the data. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based context. A sound pipeline practice facilitates a succinct and transparent workflow for analyzing temporal data. Applications are included to illustrate tidy temporal data structure, data pipeline ideas and usage. The architecture of tidy temporal data has been implemented in the R package **tsibble**.'
 keywords: "temporal context, time series, data structure, R"
 wpnumber: no/yr
 jelcodes: C10,C14,C22
 blind: false
 cover: true
 toc: false
-bibliography: references.bib
+bibliography: [references.bib, rpkgs.bib]
 biblio-style: authoryear-comp
 output:
   MonashEBSTemplates::workingpaper:
@@ -42,18 +42,21 @@ opts_chunk$set(
   fig.path = 'figure/', cache.path = 'cache/', fig.align = 'center', 
   fig.show = 'hold', cache = TRUE, external = TRUE, dev = "svglite"
 )
-# read_chunk('src/main.R')
+read_chunk('R/demo.R')
+```
+
+```{r load-pkg}
 ```
 
 # Introduction
 
 Temporal-context data consist of observational units indexed at different time points $X_{jt}$, where the $j$\textsuperscript{th} unit takes measurements of $X$ on over time $t$, for $j = 1, \dots, N_{i}$ and $1 \le t \le T$. Time primarily forms the contextual basis of temporal data, but it could arrive in many possible formats. For example, data recorded at fine time resolutions (hours, minutes, and seconds) are typically associated with different time zones and daylight savings. Temporal data often carries with rich information other than the time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors involving nested or crossed structures, linking to other data tables, and etc.
 
-In the literature, time series and panel (longitudinal) data are common terms referred to temporal-context data, depending on the research fields. Researchers who are concerned with modelling large $T$ and small $N$ would name as "time series" (serial correlation); those who are interested in modelling small $T$ and large $N$ as "panel data" (asymptotic). The data format is two-dimensional array, but different modelling focuses lend the data input to different representations. A matrix is used to represent multivariate time series where each row represents observations measured at a time point and each column represents a series ("wide" form). This matrix representation requires homogeneity (that is, all the columns must be of same type.), time indices implicitly inferred as attributes or meta-information, series of same time length, and explicit missingness. By contrast, panel data are organised in rectangular form of heterogeneous column types where multiple study subjects are stacked and repeated for its time indices in a single column ("long" form), due to commonly arisen unbalanced panels. This specification requires explicitly declared panel variable and index, which has been implemented in Stata's time series module and R package **plm**. Evidently, this data organisation appears more flexible than matrix in supporting explicit time index, multiple subjects of different time lengths, and implicit missing values. [R]
+In the literature, time series and panel (longitudinal) data are common terms referred to temporal-context data, depending on the research fields. Researchers who are concerned with modelling large $T$ and small $N$ would name as "time series" (serial correlation); those who are interested in modelling small $T$ and large $N$ as "panel data" (asymptotic). The data format is two-dimensional array, but different modelling focuses lend the data input to different representations. A matrix is used to represent multivariate time series where each row represents observations measured at a time point and each column represents a series ("wide" form). This matrix representation requires homogeneity (that is, all the columns must be of same type.), time indices implicitly inferred as attributes or meta-information, series of same time length, and explicit missingness. By contrast, panel data are organised in rectangular form of heterogeneous column types where multiple study subjects are stacked and repeated for its time indices in a single column ("long" form), due to commonly arisen unbalanced panels. This specification requires explicitly declared panel variable and index, which has been implemented in Stata's time series module and R package **plm** [@R-plm]. Evidently, this data organisation appears more flexible than matrix in supporting explicit time index, multiple subjects of different time lengths, and implicit missing values. [R]
 
-Temporal data can often be aggregated in a manner that exhibits a nested or crossed structure, also known as hierarchical or grouped time series [@fpp]. For example, in a manufacturing setting, a company can add up every store’s sales by region, by state and by country, which gives a strictly hierarchical time series; alternatively they can group the sales for each product together based on common attributes such as store, brand, price range and so forth, which leads to a non-hierarchical structure---a grouped time series. The R package **hts** is the implementation of this type of time series. But it is frustrating to create and work with such data objects due to non-extensible and non-modified. Variational data aggregation (some groups no need aggregation). [R]
+Temporal data can often be aggregated in a manner that exhibits a nested or crossed structure, also known as hierarchical or grouped time series [@fpp]. For example, in a manufacturing setting, a company can add up every store’s sales by region, by state and by country, which gives a strictly hierarchical time series; alternatively they can group the sales for each product together based on common attributes such as store, brand, price range and so forth, which leads to a non-hierarchical structure---a grouped time series. The R package **hts** [@R-hts] is the implementation of this type of time series. But it is frustrating to create and work with such data objects due to non-extensible and non-modified. Variational data aggregation (some groups no need aggregation). [R]
 
-@wickham2014tidy coined the term "tidy data" and formalized the processing from messy data to "tidy data". These principles attempt to standardize the mapping from the semantics of a dataset to its structure and facilitate data analysis in a coherent way. Based on the systematic structuring principles, a grammar of data manipulation. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R]
+@wickham2014tidy coined the term "tidy data" and formalized the processing from messy data to "tidy data". These principles attempt to standardize the mapping from the semantics of a dataset to its structure and facilitate data analysis in a coherent way. Based on the systematic structuring principles, the grammar of data manipulation, as implemented in the R package **dplyr** [@R-dplyr], abstracts an coherent and consistent set of methods to handle a wide range of data transformation tasks. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R]
 
 This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
 
@@ -63,11 +66,14 @@ The rest of the paper is structured as follows.
 
 The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout each row has the same schema and each field has a single value. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represent time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" works similarly as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. A syntax is introduced to express a key consisting of nested and crossed factors. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
 
-[A toy example is needed here and will referenced for index and key]
-
 Given the nature of temporal ordering, a temporal data set must be sorted by time index. If a key is explicitly declared, the key will be sorted first and followed by arranging time in ascending order.
 
 This high-level data abstraction is semantically structured, which shed lights on time index and what we call "key".
+
+```{r load-data}
+```
+
+(ref:tb-sub) A subset of estimates of tuberculosis burden generated by World Health Organisation in 2011 and 2012.
 
 ## Time index and interval
 
@@ -85,37 +91,38 @@ The "key" identifies units or subjects that are observed over time in a data tab
 
 # Data pipeline
 
-This representation choice will prove suitable for almost all conceivable applications of temporal data. But the data abstraction cannot live alone with an additional toolchain in order to be able to have insight and knowledge about the data itself. A desirable toolchain glues transformation, visualisation, and modelling as a data science pipeline. Each component itself is also a self-contained pipeline that can be decomposed into many individual operations. This paper will focus on part of the general pipeline---data transformation, for example filtering, subsetting and summarising. We shall see how this data abstraction breeds a consistent data process.
+This representation choice will prove suitable for almost all conceivable applications of temporal data. But the data abstraction cannot live alone with an additional toolchain in order to be able to acquire insight and knowledge about the data itself. A desirable toolchain glues transformation, visualisation, and modelling as a data science pipeline. Each component itself is also a self-contained pipeline that can be decomposed into many individual operations. This paper will focus on part of the general pipeline---data transformation, for example filtering, subsetting and summarising. We shall see how this data abstraction breeds a consistent data process.
 
 ## Literature review
 
-There has been a long history of pipeline discussions and implementation centering around data in various aspects. The Extract, Transform, and Load (ETL) process is most commonly deployed pipeline in data science. However, building a sound data pipeline can be technically difficult, which involves many implementation decisions including interface, input/output, functionality and so on to be made.
+There has been a long history of pipeline discussions and implementation centering around data in various aspects. The Extract, Transform, and Load (ETL) process is most commonly deployed pipeline in data science. However, building a sound data pipeline can be technically difficult, which involves many implementation decisions, including interface, input/output, functionality and so on, to be made.
 
-@unix coined the term "pipelines" in software development, while developing Unix at Bell Labs. In Unix-based computer operating systems, a pipeline chains a sequence of operations together on the basis of their standard streams, so that the output of each programme becomes the input to another. This shapes the Unix toolbox philosophy: "each do one simple thing, do it well, and most importantly, work well with each other" [@unix-philosophy].
+@unix coined the term "pipelines" in software development, while developing Unix at Bell Labs. In Unix-based computer operating systems, a pipeline chains together a series of operations on the basis of their standard streams, so that the output of each programme becomes the input to another. This shapes the Unix toolbox philosophy: "each do one simple thing, do it well, and most importantly, work well with each other" [@unix-philosophy].
 
-* Pipelines in interactive settings [@viewing-pipeline; @plumbing; @xie2014reactive]: Model-View-Controller paradigm.
+@viewing-pipeline proposed a viewing pipeline for data analysis in interactive statistical graphics and generalised a collection of elements required for the pipeline, which takes control of transformation from data to plot. @plumbing and @xie2014reactive implemented the data pipeline in some interactive statistical graphics software, using a reactive programming framework, in which user's interactions trigger a sequence of modules to update views accordingly.
 
-## Time-based pipeline analysis
+## Time-based pipeline analysis 
+
+Tidy data builds a concrete foundation to enable pipeline data analysis, which provides a coherent and fluent framework to work with data. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
 
 * A collection of intuitive and consistent programming interfaces empowers users to focus on the primary goal of data analysis and modelling problems, and frees users from computational implementation details.
 <!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
 * "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
 
-
 * error-prone
-* The resulting code is well-structured, unambiguous, easier to read, comprehend and maintain.
+* The resulting code is well-structured, unambiguous, easier to read, comprehend and maintain. A way of chaining together simple operations to perform complex tasks in an efficient way. 
 
 Individual operations can talk to each other.
 
 A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips.
-
-Tidy data builds a concrete foundation to enable pipeline data analysis, which provides a coherent and fluent framework to work with data. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
 
 * **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
 * **column-wise**: `mutate()`, `select()`, `summarise()`
 * **group-wise**: `index_by()`, `group_by()`
 * **time-wise**: `lead()`, `lag()`, `difference()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
+
+The index and key will automate the update.
 
 # Application: U.S.A domestic flights on-time performance (2016-2017)
 
@@ -126,3 +133,8 @@ A dataset of on-time performance of domestic flights in U.S.A from 2016 to 2017 
 A tidy representation of time series data, and data pipelines to facilitate data analysis flow have been proposed and discussed. It can be noted that tidy temporal data gains greater flexibility in keeping data richness, making data transformation and visualisation easily. A set of verbs provides a fluent and fluid pipeline to work with tidy time series data in various ways.
 
 The ground of time series modelling or forecasting is left untouched in this paper. The future plan is to bridge the gap between tidy data and model building. Currently, it is required to casting to matrix from tidy data and therefore building a model. But time series models should be directly applied to tidy data as other wrangling tools do, without such an intermediate step. In particular, a univariate time series model, like arima and exponential smoothing, can be applied to multiple time series independently. A tidy format to represent model summaries and forecasting objects will be developed and implemented in the future. Model summaries include coefficients, fitted values, and residuals; forecasting objects include future time path and distributions generating prediction intervals.
+
+```{r write-bib}
+write_bib(c("hts", "plm", "dplyr"), file = "rpkgs.bib")
+```
+
