@@ -91,7 +91,7 @@ The "key" identifies units or subjects that are observed over time in a data tab
 
 # Data pipeline
 
-This representation choice will prove suitable for almost all conceivable applications of temporal data. But the data abstraction cannot live alone with an additional toolchain in order to be able to acquire insight and knowledge about the data itself. A desirable toolchain glues transformation, visualisation, and modelling as a data science pipeline. Each component itself is also a self-contained pipeline that can be decomposed into many individual operations. This paper will focus on part of the general pipeline---data transformation, for example filtering, subsetting and summarising. We shall see how this data abstraction breeds a consistent data process.
+This representation choice will prove suitable for almost all conceivable applications of temporal data. But the data abstraction cannot live alone with an additional toolchain in order to be able to acquire insight and knowledge about the data itself. A desirable toolbox chains transformation, visualisation, and modelling as a data science pipeline. Each component itself is also a self-contained pipeline that can be decomposed into many individual operations. This paper will focus on part of the general pipeline---data transformation, for example filtering observations, selecting and summarising variables. We shall see how this data abstraction breeds a consistent data process.
 
 ## Literature review
 
@@ -99,28 +99,28 @@ There has been a long history of pipeline discussions and implementation centeri
 
 @unix coined the term "pipelines" in software development, while developing Unix at Bell Labs. In Unix-based computer operating systems, a pipeline chains together a series of operations on the basis of their standard streams, so that the output of each programme becomes the input to another. This shapes the Unix toolbox philosophy: "each do one simple thing, do it well, and most importantly, work well with each other" [@unix-philosophy].
 
-@viewing-pipeline proposed a viewing pipeline for data analysis in interactive statistical graphics and generalised a collection of elements required for the pipeline, which takes control of transformation from data to plot. @plumbing and @xie2014reactive implemented the data pipeline in some interactive statistical graphics software, using a reactive programming framework, in which user's interactions trigger a sequence of modules to update views accordingly.
+@viewing-pipeline proposed a viewing pipeline for data analysis in interactive statistical graphics and generalised a collection of elements required for the pipeline, which takes control of transformation from data to plot. @plumbing and @xie2014reactive implemented the data pipeline in interactive statistical software **plumbr** and **cranvas** respectively, using a reactive programming framework, in which user's interactions trigger a sequence of modules to update views accordingly.
 
 ## Time-based pipeline analysis 
 
-Tidy data builds a concrete foundation to enable pipeline data analysis, which provides a coherent and fluent framework to work with data. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
+What is notable about data pipeline is that it not only frees users from a tedious and error-prone analysis but also empowers them to focus on the statistical analysis tasks at hand without concerning the details of computational implementation. A fluent and coherent pipeline glues the grammar of data manipulation and tidy data as a fundamental unit of data analysis together. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
 
-* A collection of intuitive and consistent programming interfaces empowers users to focus on the primary goal of data analysis and modelling problems, and frees users from computational implementation details.
-<!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
-* "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
-
-* error-prone
-* The resulting code is well-structured, unambiguous, easier to read, comprehend and maintain. A way of chaining together simple operations to perform complex tasks in an efficient way. 
-
-Individual operations can talk to each other.
-
-A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips.
+An individual operation that performs on a specific task can be phrased as a verb. This verb is self-explanatory enough to express what the specific task is. We shall apply **dplyr** key verbs to time domain and expand its vocabulary a little more to handle time-related analysis problems.
 
 * **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
 * **column-wise**: `mutate()`, `select()`, `summarise()`
 * **group-wise**: `index_by()`, `group_by()`
 * **time-wise**: `lead()`, `lag()`, `difference()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
+
+<!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
+* "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
+
+* The resulting code is well-structured, easier to read and comprehend. A way of chaining together simple operations to perform complex tasks in an efficient way. 
+
+Individual operations can talk to each other.
+
+A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips.
 
 The index and key will automate the update.
 
