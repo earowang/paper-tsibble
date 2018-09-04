@@ -1,8 +1,6 @@
 library(tidyverse)
-library(lubridate)
-library(tsibble)
 
-tb <- read_csv("data/tb-2018-06-05.csv")
+tb <- read_csv("data-raw/tb-2018-06-05.csv")
 
 tb_small <- tb %>% 
   select(-region, -age) %>% 
@@ -14,4 +12,4 @@ tb_small <- tb %>%
   summarise(count = sum(count)) %>% 
   ungroup()
 
-write_rds(tb_small, "data/tb_small.rds")
+write_rds(tb_small, "data/tb-small.rds")
