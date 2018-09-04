@@ -40,9 +40,10 @@ library(knitr)
 opts_chunk$set(
   warning = FALSE, message = FALSE, echo = FALSE,
   fig.path = 'figure/', cache.path = 'cache/', fig.align = 'center', 
-  fig.show = 'hold', cache = TRUE, external = TRUE, dev = "svglite"
+  fig.show = 'hold', cache = TRUE, external = TRUE
 )
 read_chunk('R/demo.R')
+read_chunk('R/flights.R')
 ```
 
 ```{r load-pkg}
@@ -148,9 +149,18 @@ The index and key will automate the update.
 
 # Case studies
 
-## U.S.A domestic flights on-time performance (2016-2017)
+## On-time performance flights in U.S.A
 
-A dataset of on-time performance of domestic flights in U.S.A from 2016 to 2017 is studied and explored for illustration of tidy data and data pipeline.
+```{r load-flights-pkgs}
+```
+
+```{r load-flights}
+```
+
+```{r map-airlines}
+```
+
+A dataset of on-time performance of domestic flights in U.S.A in 2017 is studied and explored for illustration of tidy data and data pipeline.
 
 # Conclusion and future work
 

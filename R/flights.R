@@ -1,10 +1,10 @@
-## ---- load-pkgs
+## ---- load-flights-pkgs
 library(lubridate)
 library(tidyverse)
 library(tsibble)
 library(forcats)
 
-## ---- load-data
+## ---- load-flights
 flights <- read_rds("data/flights.rds")
 
 ## ---- map-airlines
@@ -35,9 +35,9 @@ ggplot() +
     fill = "white", colour = "grey60") +
   geom_segment(data = map_dat, aes(
     x = origin_lon, y = origin_lat, xend = dest_lon, yend = dest_lat
-  ), alpha = 0.2, size = 0.5, colour = "#762a83") +
+  ), alpha = 0.1, size = 0.4, colour = "#762a83") +
   geom_point(data = map_dat, aes(x = origin_lon, y = origin_lat), 
-    colour = "#f1a340", size  = 1.5) +
+    colour = "#a6dba0", size  = 0.7) +
   coord_map("albers", parameters = c(30, 45)) +
   ggthemes::theme_map()
 
