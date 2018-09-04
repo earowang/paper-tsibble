@@ -40,7 +40,8 @@ library(knitr)
 opts_chunk$set(
   warning = FALSE, message = FALSE, echo = FALSE,
   fig.path = 'figure/', cache.path = 'cache/', fig.align = 'center', 
-  fig.show = 'hold', cache = TRUE, external = TRUE
+  fig.show = 'hold', cache = TRUE, external = TRUE, dev = "pdf",
+  fig.height = 5, fig.width = 8, out.width = "\\textwidth"
 )
 read_chunk('R/demo.R')
 read_chunk('R/flights.R')

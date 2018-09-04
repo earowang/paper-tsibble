@@ -174,7 +174,7 @@ qtl_label <- c(
 hr_qtl %>% 
   filter(hour(dep_datehour) > 4) %>% 
   ggplot(aes(x = hour, y = dep_delay, group = date, colour = qtl)) +
-  geom_hline(yintercept = 0, colour = "#9ecae1", size = 2) +
+  geom_hline(yintercept = 15, colour = "#9ecae1", size = 2) +
   geom_line(alpha = 0.5) +
   facet_grid(
     qtl ~ wday, scales = "free_y", 
