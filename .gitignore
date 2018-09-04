@@ -5,3 +5,4 @@
 .DS_Store
 cache/
 data-raw/flights/
+data-raw/airports.dat
