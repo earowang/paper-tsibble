@@ -132,6 +132,7 @@ An individual operation that performs on a specific task can be phrased as a ver
 * **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
 * **column-wise**: `mutate()`, `select()`, `summarise()`
 * **group-wise**: `index_by()`, `group_by()`
+* **reshape**: `gather()`, `spread()`
 * **time-wise**: `lead()`, `lag()`, `difference()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
 
@@ -150,7 +151,7 @@ The index and key will automate the update.
 
 # Case studies
 
-## On-time performance flights in U.S.A
+## On-time performance for domestic flights in U.S.A
 
 ```{r load-flights-pkgs}
 ```
@@ -158,10 +159,22 @@ The index and key will automate the update.
 ```{r load-flights}
 ```
 
-```{r map-airlines}
+```{r map-airlines, fig.cap = "(ref:map-airlines-cap)"}
 ```
 
-A dataset of on-time performance of domestic flights in U.S.A in 2017 is studied and explored for illustration of tidy data and data pipeline.
+(ref:map-airlines-cap) An overview of US airline traffic in 2017. Points indicate locations of airports, and lines the plane movements across the country. There are a few hubs connecting most airlines and sporadic airports.
+
+The dataset of 2017 on-time performance for US domestic flights represents temporal-context data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). The data, arrived in much greater resolution, includes many aspects and measurements of every single flight at its scheduled departure time from performance metrics to flight routes. Table ?? shows the millions of observations and 22 variables ranging from numerics to characters to date-times, which are intrinsically heterogeneous. Flights have their own scheduled departure times, resulting irregular space in time. This example also characterizes itself as event data, actions and states observed at the point in time.
+
+(Need to format into a table)
+
+```{r glimpse}
+```
+
+The data easily fits into the tsibble framework without the loss of data richness. To declare it to a tsibble, the setup is to specify `sched_dep_datetime` as "index", `flight` variable as "key", and `regular = FALSE`. A rigorous check is performed for validating the distinct rows determined by key and index.
+
+```{r tsibble, echo = TRUE}
+```
 
 # Conclusion and future work
 
