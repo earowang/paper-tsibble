@@ -171,6 +171,11 @@ qtl_label <- c(
   "qtl95" = "95%" 
 )
 
+min_y <- hr_qtl %>% 
+  filter(hour(dep_datehour) > 4) %>% 
+  pull(dep_delay) %>%
+  min()
+
 hr_qtl %>% 
   filter(hour(dep_datehour) > 4) %>% 
   ggplot(aes(x = hour, y = dep_delay, group = date, colour = qtl)) +
@@ -184,7 +189,7 @@ hr_qtl %>%
   ylab("Depature delay") + 
   scale_x_continuous(limits = c(0, 23), breaks = seq(6, 23, by = 6)) +
   scale_colour_manual(values = break_cols, guide = FALSE) +
-  theme_remark()
+  expand_limits(y = min_y)
 
 ## ---- carrier
 carrier_delay <- us_flights %>% 
