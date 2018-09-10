@@ -156,7 +156,7 @@ The index and key will automate the update.
 ```{r load-flights-pkgs}
 ```
 
-```{r load-flights}
+```{r load-flights, cache.extra = tools::md5sum("data/flights.rds")}
 ```
 
 ```{r map-airlines, fig.cap = "(ref:map-airlines-cap)"}
@@ -164,33 +164,33 @@ The index and key will automate the update.
 
 (ref:map-airlines-cap) An overview of US airline traffic in 2017. Points indicate locations of airports, and lines the connecting routes across the country. There are a few hubs connecting most airlines and sporadic airports.
 
-The dataset of 2017 on-time performance for US domestic flights represents temporal-context data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). The data, arrived in much greater resolution, includes many aspects and measurements of every single flight at its scheduled departure time from performance metrics to flight routes. An overview of airports and routes is shown in Figure \@ref(fig:map-airlines). Table ?? shows the millions of observations and 22 variables ranging from numerics to characters to date-times, which are intrinsically heterogeneous. Flights have their own scheduled departure times, resulting in irregular time space. This example also characterizes itself as event data, actions and states observed at the point in time.
+The dataset of 2017 on-time performance for US domestic flights represents temporal-context data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). The data, arrived in much greater resolution, includes many aspects and measurements of every single flight at its scheduled departure time from performance metrics to flight routes. An overview of airports and routes is shown in Figure \@ref(fig:map-airlines). Table ?? shows the millions of observations and 22 variables ranging from numerics to characters to date-times, which are intrinsically heterogeneous. Flights have their own scheduled departure times in local time zone, resulting in irregular time space. This example also characterizes itself as event data, actions and states observed at the point in time.
 
 (Need to format into a table)
 
 ```{r glimpse}
 ```
 
-The data easily fits into the tsibble framework without the loss of data richness and heterogeneity. To declare it to a tsibble, the setup is to specify `sched_dep_datetime` as "index", `flight` variable as "key", and `regular = FALSE`. A rigorous check is performed for validating the distinct rows determined by key and index.
+The data easily fits into the tsibble framework without the loss of data richness and heterogeneity. To declare it as a tsibble, the setup is to specify `sched_dep_datetime` as "index", `flight` and `origin` variables as "key", and `regular = FALSE`. The observation unit is defined by a flight at its origin. A rigorous check is performed for validating the distinct rows determined by key and index.
 
 ```{r tsibble, echo = TRUE}
 ```
 
-On the basis of the tsibble, what question to be asked leads the way to composing a time-based pipeline in order for exploratory data analysis in time context. For example, one would be interested in the number of flights between origins and destinations every day, daily proportions of delayed flights by carriers, and etc. In this section, a given pipeline helps explore and demonstrate the distribution of departure delay conditional on time of day and day of week, particularly the upper tail behaviors. The accompanying code snippet is shown as follows.
+On the basis of the tsibble, what question to be asked leads its way to composing a time-based pipeline in order for exploratory data analysis in time context. For example, one would be interested in the number of flights between origins and destinations every day, daily proportions of delayed flights by carriers, and etc. In this section, what time of the day and day of the week is good for travelling in order to avoid severe delay, from passenger's point of view? A given pipeline helps explore and demonstrate the distribution of departure delay conditional on time of day and day of week, particularly the upper tail behaviors. The accompanying code snippet is shown as follows.
 
 ```{r quantile, echo = TRUE}
 ```
 
 (Need a flow chart for the code)
 
-This pipeline chains four verbs. A set of succinct verbs makes the composition self-explanatory: (1) `index_by()` + `summarise()`: compute 50%, 80% and 95% quantiles for every hour; (2) `mutate()`: add time components that are extracted from the index; (3) `gather()`: melt different quantiles into a long form. Step (2) and (3) prepare the data for visualisation later. Every verb generates the output of the same type of the input, making chaining possible. Once the initial setup is done, the program takes care of updating the index and key, and empowers users concentrate on the substance of data analysis.
+This pipeline chains four verbs. A set of succinct verbs makes the composition self-explanatory: (1) `index_by()` + `summarise()`: compute 50%, 80% and 95% quantiles for every hour; (2) `mutate()`: add time components that are extracted from the index; (3) `gather()`: melt different quantiles into a long form. Step (2) and (3) prepare the data for visualisation later. Every verb generates the output of the same type of the input, making chaining possible. Once the initial setup is done, the program takes care of updating the index and key, and empowers users concentrate on the substance of data analysis. Every one else who do not write the code would find the code fairly easy to comprehend.
 
-Figure \@ref(fig:draw-qtl) is the plot based on the transformed data.
+The data has been transformed in a way that the variables could be mapped to graphical elements. Figure \@ref(fig:draw-qtl) shows the plot of the transformed data using the grammar of graphics. It suggests to leave early in a day and fly on Tuesdays in a week to avoid severe delay.
 
 ```{r draw-qtl, fig.cap = "(ref:draw-qtl-cap)"}
 ```
 
-(ref:draw-qtl-cap) Small multiples of lines about departure delay against time of day, faceted by day of week and quantiles.
+(ref:draw-qtl-cap) Small multiples of lines about departure delay against time of day, faceted by day of week and quantiles. A blue horizontal line is drawn at 15-minute departure delay, which highlights that the departing flights who delay less than 15 minutes are considered as on time.
 
 # Conclusion and future work
 

@@ -50,8 +50,7 @@ print(flights, width = 80)
 ## ---- tsibble
 us_flights <- flights %>% 
   as_tsibble(
-    index = sched_dep_datetime,
-    key = id(flight), 
+    index = sched_dep_datetime, key = id(flight, origin), 
     regular = FALSE
   )
 

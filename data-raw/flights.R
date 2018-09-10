@@ -90,10 +90,4 @@ flights_full <- map_dfr(dir("data-raw/flights", full.names = TRUE), get_all)
 flights <- flights_full %>% 
   drop_na(air_time) # remove cancelled flights
 
-## rm duplicates due to corrupted data (my reasoning)
-dup <- flights %>% 
-  find_duplicates(key = id(flight), index = sched_dep_datetime)
-dup_df <- flights[dup, 1:2] # remove NK630 from DEN to LGA
-flights <- flights[!dup, ]
-
 write_rds(flights, path = "data/flights.rds", compress = "bz2")
