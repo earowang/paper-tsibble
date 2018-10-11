@@ -3,13 +3,13 @@ library(lubridate)
 library(tidyverse)
 library(tsibble)
 library(forcats)
+# devtools::install_github("heike/ggmapr")
+library(ggmapr)
 
 ## ---- load-flights
 flights <- read_rds("data/flights.rds")
 
-## ---- map-airlines
-# devtools::install_github("heike/ggmapr")
-library(ggmapr)
+## ---- map-prep
 origin_dest <- flights %>% 
   distinct(origin, origin_state, dest, dest_state)
 airports <- read_rds("data/airports.rds")
@@ -30,6 +30,7 @@ states <- states %>%
   scale(NAME == "Alaska", scale = 0.3, set_to = c(-117, 27)) %>%
   filter(lat > 20)
 
+## ---- map-airlines
 ggplot() +
   geom_polygon(data= states, aes(x = long, y = lat, group = group), 
     fill = "white", colour = "grey60") +
@@ -38,6 +39,27 @@ ggplot() +
   ), alpha = 0.1, size = 0.4, colour = "#762a83") +
   geom_point(data = map_dat, aes(x = origin_lon, y = origin_lat), 
     colour = "#a6dba0", size  = 0.7) +
+  coord_map("albers", parameters = c(30, 45)) +
+  ggthemes::theme_map()
+
+## ---- dl771
+dl771 <- flights %>% 
+  filter(flight_num == "DL771") %>% 
+  left_join(map_dat) %>% 
+  arrange(sched_dep_datetime)
+
+ggplot() +
+  geom_polygon(data= states, aes(x = long, y = lat, group = group), 
+    fill = "white", colour = "grey60") +
+  geom_segment(data = dl771, aes(
+    x = origin_lon, y = origin_lat, xend = dest_lon, yend = dest_lat
+  ), colour = "#762a83", size = 1, alpha = 0.6, 
+    arrow = arrow(length = unit(0.2, "inches"))
+  ) +
+  geom_point(data = dl771, aes(x = origin_lon, y = origin_lat), 
+    colour = "#f1a340", size  = 1.5) +
+  geom_point(data = dl771, aes(x = dest_lon, y = dest_lat), 
+    colour = "#f1a340", size  = 1.5) +
   coord_map("albers", parameters = c(30, 45)) +
   ggthemes::theme_map()
 
@@ -50,7 +72,7 @@ print(flights, width = 80)
 ## ---- tsibble
 us_flights <- flights %>% 
   as_tsibble(
-    index = sched_dep_datetime, key = id(flight, origin), 
+    index = sched_dep_datetime, key = id(flight_num, origin), 
     regular = FALSE, validate = FALSE
   )
 
@@ -63,7 +85,7 @@ us_flights %>%
 
 ## ---- select
 us_flights %>% 
-  select(flight, dep_delay)
+  select(flight_num, origin, dep_delay)
 
 ## ---- summarise
 us_flights %>% 

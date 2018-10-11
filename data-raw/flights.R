@@ -64,7 +64,7 @@ get_all <- function(path) {
       late_aircraft_delay = LateAircraftDelay
     ) %>%
     mutate(
-      flight = paste0(carrier, flight_num),
+      flight_num = paste0(carrier, flight_num),
       origin_city_name = gsub("^(.*?),.*", "\\1", origin_city_name),
       dest_city_name = gsub("^(.*?),.*", "\\1", dest_city_name),
       hour = sched_dep_time %/% 100,
@@ -76,11 +76,11 @@ get_all <- function(path) {
       sched_arr_datetime = make_datetime(year, month, day, hour_arr, minute_arr)
     ) %>% 
     select(
-      -year, -month, -day, -flight_num, -hour, -minute,
-      -dep_time, -sched_dep_time, -origin_state_name, -dest_state_name,
+      -year, -month, -day, -hour, -minute, -dep_time, 
+      -sched_dep_time, -origin_state_name, -dest_state_name,
       -arr_time, -sched_arr_time, -hour_arr, -minute_arr
     ) %>% 
-    select(flight, sched_dep_datetime, sched_arr_datetime, everything()) %>% 
+    select(flight_num, sched_dep_datetime, sched_arr_datetime, everything()) %>% 
     filter(!is.na(dep_delay), !(origin_state %in% c("PR", "TT", "VI")))
 }
 

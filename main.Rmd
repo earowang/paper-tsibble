@@ -159,6 +159,9 @@ The index and key will automate the update.
 ```{r load-flights, cache.extra = tools::md5sum("data/flights.rds")}
 ```
 
+```{r map-prep}
+```
+
 <!-- 
 ```{r map-airlines, fig.cap = "(ref:map-airlines-cap)"}
 ```
@@ -166,9 +169,12 @@ The index and key will automate the update.
 (ref:map-airlines-cap) An overview of US airline traffic in 2017. Points indicate locations of airports, and lines the connecting routes across the country. There are a few hubs connecting most airlines and sporadic airports.
 -->
 
-The dataset of 2017 on-time performance for US domestic flights represents temporal-context data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). The data, arrived in much greater resolution, includes many aspects and measurements of every single flight at its scheduled departure time from performance metrics to flight routes. An overview of airports and routes is shown in Figure \@ref(fig:map-airlines). Table ?? shows the millions of observations and 22 variables ranging from numerics to characters to date-times, which are intrinsically heterogeneous. Flights have their own scheduled departure times in local time zone, resulting in irregular time space. This example also characterizes itself as event data, actions and states observed at the point in time.
+The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights (or observations) associated with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a local timestamp. But every single flight is identified by its flight number and origin, from a passenger's point of view. For example, the flight number DL771 is tied to multiple origins instead a specific one, shown in Figure \@ref(fig:dl771). This dataset is intrinsically heterogeneous, encoded in numbers, strings, and date-times.
 
-(Need to format into a table)
+```{r dl771, fig.cap = "(ref:dl771-cap)"}
+```
+
+(ref:dl771-cap) Multiple flight paths of flight DL771.
 
 The data easily fits into the tsibble framework without the loss of data richness and heterogeneity. To declare it as a tsibble, the setup is to specify `sched_dep_datetime` as "index", `flight` and `origin` variables as "key", and `regular = FALSE`. The observation unit is defined by a flight at its origin. A rigorous check is performed for validating the distinct rows determined by key and index.
 
