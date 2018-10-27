@@ -76,8 +76,8 @@ us_flights <- flights %>%
     regular = FALSE, validate = FALSE
   )
 
-## ---- print-tsibble
-us_flights
+## ---- tsibble-header
+cat(format(us_flights)[1:2], sep = "\n")
 
 ## ---- filter
 us_flights %>% 

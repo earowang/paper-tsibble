@@ -41,7 +41,8 @@ opts_chunk$set(
   warning = FALSE, message = FALSE, echo = FALSE,
   fig.path = 'figure/', cache.path = 'cache/', fig.align = 'center', 
   fig.show = 'hold', cache = TRUE, external = TRUE, dev = "pdf",
-  fig.height = 5, fig.width = 8, out.width = "\\textwidth"
+  fig.height = 5, fig.width = 8, out.width = "\\textwidth",
+  comment = "#>"
 )
 read_chunk('R/demo.R')
 read_chunk('R/flights.R')
@@ -169,23 +170,30 @@ The index and key will automate the update.
 (ref:map-airlines-cap) An overview of US airline traffic in 2017. Points indicate locations of airports, and lines the connecting routes across the country. There are a few hubs connecting most airlines and sporadic airports.
 -->
 
-The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights (or observations) associated with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a local timestamp. But every single flight is identified by its flight number and origin, from a passenger's point of view. For example, the flight number DL771 is tied to multiple origins instead a specific one, shown in Figure \@ref(fig:dl771). This dataset is intrinsically heterogeneous, encoded in numbers, strings, and date-times.
+The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. But every single flight can be uniquely identified by its flight number and origin, from a passenger's point of view. For example, flight DL771 connects multiple origins and destinations rather than a specific route, shown in Figure \@ref(fig:dl771). This dataset is intrinsically heterogeneous, encoding in numbers, strings, and date-times.
 
 ```{r dl771, fig.cap = "(ref:dl771-cap)"}
 ```
 
-(ref:dl771-cap) Multiple flight paths of flight DL771.
-
-The data easily fits into the tsibble framework without the loss of data richness and heterogeneity. To declare it as a tsibble, the setup is to specify `sched_dep_datetime` as "index", `flight` and `origin` variables as "key", and `regular = FALSE`. The observation unit is defined by a flight at its origin. A rigorous check is performed for validating the distinct rows determined by key and index.
+(ref:dl771-cap) Flight DL771 operates on multiple routes between different origins and destinations. It suggests that the key required for identification consists of flight number and origin.
 
 ```{r tsibble}
 ```
 
+The tsibble framework, as expected, incorporates this type of data, without the loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as "index", columns `flight` and `origin` as "key" via `id(flight, origin)`. As a result of event data, this data is irregularly spaced, and hence switching `regular` to `FALSE` is necessary. The program internally validates if the key and index produce the distinct rows, and then sort the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, such as dimensions, irregular interval (``r tsibble::tbl_sum(us_flights)[1]``) and the number of time-based observational units (``r tsibble::tbl_sum(us_flights)[2]``).
+
+```{r tsibble-header}
+```
+
+Transforming tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can generate sound pipelines. From the perspective of a passenger, one need to travel smart, by choosing an efficient carrier to fly with and the time of day to avoid congestion, for example. We take a drill-down approach to exploring this data, starting with annual carrier performance and disaggregating to finer time resolutions.
+
 ```{r carrier-delayed}
 ```
 
-```{r carrier-mosaic}
+```{r carrier-mosaic, fig.cap = "(ref:carrier-mosaic-cap)"}
 ```
+
+(ref:carrier-mosaic-cap) Mosaic plot showing the association between the size of airline carriers and the delayed proportion of departure in 2017. Southwest Airlines is the largest operator, but does not operate as efficient as Delta. Hawaiian Airlines, also as a small operator, performs the best.
 
 ```{r nyc-flights}
 ```
@@ -201,8 +209,6 @@ The data easily fits into the tsibble framework without the loss of data richnes
 
 ```{r nyc-monthly-plot}
 ```
-
-On the basis of the tsibble, what question to be asked leads its way to composing a time-based pipeline in order for exploratory data analysis in time context. For example, one would be interested in the number of flights between origins and destinations every day, daily proportions of delayed flights by carriers, and etc. In this section, what time of the day and day of the week is good for travelling in order to avoid severe delay, from passenger's point of view? A given pipeline helps explore and demonstrate the distribution of departure delay conditional on time of day and day of week, particularly the upper tail behaviors. The accompanying code snippet is shown as follows.
 
 ```{r quantile}
 ```
