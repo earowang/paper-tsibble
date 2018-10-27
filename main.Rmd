@@ -180,12 +180,14 @@ The dataset of 2017 on-time performance for US domestic flights represents event
 ```{r tsibble}
 ```
 
-The tsibble framework, as expected, incorporates this type of data, without the loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as "index", columns `flight` and `origin` as "key" via `id(flight, origin)`. As a result of event data, this data is irregularly spaced, and hence switching `regular` to `FALSE` is necessary. The program internally validates if the key and index produce the distinct rows, and then sort the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, such as dimensions, irregular interval (``r tsibble::tbl_sum(us_flights)[1]``) and the number of time-based observational units (``r tsibble::tbl_sum(us_flights)[2]``).
+The tsibble framework, as expected, incorporates this type of data, without the loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as "index", columns `flight` and `origin` as "key" via `id(flight, origin)`. As a result of event data, this data is irregularly spaced, and hence switching to irregular option is necessary. The program internally validates if the key and index produce the distinct rows, and then sort the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, such as dimensions, irregular interval (``r tsibble::tbl_sum(us_flights)[1]``) and the number of time-based observational units (``r tsibble::tbl_sum(us_flights)[2]``).
 
 ```{r tsibble-header}
 ```
 
-Transforming tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can generate sound pipelines. From the perspective of a passenger, one need to travel smart, by choosing an efficient carrier to fly with and the time of day to avoid congestion, for example. We take a drill-down approach to exploring this data, starting with annual carrier performance and disaggregating to finer time resolutions.
+Transforming tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can generate well-constructed pipelines. From the perspective of a passenger, one need to travel smart, by choosing an efficient carrier to fly with and the time of day to avoid congestion, for example. We take a drill-down approach to exploring this data, starting with annual carrier performance and followed by disaggregating to finer time resolutions.
+
+Figure \@ref(fig:carrier-mosaic) visually presents the end product of aggregating the number of on-time and delayed flights to the year interval by carriers. This pipeline is initialized defining a new variable if the flight is delayed, and involves summarizing the tallies of on-time and delayed flights for each carrier annually. To prepare the summarized data for a mosaic plot, it is further manipulated by melting new tallies into a single column. The flow chart shown as Figure \@ref(fig:flight-pipeline1) demonstrates the operations undertaking in a data pipeline. The input to this pipeline is a tsibble of irregular interval, and the output ends with a tsibble of unknown interval. The final data is each carrier along with a single year, in which the interval cannot be determined. It also feeds into the mosaic display. Southwest Airlines, as the largest carrier, operates less efficiently compared to Delta.
 
 ```{r carrier-delayed}
 ```
@@ -193,7 +195,13 @@ Transforming tsibble for exploratory data analysis with a suite of time-specific
 ```{r carrier-mosaic, fig.cap = "(ref:carrier-mosaic-cap)"}
 ```
 
-(ref:carrier-mosaic-cap) Mosaic plot showing the association between the size of airline carriers and the delayed proportion of departure in 2017. Southwest Airlines is the largest operator, but does not operate as efficient as Delta. Hawaiian Airlines, also as a small operator, performs the best.
+(ref:carrier-mosaic-cap) Mosaic plot showing the association between the size of airline carriers and the delayed proportion of departure in 2017. Southwest Airlines is the largest operator, but does not operate as efficient as Delta. Hawaiian Airlines, also as a small operator, outperforms the rest.
+
+```{r flight-pipeline1, fig.cap = "(ref:flight-pipeline1-cap)"}
+include_graphics("img/flight-pipeline1")
+```
+
+(ref:flight-pipeline1-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:carrier-mosaic}.
 
 ```{r nyc-flights}
 ```
@@ -207,13 +215,13 @@ Transforming tsibble for exploratory data analysis with a suite of time-specific
 ```{r nyc-monthly-2}
 ```
 
-```{r nyc-monthly-plot}
+```{r nyc-monthly-plot, fig.cap = "(ref:nyc-monthly-plot-cap)"}
 ```
+
+(ref:nyc-monthly-plot-cap) Daily departure percentage at New York airports.
 
 ```{r quantile}
 ```
-
-(Need a flow chart for the code)
 
 This pipeline chains four verbs. A set of succinct verbs makes the composition self-explanatory: (1) `index_by()` + `summarise()`: compute 50%, 80% and 95% quantiles for every hour; (2) `mutate()`: add time components that are extracted from the index; (3) `gather()`: melt different quantiles into a long form. Step (2) and (3) prepare the data for visualisation later. Every verb generates the output of the same type of the input, making chaining possible. Once the initial setup is done, the program takes care of updating the index and key, and empowers users concentrate on the substance of data analysis. The one who write the code would easily reason about the code and every one else would find the code fairly easy to comprehend.
 

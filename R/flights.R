@@ -135,37 +135,6 @@ nyc_delay <- nyc_flights %>%
   ) %>% 
   mutate(pct_delay = n_delayed / n_flights)
 
-## ---- nyc-delay-plot
-nyc_delay %>% 
-  ggplot(aes(x = sched_dep_date, y = pct_delay, colour = origin)) +
-  geom_line() +
-  facet_grid(origin ~ .) +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
-  scale_colour_brewer(palette = "Dark2") +
-  xlab("Departure date") +
-  ylab("% of flight delay") +
-  theme(legend.position = "bottom")
-
-## ----- nyc-weekly-ma
-nyc_weekly <- nyc_delay %>% 
-  group_by(origin) %>% 
-  mutate(ma_delay = slide_dbl(
-    pct_delay, mean, .size = 7, .align = "center"
-  ))
-nyc_weekly %>% select(origin, ma_delay)
-  
-## ----- nyc-weekly-plot
-nyc_weekly %>% 
-  ggplot(aes(x = sched_dep_date)) +
-  geom_line(aes(y = pct_delay), colour = "grey80", size = 0.8) +
-  geom_line(aes(y = ma_delay, colour = origin), size = 1) +
-  facet_grid(origin ~ .) +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
-  scale_colour_brewer(palette = "Dark2") +
-  theme(legend.position = "bottom") +
-  xlab("Date") +
-  ylab("Departure delay")
-
 ## ----- nyc-monthly-1
 nyc_lst <- nyc_delay %>% 
   mutate(yrmth = yearmonth(sched_dep_date)) %>% 
@@ -175,9 +144,9 @@ nyc_lst <- nyc_delay %>%
 ## ---- nyc-monthly-2
 nyc_monthly <- nyc_lst %>% 
   group_by(origin) %>% 
-  mutate(monthly_ma = slide_dbl(data, #<<
-    ~ mean(.$pct_delay), .size = 2, .bind = TRUE#<<
-  )) %>% #<<
+  mutate(monthly_ma = slide_dbl(data,
+    ~ mean(.$pct_delay), .size = 2, .bind = TRUE
+  )) %>%
   unnest(key = id(origin))
 
 ## ----- nyc-monthly-plot
