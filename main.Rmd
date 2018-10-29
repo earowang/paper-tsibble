@@ -150,6 +150,8 @@ A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) v
 
 The index and key will automate the update.
 
+Every verb generates the output of the same type of the input, making chaining possible. Once the initial setup is done, the program takes care of updating the index and key, and empowers users concentrate on the substance of data analysis. The one who write the code would easily reason about the code and every one else would find the code fairly easy to comprehend.
+
 # Case studies
 
 ## On-time performance for domestic flights in U.S.A
@@ -185,9 +187,9 @@ The tsibble framework, as expected, incorporates this type of data, without the 
 ```{r tsibble-header}
 ```
 
-Transforming tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can generate well-constructed pipelines. From the perspective of a passenger, one need to travel smart, by choosing an efficient carrier to fly with and the time of day to avoid congestion, for example. We take a drill-down approach to exploring this data, starting with annual carrier performance and followed by disaggregating to finer time resolutions.
+Transforming tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can result in well-constructed pipelines. From the perspective of a passenger, one need to travel smart, by choosing an efficient carrier to fly with and the time of day to avoid congestion, for example. We take a drill-down approach to exploring this data, starting with annual carrier performance and followed by disaggregating to finer time resolutions.
 
-Figure \@ref(fig:carrier-mosaic) visually presents the end product of aggregating the number of on-time and delayed flights to the year interval by carriers. This pipeline is initialized defining a new variable if the flight is delayed, and involves summarizing the tallies of on-time and delayed flights for each carrier annually. To prepare the summarized data for a mosaic plot, it is further manipulated by melting new tallies into a single column. The flow chart shown as Figure \@ref(fig:flight-pipeline1) demonstrates the operations undertaking in a data pipeline. The input to this pipeline is a tsibble of irregular interval, and the output ends with a tsibble of unknown interval. The final data is each carrier along with a single year, in which the interval cannot be determined. It also feeds into the mosaic display. Southwest Airlines, as the largest carrier, operates less efficiently compared to Delta.
+Figure \@ref(fig:carrier-mosaic) visually presents the end product of aggregating the number of on-time and delayed flights to the year interval by carriers. This pipeline is initialized defining a new variable if the flight is delayed, and involves summarizing the tallies of on-time and delayed flights for each carrier annually. To prepare the summarized data for a mosaic plot, it is further manipulated by melting new tallies into a single column. The flow chart shown as Figure \@ref(fig:flight-pipeline1) demonstrates the operations undertaking in a data pipeline. The input to this pipeline is a tsibble of irregular interval, and the output ends up with a tsibble of unknown interval. The final data is each carrier along with a single year, in which the interval cannot be determined. It in turn feeds into the mosaic display. Note that Southwest Airlines, as the largest carrier, operates less efficiently compared to Delta, in Figure \@ref(fig:carrier-mosaic).
 
 ```{r carrier-delayed}
 ```
@@ -202,6 +204,8 @@ include_graphics("img/flight-pipeline1")
 ```
 
 (ref:flight-pipeline1-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:carrier-mosaic}.
+
+A closer examination of New York airports will give an indication about how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for EWR, JFK and LGA airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:nyc-monthly-plot). LGA fluctuates a lot compared to the other two. What superimposes on these lines is two-month moving averages so that a temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without specifying weights. The sliding of large window size smoothes out the fluctuations and gives a stable trend around 25% over the year.
 
 ```{r nyc-flights}
 ```
@@ -218,12 +222,10 @@ include_graphics("img/flight-pipeline1")
 ```{r nyc-monthly-plot, fig.cap = "(ref:nyc-monthly-plot-cap)"}
 ```
 
-(ref:nyc-monthly-plot-cap) Daily departure percentage at New York airports.
+(ref:nyc-monthly-plot-cap) Daily delayed percentages for departure with two-month moving averages overlaid at New York airports. There are many fluctuations observed at LGA airport. The estimates of temporal trend are around 25% across three airports, highlighting relatively less delay in Fall.
 
 ```{r quantile}
 ```
-
-This pipeline chains four verbs. A set of succinct verbs makes the composition self-explanatory: (1) `index_by()` + `summarise()`: compute 50%, 80% and 95% quantiles for every hour; (2) `mutate()`: add time components that are extracted from the index; (3) `gather()`: melt different quantiles into a long form. Step (2) and (3) prepare the data for visualisation later. Every verb generates the output of the same type of the input, making chaining possible. Once the initial setup is done, the program takes care of updating the index and key, and empowers users concentrate on the substance of data analysis. The one who write the code would easily reason about the code and every one else would find the code fairly easy to comprehend.
 
 The data has been transformed in a way that the variables could be mapped to graphical elements. Figure \@ref(fig:draw-qtl) shows the plot of the transformed data using the grammar of graphics. It suggests to leave early in a day and fly on Tuesdays in a week to avoid severe delay.
 
