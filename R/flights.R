@@ -9,6 +9,16 @@ library(ggmapr)
 ## ---- load-flights
 flights <- read_rds("data/flights.rds")
 
+# dup <- flights %>% 
+#   find_duplicates(key = id(flight_num), index = sched_dep_datetime)
+# dup_data <- flights[dup, ]
+#
+# flights %>% 
+#   filter(
+#     flight_num == dup_data$flight_num,
+#     sched_dep_datetime == dup_data$sched_dep_datetime
+#   ) %>% glimpse()
+
 ## ---- map-prep
 origin_dest <- flights %>% 
   distinct(origin, origin_state, dest, dest_state)
