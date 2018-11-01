@@ -9,16 +9,6 @@ library(ggmapr)
 ## ---- load-flights
 flights <- read_rds("data/flights.rds")
 
-# dup <- flights %>% 
-#   find_duplicates(key = id(flight_num), index = sched_dep_datetime)
-# dup_data <- flights[dup, ]
-#
-# flights %>% 
-#   filter(
-#     flight_num == dup_data$flight_num,
-#     sched_dep_datetime == dup_data$sched_dep_datetime
-#   ) %>% glimpse()
-
 ## ---- map-prep
 origin_dest <- flights %>% 
   distinct(origin, origin_state, dest, dest_state)
@@ -73,16 +63,25 @@ ggplot() +
   coord_map("albers", parameters = c(30, 45)) +
   ggthemes::theme_map()
 
-## ---- glimpse
-glimpse(flights)
+## ---- find-duplicate
+dup <- flights %>% 
+  find_duplicates(
+    key = id(flight_num), index = sched_dep_datetime, fromLast = TRUE
+  )
+dup_entry <- flights %>% filter(dup)
 
-## ---- print
-print(flights, width = 80)
+flights %>% 
+  filter(
+    flight_num == dup_entry$flight_num,
+    sched_dep_datetime == dup_entry$sched_dep_datetime
+  ) %>% 
+  as.data.frame()
 
 ## ---- tsibble
 us_flights <- flights %>% 
+  filter(!dup) %>% 
   as_tsibble(
-    index = sched_dep_datetime, key = id(flight_num, origin), 
+    key = id(flight_num), index = sched_dep_datetime,
     regular = FALSE, validate = FALSE
   )
 

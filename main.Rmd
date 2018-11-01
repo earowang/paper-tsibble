@@ -110,6 +110,8 @@ Extensible. Custom index classes can be supported.
 
 The "key" identifies units or subjects that are observed over time in a data table, which is typically a priori known structure by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification. The key is not constrained to a single column, but is comprised of multiple columns. When involving multiple variables, one need to distinguish nesting and crossing data variables. "Nesting" refers to a scenario where a variable is nested within another when each category of the former variable co-occurs with only one category of the latter (for example, `country` nested within `continent`); on the other hand, "crossing" means that a variable is crossed with another when every category of one variable co-occurs with every category of the other (for example, `country` crosses with `gender`). Nesting is a special case of crossing. The former exhibits a hierarchical ordering with lower-level category (children) nested within higher-level category (parent) (more categories in lower level); whereas the ordering of the latter makes no difference. Whilst constructing tidy temporal data, users also need to specify the key that identifies the structure on the data. Rather than creating a separate object that contains the data structure, like what the **hts** does, we propose a syntax-based interface to directly deal with variables, so that it takes advantage of data semantics. The expression of a vertical bar (`|`) (can be interpreted probabilistically as the conditional distribution for its parent) is used to indicate nesting variables (reflect depths), while a comma (`,`) for crossing variables. @wilkinson2006grammar discussed the distinction between nesting and crossing with respect to facets in graphics, and he used `/` and `*` instead for nested and crossed expressions. A crossing structure displays all unique and possible combinations of crossed variables, including those not found in the data, in a graphical layout. However, tidy temporal data finds only the combinations that occur in the data and intentionally respects the structure of incomplete combinations.
 
+It encourage users to look into the data as earlier as possible, examining the data quality issues.
+
 # Data pipeline {#sec:pipeline}
 
 There has been a long history of pipeline discussions and implementation centering around data in various aspects. The Extract, Transform, and Load (ETL) process is most commonly deployed pipeline in data science. However, building a sound data pipeline can be technically difficult, which involves many implementation decisions, including interface, input/output, functionality and so on, to be made.
@@ -172,17 +174,26 @@ Every verb generates the output of the same type of the input, making chaining p
 (ref:map-airlines-cap) An overview of US airline traffic in 2017. Points indicate locations of airports, and lines the connecting routes across the country. There are a few hubs connecting most airlines and sporadic airports.
 -->
 
-The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. But every single flight can be uniquely identified by its flight number and origin, from a passenger's point of view. For example, flight DL771 connects multiple origins and destinations rather than a specific route, shown in Figure \@ref(fig:dl771). This dataset is intrinsically heterogeneous, encoding in numbers, strings, and date-times.
+The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. Every single flight would be uniquely identified by the flight number and its scheduled departure time, from a passenger's point of view. In fact, it fails to pass the tsibble hurdle due to duplicates in the original data. An error is immediately raised when attempting to convert this data into a tsibble, and a closer inspection has to be carried out to locate the issue. The **tsibble** package provides the tool to easily find the duplicates in the data with `find_duplicates()`. Below shows the problematic entries.
+
+```{r find-duplicate}
+```
+
+The issue is perhaps introduced when updating or entering the data into a system. The same flight is scheduled at exactly the same time, together with the same performance statistics but different flight details, which is very unlikely. Flight NK630 is usually scheduled at 17:45 from Chicago to New York, searching into the whole records. A decision is made on removal of the first row from the duplicated entries before proceeding to the tsibble creation.
+
+<!--
 
 ```{r dl771, fig.cap = "(ref:dl771-cap)"}
 ```
 
 (ref:dl771-cap) Flight DL771 operates on multiple routes between different origins and destinations. It suggests that the key required for identification consists of flight number and origin.
 
+-->
+
 ```{r tsibble}
 ```
 
-The tsibble framework, as expected, incorporates this type of data, without the loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as "index", columns `flight` and `origin` as "key" via `id(flight, origin)`. As a result of event data, this data is irregularly spaced, and hence switching to irregular option is necessary. The program internally validates if the key and index produce the distinct rows, and then sort the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, such as dimensions, irregular interval (``r tsibble::tbl_sum(us_flights)[1]``) and the number of time-based observational units (``r tsibble::tbl_sum(us_flights)[2]``).
+This dataset is intrinsically heterogeneous, encoding in numbers, strings, and date-times. The tsibble framework, as expected, incorporates this type of data, without the loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as "index", column `flight_num` as "key" via `id(flight_num)`. As a result of event data, this data is irregularly spaced, and hence switching to irregular option is necessary. The program internally validates if the key and index produce the distinct rows, and then sort the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, such as dimensions, irregular interval (``r tsibble::tbl_sum(us_flights)[1]``) and the number of time-based observational units (``r tsibble::tbl_sum(us_flights)[2]``).
 
 ```{r tsibble-header}
 ```
@@ -204,6 +215,8 @@ include_graphics("img/flight-pipeline1")
 ```
 
 (ref:flight-pipeline1-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:carrier-mosaic}.
+
+[Change New York Airports to others to be able to see seasonal effects]
 
 A closer examination of New York airports will give an indication about how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for EWR, JFK and LGA airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:nyc-monthly-plot). LGA fluctuates a lot compared to the other two. What superimposes on these lines is two-month moving averages so that a temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without worrying weights specification. The sliding with large window size smoothes out the fluctuations and gives a stable trend around 25% over the year.
 
