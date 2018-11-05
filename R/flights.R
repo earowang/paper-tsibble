@@ -129,12 +129,12 @@ delayed_carrier %>%
     scale_y_productlist(name = "Delayed") +
     theme(legend.position = "bottom")
 
-## ---- nyc-flights
-nyc_flights <- us_flights %>% 
-  filter(origin %in% c("JFK", "LGA", "EWR"))
+## ---- sel-flights
+sel_flights <- us_flights %>% 
+  filter(origin %in% c("JFK", "SEA", "IAH", "KOA", "LAX"))
 
-## ---- nyc-delay
-nyc_delay <- nyc_flights %>% 
+## ---- sel-delay
+sel_delay <- sel_flights %>% 
   mutate(delayed = dep_delay > 15) %>% 
   group_by(origin) %>% 
   index_by(sched_dep_date = as_date(sched_dep_datetime)) %>% 
@@ -144,22 +144,22 @@ nyc_delay <- nyc_flights %>%
   ) %>% 
   mutate(pct_delay = n_delayed / n_flights)
 
-## ----- nyc-monthly-1
-nyc_lst <- nyc_delay %>% 
+## ----- sel-monthly-1
+sel_lst <- sel_delay %>% 
   mutate(yrmth = yearmonth(sched_dep_date)) %>% 
   group_by(origin, yrmth) %>% 
   nest()
 
-## ---- nyc-monthly-2
-nyc_monthly <- nyc_lst %>% 
+## ---- sel-monthly-2
+sel_monthly <- sel_lst %>% 
   group_by(origin) %>% 
   mutate(monthly_ma = slide_dbl(data,
     ~ mean(.$pct_delay), .size = 2, .bind = TRUE
   )) %>%
   unnest(key = id(origin))
 
-## ----- nyc-monthly-plot
-nyc_monthly %>% 
+## ----- sel-monthly-plot
+sel_monthly %>% 
   ggplot() +
   geom_line(aes(x = sched_dep_date, y = pct_delay), colour = "grey80", size = 0.8) +
   geom_line(aes(x = yrmth, y = monthly_ma, colour = origin), size = 1) +
