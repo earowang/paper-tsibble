@@ -55,6 +55,8 @@ read_chunk('R/flights.R')
 
 Temporal-context data, $X_{jt}$, consist of $j = 1, \dots, N_{i}$ observational units indexed at different time points, $1 \le t \le T$. Time forms the contextual basis of temporal data, but it can arrive in many possible formats, which makes preparing it for modeling and forecasting painful. For example, data can be recorded at various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information in addition to time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors involving nested or crossed structures. The data problems are grouped into two types of analysis, time series and longitudinal. 
 
+# Data structures {#sec:str}
+
 ## Time series and longitudinal data
 
 Despite of exactly the same data input, the representation of time series and longitudinal data diverges due to different modelling approaches. 
@@ -91,6 +93,8 @@ Given the nature of temporal ordering, a temporal data set must be sorted by tim
 
 This high-level data abstraction is semantically structured, which shed lights on time index and what we call "key".
 
+It encourage users to look into the data as earlier as possible, assessing the data quality issues.
+
 ```{r tb-sub}
 ```
 
@@ -104,11 +108,9 @@ Time forms an integral component and a contextual basis of temporal data. A vari
 
 ## Key {#sec:key}
 
-The "key" specification contributes to forming a tsibble alongside the index. The concept of "key" is introduced to identify units or subjects that are observed over time in a data table. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The variables remain the same as it is, without additional manipulation to create the identifiers.
+The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to identify units or subjects that are observed over time in a data table. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, remain the same as they are in the original table, with no additional manipulation.
 
-It is typically a priori known by users. The absence of key only occurs to a univariate case where the key is implicit. Multiple units must associate with an explicit "key" to allow for identification.
-
-It encourage users to look into the data as earlier as possible, assessing the data quality issues.
+Each tsibble must attach with a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
 
 ## Interval {#sec:interval}
 
