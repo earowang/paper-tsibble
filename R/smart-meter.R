@@ -2,22 +2,23 @@ library(tidyverse)
 library(lubridate)
 library(tsibble)
 
-customer <- read_rds("data/customer_newcastle.rds")
-eudm <- read_rds("data/eudm13_newcastle.rds")
+customer <- read_rds("data/customer.rds")
+elec <- read_rds("data/smart-meter13.rds")
 
-eudm_ts <- eudm %>% 
+elec_ts <- elec %>% 
   build_tsibble(
     key = id(customer_id), index = reading_datetime,
     validate = FALSE, ordered = TRUE
   )
 
-gap_df <- has_gaps(eudm_ts)
+gap_df <- has_gaps(elec_ts)
 
 gap_df %>% 
   ggplot(aes(x = factor(1), fill = .gaps)) +
-  geom_bar(position = "fill")
+  geom_bar(position = "fill") +
+  coord_flip()
 
-customer_na <- eudm_ts %>% 
+customer_na <- elec_ts %>% 
   filter(customer_id %in% (gap_df %>% filter(.gaps) %>% pull(customer_id)))
 
 count_na_df <- customer_na %>% 
@@ -37,8 +38,34 @@ count_na_df %>%
   coord_flip() +
   theme(legend.position = "bottom")
 
-eudm_full <- eudm_ts %>% 
+elec_full <- elec_ts %>% 
   fill_na()
 
-eudm_na <- eudm_full %>% 
+elec_na <- elec_full %>% 
   filter(is.na(general_supply_kwh))
+
+elec_na_mth <- elec_na %>% 
+  mutate(
+    mth = month(reading_datetime, label = TRUE),
+    is_na = 1L
+  ) %>% 
+  group_by(customer_id) %>% 
+  index_by(mth) %>% 
+  summarise(n_na = sum(is_na))
+
+elec_na_mth %>% 
+  ggplot(aes(x = mth)) +
+  geom_bar()
+
+elec_gen <- elec_full %>% 
+  left_join(
+    customer %>% select(customer_key, has_gas, has_aircon),
+    by = c("customer_id" = "customer_key")
+  )
+
+elec_gen %>% 
+  as_tibble() %>% 
+  group_by(has_gas, has_aircon) %>% 
+  summarise(avg_kwh = mean(general_supply_kwh, na.rm = TRUE))
+
+names(customer)
