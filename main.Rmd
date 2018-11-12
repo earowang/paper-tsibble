@@ -53,6 +53,10 @@ read_chunk('R/flights.R')
 
 # Introduction {#sec:intro}
 
+```{r pipeline-ann}
+include_graphics("img/time-series-structure.pdf")
+```
+
 Temporal-context data, $X_{jt}$, consist of $j = 1, \dots, N_{i}$ observational units indexed at different time points, $1 \le t \le T$. Time forms the contextual basis of temporal data, but it can arrive in many possible formats, which makes preparing it for modeling and forecasting painful. For example, data can be recorded at various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information in addition to time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors involving nested or crossed structures. The data problems are grouped into two types of analysis, time series and longitudinal. 
 
 # Data structures {#sec:str}
@@ -108,6 +112,8 @@ Time provides a contextual basis for temporal data. Time representation could ra
 
 A variable representing time is indispensable to a tsibble, referred to as "index". The "index" is an intact data column rather than an attribute, which makes time accessible to users. For example, one could easily extract time components, such as time of day and day of week, from the index to visualise seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indices. The accessibility of tsibble index motivates data analysis towards transparency and human readability. But if the "index" is employed as attributes, analysts would write these simple queries in a programmatic manner, which can be avoidable from an analytic point of view.
 
+Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
+
 ## Key {#sec:key}
 
 The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to identify units or subjects that are observed over time in a data table. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, remain the same as they are in the original table, with no additional manipulation.
@@ -118,10 +124,6 @@ Each tsibble must attach with a "key". It is normally a priori known by analysts
 
 For data indexed in regular time space, the time interval is obtained by computing the greatest common divisor based on the non-negative differences of a given time index, although the data may include implicit time gaps. This implies that all the units in the table must share a common interval. It is relatively easy to determine if the data is daily or sub-daily since most statistical packages have built-in time representations for date-times and dates, for example their corresponding classes `POSIXct` and `Date` in R. However these turn out inappropriate for weekly, monthly and quarterly data. For example, the smallest time unit of monthly data is months in a year, which is equispaced points in a year. However, using the first day of the month can range from 28 to 31 days, which is irregularly spaced. A genuine year-month representation should avoid associating days with its format. Displaying the year and month components suffice to signal its monthly aggregated values instead of observed values at a particular timestamp. This argument is also applicable to the creation of year-week and year-quarter. (coercion)
 
-Since Table \@ref(tab:tb-sub) possesses complete observations for each category, the interval obtained from the greatest common factor is 1 year.
-
-Extensible. Custom index classes can be supported.
-
 # Data pipeline {#sec:pipeline}
 
 There has been a long history of pipeline discussions and implementation centering around data in various aspects. The Extract, Transform, and Load (ETL) process is most commonly deployed pipeline in data science. However, building a sound data pipeline can be technically difficult, which involves many implementation decisions, including interface, input/output, functionality and so on, to be made.
@@ -130,23 +132,27 @@ There has been a long history of pipeline discussions and implementation centeri
 
 @viewing-pipeline proposed a viewing pipeline for data analysis in interactive statistical graphics and generalised a collection of elements required for the pipeline, which takes control of transformation from data to plot. @plumbing and @xie2014reactive implemented the data pipeline in interactive statistical software **plumbr** and **cranvas** respectively, using a reactive programming framework, in which user's interactions trigger a sequence of modules to update views accordingly.
 
-What is notable about data pipeline is that it not only frees users from a tedious and error-prone analysis but also empowers a wider audience to focus on the statistical analysis tasks at hand without concerning the details of computational implementation. A fluent and coherent pipeline glues the grammar of data manipulation and tidy data as a fundamental unit of data analysis together. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
+The tidy data abstraction lays the foundation for data science modules including transformation, visualisation and modelling. Each module frictionlessly communicates between each other. Because a desirable toolbox acquires tidy input, produces tidy output, and consequently chains a series of operations together to accomplish analytic tasks at hand.
+
+What is notable about data pipeline is that it not only frees users from a tedious and error-prone analysis but also empowers a wider audience to focus on the statistical analysis tasks at hand without concerning the details of computational implementation. A fluent and fluid pipeline glues tidy data and the grammar of data manipulation together. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes as many as possible.
 
 ## Time-based pipeline
 
-This "tidy" data representation choice will prove suitable for almost all conceivable applications of temporal data. But the data abstraction cannot live alone with an additional toolchain in order to be able to acquire insight and knowledge about the data itself. A desirable toolbox chains transformation, visualisation, and modelling as a data science pipeline. Each component itself is also a self-contained pipeline that can be decomposed into many individual operations. This paper will focus on part of the general pipeline---data transformation, for example filtering observations, selecting, and summarising variables, by contrast to data cleaning. We shall see how this data abstraction breeds a consistent data process.
+This tidy data representation choice will prove suitable for almost all conceivable applications of temporal data. Time-based pipeline starts with raw data. It is advised to scrutinize identical entries of key and index in the right beginning. Duplicates signal the data quality issue, which would likely affect the following analyses and hence decision making. Analysts are encouraged to gaze at data as early as possible and reason about the process of data cleaning. When the data meets the tsibble standard, it flows into the exploration stage.
 
-All the individual operations strive to keep the time context so that they will implicitly preserve the index variable.
+Time series models typically assume that the input is a complete and regularly-spaced series, which most temporal data can barely satisfy. Temporal data becomes more granular in time resolution and more disaggregated to individual level. This inevitably goes with implicit missing values and noisiness. Data needs transformation to some extent for modelling. A suite of verbs are introduced to flatten the lumpy path from temporal data to the object that directs to modelling under the umbrella of tsibble structure.
+
+All the individual operations strive to keep the time context so that they will implicitly preserve the index variable, and maintain a valid tsibble all the time.
 
 ## Modularity and clarity
 
 An individual operation that performs on a specific task can be phrased as a verb. This verb is self-explanatory enough to express what it is supposed to do or fail. We shall adapt **dplyr** key verbs to time domain and expand its vocabulary a little more to handle time-related analysis problems.
 
-* **row-wise**: `filter()`, `slice()`, `arrange()`, `fill_na()`
+* **implicit missingness**: `has_gaps()`, `count_gaps()`, `fill_na()`
+* **row-wise**: `filter()`, `slice()`, `arrange()`
 * **column-wise**: `mutate()`, `select()`, `summarise()`
 * **group-wise**: `index_by()`, `group_by()`
-* **reshape**: `gather()`, `spread()`
-* **time-wise**: `lead()`, `lag()`, `difference()`
+* **reshape**: `gather()`, `spread()`, `nest()`, `unnest()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
 
 ## Composition and transparency
