@@ -26,7 +26,7 @@ count_na_df <- customer_na %>%
 
 count_na_10 <- count_na_df %>% 
   count(customer_id) %>% 
-  top_n(10) %>% 
+  top_n(100) %>% 
   pull(customer_id)
 
 count_na_df %>% 
@@ -38,10 +38,10 @@ count_na_df %>%
   coord_flip() +
   theme(legend.position = "bottom")
 
-elec_full <- elec_ts %>% 
+elec_ts <- elec_ts %>% 
   fill_na()
 
-elec_na <- elec_full %>% 
+elec_na <- elec_ts %>% 
   filter(is.na(general_supply_kwh))
 
 elec_na_mth <- elec_na %>% 
@@ -57,15 +57,65 @@ elec_na_mth %>%
   ggplot(aes(x = mth)) +
   geom_bar()
 
-elec_gen <- elec_full %>% 
-  left_join(
-    customer %>% select(customer_key, has_gas, has_aircon),
+elec_ts <- elec_ts %>% 
+  mutate(season = if_else(
+    reading_datetime < make_datetime(2013, 4) |
+    reading_datetime >= make_datetime(2013, 10),
+    "Autumn-Winter", "Spring-Summer"
+  ))
+
+qtl_grid <- seq(0.1, 0.9, 0.01)
+gas_aircon <- elec_ts %>% 
+  inner_join(
+    customer %>% 
+      select(customer_key, has_gas, has_aircon) %>% 
+      drop_na(has_gas, has_aircon),
     by = c("customer_id" = "customer_key")
-  )
+  ) %>% 
+  index_by(hms = hms::as.hms(reading_datetime)) %>% 
+  group_by(season, has_gas, has_aircon) %>% 
+  summarise(
+    value = list(quantile(general_supply_kwh, qtl_grid, na.rm = TRUE)),
+    qtl = list(qtl_grid)
+  ) %>% 
+  unnest(key = id(qtl))
 
-elec_gen %>% 
-  as_tibble() %>% 
+gas_aircon %>% 
+  ggplot(aes(x = hms, y = value, colour = qtl, group = qtl)) +
+  geom_line() +
+  facet_grid(has_aircon ~ has_gas + season, labeller = "label_both") +
+  scale_colour_viridis_c()
+
+gas_aircon_avg <- elec_ts %>% 
+  inner_join(
+    customer %>% 
+      select(customer_key, has_gas, has_aircon) %>% 
+      drop_na(has_gas, has_aircon),
+    by = c("customer_id" = "customer_key")
+  ) %>% 
   group_by(has_gas, has_aircon) %>% 
-  summarise(avg_kwh = mean(general_supply_kwh, na.rm = TRUE))
+  summarise(avg_kwh = mean(general_supply_kwh, na.rm = TRUE)) %>% 
+  ungroup()
 
+gas_aircon_avg %>% 
+  ggplot(aes(x = reading_datetime, y = avg_kwh, colour = has_gas)) +
+  geom_point(size = 0.1) +
+  facet_grid(has_aircon ~ has_gas, labeller = "label_both")
+
+gas_aircon_avg %>% 
+  ggplot(aes(x = reading_datetime, y = avg_kwh, colour = season)) +
+  geom_point(size = 0.1) +
+  facet_grid(has_aircon ~ has_gas, labeller = "label_both")
+
+gas_aircon_avg %>% 
+  ggplot(aes(x = season, y = avg_kwh, colour = has_gas)) +
+  geom_boxplot() +
+  facet_grid(has_aircon ~ ., labeller = "label_both") +
+  scale_y_log10()
+
+gas_aircon_avg %>% 
+  ggplot(aes(x = season, y = avg_kwh, colour = has_aircon)) +
+  geom_boxplot() +
+  facet_grid(has_gas ~ ., labeller = "label_both") +
+  scale_y_log10()
 names(customer)

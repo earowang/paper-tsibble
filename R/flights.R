@@ -66,7 +66,7 @@ ggplot() +
 ## ---- find-duplicate
 dup <- flights %>% 
   find_duplicates(
-    key = id(flight_num), index = sched_dep_datetime, fromLast = TRUE
+    key = id(flight_num), index = sched_dep_datetime, from_last = TRUE
   )
 dup_entry <- flights %>% filter(dup)
 
