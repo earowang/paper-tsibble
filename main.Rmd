@@ -53,11 +53,13 @@ read_chunk('R/flights.R')
 
 # Introduction {#sec:intro}
 
+Temporal-context data, $X_{jt}$, consist of $j = 1, \dots, N_{i}$ observational units indexed at different time points, $1 \le t \le T$. Time forms the contextual basis of temporal data, but it can arrive in many possible formats, which makes preparing it for modeling and forecasting painful. For example, data can be recorded at various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information in addition to time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors involving nested or crossed structures. The data problems are grouped into two types of analysis, time series and longitudinal. 
+
 ```{r pipeline-ann}
 include_graphics("img/time-series-structure.pdf")
 ```
 
-Temporal-context data, $X_{jt}$, consist of $j = 1, \dots, N_{i}$ observational units indexed at different time points, $1 \le t \le T$. Time forms the contextual basis of temporal data, but it can arrive in many possible formats, which makes preparing it for modeling and forecasting painful. For example, data can be recorded at various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information in addition to time: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors involving nested or crossed structures. The data problems are grouped into two types of analysis, time series and longitudinal. 
+The rest of the paper is structured as follows.
 
 # Data structures {#sec:str}
 
@@ -84,8 +86,6 @@ The R package **hts** [@R-hts] is the implementation of structured collections o
 @wickham2014tidy coined the term "tidy data", which is a rephrasing of the second and third normal forms in relational databases but in a way that makes more sense to data scientists. A suite of paired verbs such as `gather` and `spread` [@R-tidyr] were used to describe the reshape processing from messy data to tidy data. Tidy data, which standardized the mapping from the semantics of a dataset to its physical representation, serves remarkably as a fundamental unit of data analysis. R package **ggplot2** [@wickham2009ggplot2] pioneered developing the grammar of graphics based on tidy data, thus making it possible mapping from data space to visual elements. **dplyr** [@R-dplyr] generalised a coherent and consistent set of verbs to handle a wide range of data transformation tasks. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R]
 
 This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
-
-The rest of the paper is structured as follows.
 
 # Data semantics {#sec:semantics}
 
@@ -138,13 +138,13 @@ What is notable about data pipeline is that it not only frees users from a tedio
 
 ## Time-based pipeline
 
-This tidy data representation choice will prove suitable for almost all conceivable applications of temporal data. Time-based pipeline starts with raw data. It is advised to scrutinize identical entries of key and index in the right beginning. Duplicates signal the data quality issue, which would likely affect the following analyses and hence decision making. Analysts are encouraged to gaze at data as earlier as possible and reason about the process of data cleaning. When the data meets the tsibble standard, it flows into the exploration stage.
+This tidy data representation choice will prove suitable for almost all conceivable applications of temporal data. Time-based pipeline starts with raw data however it lands. It is advised to scrutinize identical entries of key and index in the right beginning. Duplicates signal the data quality issue, which would likely affect the following analyses and hence decision making. Analysts are encouraged to gaze at data as earlier as possible and reason about the process of data cleaning. When the data meets the tsibble standard, it flows into the exploration stage.
 
 Time series models typically assume that the input is a complete and regularly-spaced series, which most temporal data can barely satisfy. Temporal data becomes more granular in time resolution and more disaggregated to individual level. This inevitably goes with implicit missing values and noisiness. Data needs transformation to some extent for modelling. A suite of verbs are introduced to flatten the lumpy path from temporal data to the object that directs to modelling under the tsibble framework, as well as to facilitate transforming tsibble in various kinds of shapes for analysis and visualization. The principle that underpins every single verb is a tsibble in and a tsibble out, thereby striving to retain a valid tsibble by automating index and key updates under the hood. If a tsibble cannot hold, for example swiping index off, an error prompts users to complain and suggest alternatives. This warrants users least surprise and reminds them of time awareness.
 
-## Modularity and clarity
+## Clarity and transparency
 
-An individual operation that performs on a specific task can be phrased as a verb. This verb is self-explanatory enough to express what it is supposed to do or fail. We shall adapt **dplyr** key verbs to time domain and expand its vocabulary a little more to handle time-related analysis problems.
+Transformation assembles a set of modules. A unit that makes up a module is function or preferably "verb". A tsibble is an object, considered as a conceptualized and materialized noun, an action performed on the object can be phrased as a verb. Naming verbs is difficult. This verb is self-explanatory enough to express what it is supposed to do or fail. We shall adapt **dplyr** key verbs to time domain and expand its vocabulary a little more to handle time-related analysis problems.
 
 * **implicit missingness**: `has_gaps()`, `count_gaps()`, `fill_na()`
 * **row-wise**: `filter()`, `slice()`, `arrange()`
@@ -153,7 +153,7 @@ An individual operation that performs on a specific task can be phrased as a ver
 * **reshape**: `gather()`, `spread()`, `nest()`, `unnest()`
 * **rolling window**: `slide()`, `tile()`, `stretch()`
 
-## Composition and transparency
+## Composition and modularity
 
 <!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
 * "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
