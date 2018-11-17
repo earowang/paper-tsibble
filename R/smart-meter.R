@@ -13,16 +13,15 @@ elec_ts <- elec %>%
 
 gap_df <- has_gaps(elec_ts)
 
-gap_df %>% 
-  ggplot(aes(x = factor(1), fill = .gaps)) +
-  geom_bar(position = "fill") +
-  coord_flip()
+# ToDo: use tables to present implicit missingness proportions
 
 customer_na <- elec_ts %>% 
   filter(customer_id %in% (gap_df %>% filter(.gaps) %>% pull(customer_id)))
 
 count_na_df <- customer_na %>% 
   count_gaps()
+
+# ToDo: do a hierarchical clustering for classifying customers
 
 count_na_10 <- count_na_df %>% 
   count(customer_id) %>% 
@@ -59,8 +58,7 @@ elec_na_mth %>%
 
 elec_ts <- elec_ts %>% 
   mutate(season = if_else(
-    reading_datetime < make_datetime(2013, 4) |
-    reading_datetime >= make_datetime(2013, 10),
+    time_in(reading_datetime, ~ "2013-03", "2013-10" ~ .),
     "Autumn-Winter", "Spring-Summer"
   ))
 
