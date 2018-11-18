@@ -1,5 +1,5 @@
 ---
-title: "Tidy data structure to support exploration and modeling of temporal-context data"
+title: "Tidy data structure to support exploration and modeling of temporal data"
 author:
   - familyname: Wang
     othernames: Earo
@@ -14,7 +14,7 @@ author:
     othernames: Rob J
     address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia.
     email : rob.hyndman@monash.edu
-abstract: 'Mining temporal-context data for information is often inhibited by a multitude of time formats: irregular or multiple time intervals, multiple observational units or repeated measurements on multiple individuals, heterogeneous data types. Time series models, in particular, the software supporting time series forecasting makes strict assumptions on data to be provided, typically a matrix of numeric data with an implicit time index. Going from raw data to model-ready data is painful. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and forecasting routines. Tidy data principles are applied, and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) including an explicitly declared index variable representing time, (3) incorporating a "key" comprised of single or multiple variables to uniquely identify units over time. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based context. A sound data pipeline facilitates a fluent and transparent workflow for analyzing temporal data. Applications are included to illustrate tidy temporal data structure, data pipeline structure and usage. The infrastructure of tidy temporal data has been implemented in the R package **tsibble**.'
+abstract: 'Mining temporal data for information is often inhibited by a multitude of time formats: irregular or multiple time intervals, multiple observational units or repeated measurements on multiple individuals, heterogeneous data types. Time series models, in particular, the software supporting time series forecasting makes strict assumptions on data to be provided, typically a matrix of numeric data with an implicit time index. Going from raw data to model-ready data is painful. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization and forecasting routines. Tidy data principles are applied, and extended to temporal data: (1) mapping the semantics of a dataset into its physical layout, (2) including an explicitly declared index variable representing time, (3) incorporating a "key" comprised of single or multiple variables to uniquely identify units over time. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based context. A sound data pipeline facilitates a fluent and transparent workflow for analyzing temporal data. Applications are included to illustrate tidy temporal data structure, data pipeline structure and usage. The infrastructure of tidy temporal data has been implemented in the R package **tsibble**.'
 keywords: "temporal data, time series, data structures, data wrangling, tidy data, R, forecasting, data science, exploratory data analysis"
 wpnumber: no/yr
 jelcodes: C10,C14,C22
@@ -138,35 +138,26 @@ What is notable about data pipeline is that it not only frees users from a tedio
 
 ## Time-based pipeline
 
-This tidy data representation choice will prove suitable for almost all conceivable applications of temporal data. Time-based pipeline starts with raw data however it arrives. It is advised to scrutinize identical entries of key and index in the right beginning. Duplicates signal the data quality issue, which would likely affect the following analyses and hence decision making. Analysts are encouraged to gaze at data as earlier as possible and reason about the process of data cleaning. When the data meets the tsibble standard, it flows into the exploration stage.
+This tidy data representation choice will prove suitable for almost all conceivable applications of temporal data. Time-based pipeline starts with raw data however it arrives. It is advised to scrutinize identical entries of key and index in the right beginning. Duplicates signal the data quality issue, which would likely affect succeeding analyses and hence decision making. Analysts are encouraged to gaze at data as earlier as possible and reason about the process of data cleaning. When the data meets the tsibble standard, it flows into the exploration stage.
 
-Time series models typically assume that the input is a complete and regularly-spaced series, which most temporal data can barely satisfy. Temporal data becomes more granular in time resolution and more disaggregated to individual level. This inevitably goes with implicit missing values and noisiness. Data needs transformation to some extent for modelling. A suite of verbs are introduced to flatten the lumpy path from temporal data to the object that directs to modelling under the tsibble framework, as well as to facilitate transforming tsibble in various kinds of shapes for analysis and visualization. The principle that underpins every single verb is a tsibble in and a tsibble out, thereby striving to retain a valid tsibble by automating index and key updates under the hood. If a tsibble cannot hold, for example swiping index off, an error prompts users to complain and suggest alternatives. This warrants users least surprise and reminds them of time awareness.
+Time series models typically assume that the input is a complete and regularly-spaced series, which most temporal data can barely satisfy. Temporal data becomes more granular in time resolution and more disaggregated to individual level. This inevitably goes with implicit missing values and noisiness. Data needs transformation to some extent for modelling. A suite of verbs are introduced to flatten the lumpy path from temporal data to the object that directs to modelling under the tsibble framework, as well as to facilitate transforming tsibble in various kinds of shapes for analysis and visualization. The principle that underpins most verbs is a tsibble in and a tsibble out, thereby striving to retain a valid tsibble by automating index and key updates under the hood. If a tsibble cannot hold, for example swiping index off, an error prompts users to complain and suggest alternatives. This warrants users least surprise and reminds them of time awareness.
 
-Transformation assembles a set of modules. A unit that makes up a module is function or preferably "verb". A tsibble is an object, conceptually considered as a noun, and hence an action performed on the object can be phrased as a verb. Each verb focuses on one thing and achieve its goal. The verb should be self-explanatory to advise what it is supposed to do or fail, for example `filter()` picks observations, and `select()` picks variables. These general-purpose verbs are made available in the **tidyvere** suite. When manipulating in temporal context, these verbs are adapted to time domain. A perceivable difference is summarizing variables between data frame and tsibble. The former will reduce to a single summary, whereas the latter will retain the index and their corresponding summaries. New tsibble-specific verbs are proposed to expand the vocabulary in order to facilitate temporal data analysis.
+Transformation assembles a set of modules. A unit that makes up a module is function or preferably "verb". A tsibble is an object, conceptually considered as a noun, and hence an action performed on the object can be phrased as a verb. Each verb focuses on one thing and achieve its goal. The verb should be self-explanatory to advise what it is supposed to do or fail, for example `filter()` picking observations, and `select()` picking variables. These general-purpose verbs are made available in the **tidyverse** suite. When manipulating in temporal context, these verbs are adapted to time domain. A perceivable difference is summarizing variables between data frame and tsibble. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. New tsibble-specific verbs are proposed to expand the **tidyverse** vocabulary. We believe that users, who are already familiar with **tidyverse**, will experience a gentle learning curve for mastering tsibble verbs and glide into temporal data analysis with low cognitive load.
 
 A table to list the verbs and what they do.
 
-* **implicit missingness**: `has_gaps()`, `count_gaps()`, `fill_na()`
+* **implicit missingness**: `has_gaps()`, `count_gaps()`, `fill_gaps()`
 * **row-wise**: `filter()`, `slice()`, `arrange()`
 * **column-wise**: `mutate()`, `select()`, `summarize()`
 * **group-wise**: `index_by()`, `group_by()`
 * **reshape**: `gather()`, `spread()`, `nest()`, `unnest()`
 
-* Clarity and transparency
-* Composition and modularity
-
 <!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
-* "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system" [@eopl]
+@eopl assert "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." Each verb works with other transformation family members in harmony. The chaining of manipulation verbs prepares tsibble for visualization and modeling in numerous ways. Most importantly, the ecosystem for tidy time series analysis has been undertaking on the basis of tsibble in R, know as "tidyverts".
 
-* The resulting code is well-structured, easier to read and comprehend. A way of chaining together simple operations to perform complex tasks in an efficient way. 
+As a special case of tabular data, a tsibble pipes into the grammar of graphics straight way, making most use of existing graphical toolkits. Specialist plotting.
 
-Individual operations can talk to each other.
-
-A pipeline exhibits a hierarchy of data operations: (1) atomic (1-dimensional) vectors (`mean(variable)`) --> (2) (2-dimensional) data table (`summarise()`) --> repeat step (1) and (2) to form a chain. Reversely, a data pipeline is decomposed into rectangular blocks, and then into atomic strips.
-
-The index and key will automate the update.
-
-Every verb generates the output of the same type of the input, making chaining possible. Once the initial setup is done, the program takes care of updating the index and key, and empowers users concentrate on the substance of data analysis. The one who write the code would easily reason about the code and every one else would find the code fairly easy to comprehend.
+Tidy forecasting
 
 ## Rolling window in functional programming
 
