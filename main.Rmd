@@ -152,12 +152,11 @@ A table to list the verbs and what they do.
 * **group-wise**: `index_by()`, `group_by()`
 * **reshape**: `gather()`, `spread()`, `nest()`, `unnest()`
 
-<!-- * [@Unwin99guiand] since programming interfaces are precise and repeatable, they are preferable when we can describe exactly what we want, but a GUI is better when: “Searching for information and interesting structures without fully specified questions.” [R] -->
-@eopl assert "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." Each verb works with other transformation family members in harmony. The chaining of manipulation verbs prepares tsibble for visualization and modeling in numerous ways. Most importantly, the ecosystem for tidy time series analysis has been undertaking on the basis of tsibble in R, know as "tidyverts".
+@eopl asserted "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." Each verb works with other transformation family members in harmony. This set of verbs can result in many combinations to prepare tsibble for a broad range of visualization and modeling problems. Most importantly, the ecosystem for tidy time series analysis has been undertaking on the basis of tsibble in R, known as "tidyverts".
 
-As a special case of tabular data, a tsibble pipes into the grammar of graphics straight way, making most use of existing graphical toolkits. Specialist plotting.
+As a special case of data frame, a tsibble pipes into the grammar of graphics straight way, making most use of this powerful graphical system. It should be easy to create and extend some specialist plotting methods based on tsibble structure, such as autocorrelation plots [@tsibblestats] and calendar-based graphics [@sugrrants].
 
-Tidy forecasting
+Modeling is crucial to explanatory and predictive analytics, but often imposes stricter assumptions on tsibble data. The verbs listed in Table \ref{tab:??} ease the transition to a tsibble that suits modeling. A tidy forecasting framework built on top of tsibble is under development, which aims at promoting transparent forecasting practices and concise model representation. A tsibble usually contains multiple time series. Batch forecasting will be enabled if a univariate model, such as ARIMA and Exponential Smoothing, is applied to each time series independently. This yields a "mable" (short for model table), where each model only associates with each "key" value in tsibble to avoid expensive data copying and reduce model storage. It also underlines the advantage of tsibble's "key" in linking between data input and models.
 
 ## Rolling window in functional programming
 
