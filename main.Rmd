@@ -87,7 +87,7 @@ The R package **hts** [@R-hts] is the implementation of structured collections o
 
 This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
 
-# Data semantics {#sec:semantics}
+# Contextual semantics {#sec:semantics}
 
 The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout each row has the same schema and each field has a single value. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represents time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" serves a similar purpose as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
 
@@ -116,9 +116,11 @@ Additional representations are provided, like year-month, year-quarter. Extensib
 
 ## Key {#sec:key}
 
-The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to identify units or subjects that are observed over time in a data table. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, remain the same as they are in the original table, with no additional manipulation.
+The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to identify units or subjects that are observed over time in a data table. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, stay the same as they are in the original table, with no further tweaks.
 
-Each tsibble must attach with a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
+Each tsibble must hold a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key, similar to a panel variable for longitudinal data. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
+
+Not only pinpoints a "key" observational units in the tsibble but also provides a solution to seamlessly link between the data, models, and forecasts. This neatly separates the data from models and forecasts, leaving more room for compulsory model components, such as coefficients, fitted values and residuals. More details are given in the following section.
 
 ## Interval {#sec:interval}
 
@@ -160,13 +162,17 @@ A table to list the verbs and what they do.
 
 As a special case of data frame, a tsibble pipes into the grammar of graphics straight way, making most use of this powerful graphical system. It should be easy to create and extend some specialist plotting methods based on tsibble structure, such as autocorrelation plots [@tsibblestats] and calendar-based graphics [@sugrrants].
 
-Modeling is crucial to explanatory and predictive analytics, but often imposes stricter assumptions on tsibble data. The verbs listed in Table \ref{tab:??} ease the transition to a tsibble that suits modeling. A tidy forecasting framework built on top of tsibble is under development, which aims at promoting transparent forecasting practices and concise model representation. A tsibble usually contains multiple time series. Batch forecasting will be enabled if a univariate model, such as ARIMA and Exponential Smoothing, is applied to each time series independently. This yields a "mable" (short for model table), where each model only tags to each "key" value in tsibble to avoid expensive data copying and reduce model storage. The mable is further supplied to forecasting methods, to produce a tsibble in which each "key" along with its future time holds predictions. It also underlines the advantage of tsibble's "key" in linking between data inputs, models and forecasts. The modeling module will be fulfilled and integrated eventually.
+Modeling is crucial to explanatory and predictive analytics, but often imposes stricter assumptions on tsibble data. The verbs listed in Table \ref{tab:??} ease the transition to a tsibble that suits modeling. A tidy forecasting framework built on top of tsibble is under development, which aims at promoting transparent forecasting practices and concise model representation. A tsibble usually contains multiple time series. Batch forecasting will be enabled if a univariate model, such as ARIMA and Exponential Smoothing, is applied to each time series independently. This yields a "mable" (short for model table), where each model only tags to each "key" value in tsibble to avoid expensive data copying and reduce model storage. The mable is further supplied to forecasting methods, to produce a tsibble in which each "key" along with its future time holds predictions. It also underlines the advantage of tsibble's "key" in linking between data inputs, models and forecasts. Advanced forecasting techniques, such as vector autocorrelation, hierarchical reconciliation, and ensembles, can be developed in alike spirit. The modeling module will be fulfilled and integrated eventually.
 
 We go through the whole exploration circle, and keep iterating and refining until data insights gained. The tsibble data structure substantially lubricates between these modules for time-based pipelines. The cohesive and coherent framework results in cleaner, clearer and more expressive code.
 
 ## Rolling window in functional programming
 
 * **rolling window**: `slide()`, `tile()`, `stretch()`
+
+# Software structure
+
+* Extensibility
 
 # Case studies
 

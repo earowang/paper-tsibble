@@ -14,7 +14,6 @@ elec_ts <- elec %>%
 gap_df <- has_gaps(elec_ts)
 
 # ToDo: use tables to present implicit missingness proportions
-
 customer_na <- elec_ts %>% 
   filter(customer_id %in% (gap_df %>% filter(.gaps) %>% pull(customer_id)))
 
@@ -22,7 +21,6 @@ count_na_df <- customer_na %>%
   count_gaps()
 
 # ToDo: do a hierarchical clustering for classifying customers
-
 count_na_10 <- count_na_df %>% 
   count(customer_id) %>% 
   top_n(100) %>% 
@@ -37,8 +35,27 @@ count_na_df %>%
   coord_flip() +
   theme(legend.position = "bottom")
 
+qtl_grid <- seq(0.1, 0.9, 0.01)
+elec_qtl <- elec_ts %>% 
+  summarise(
+    value = list(quantile(general_supply_kwh, qtl_grid, na.rm = TRUE)),
+    qtl = list(qtl_grid)
+  ) %>% 
+  unnest(key = id(qtl)) %>% 
+  mutate(
+    time = hms::as.hms(reading_datetime),
+    date = as_date(reading_datetime)
+  )
+
+elec_qtl %>% 
+  ggplot(aes(x = time, y = value, colour = qtl, group = qtl)) +
+  geom_line() +
+  sugrrants::facet_calendar(~ date, ncol = 3) +
+  scale_colour_viridis_c()
+
+# make complete series
 elec_ts <- elec_ts %>% 
-  fill_na()
+  fill_gaps()
 
 elec_na <- elec_ts %>% 
   filter(is.na(general_supply_kwh))

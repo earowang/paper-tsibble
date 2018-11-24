@@ -64,22 +64,15 @@ ggplot() +
   ggthemes::theme_map()
 
 ## ---- find-duplicate
-dup <- flights %>% 
-  find_duplicates(
-    key = id(flight_num), index = sched_dep_datetime, from_last = TRUE
-  )
-dup_entry <- flights %>% filter(dup)
-
 flights %>% 
-  filter(
-    flight_num == dup_entry$flight_num,
-    sched_dep_datetime == dup_entry$sched_dep_datetime
-  ) %>% 
+  duplicates(key = id(flight_num), index = sched_dep_datetime) %>% 
   as.data.frame()
+dup_lgl <- are_duplicated(flights, key = id(flight_num), 
+  index = sched_dep_datetime, from_last = TRUE)
 
 ## ---- tsibble
 us_flights <- flights %>% 
-  filter(!dup) %>% 
+  filter(!dup_lgl) %>% 
   as_tsibble(
     key = id(flight_num), index = sched_dep_datetime,
     regular = FALSE, validate = FALSE
