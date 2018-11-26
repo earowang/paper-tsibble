@@ -110,11 +110,9 @@ It encourage users to look into the data as earlier as possible, assessing the d
 
 Time provides a contextual basis for temporal data. Time representation could range from date-times (such as `POSIXct` and `Date` in R) to years, to sequential numbers for simulated data for example.
 
-A variable representing time is indispensable to a tsibble, referred to as "index". The "index" is an intact data column rather than an attribute, which makes time accessible to users. For example, one could easily extract time components, such as time of day and day of week, from the index to visualise seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indices. The accessibility of tsibble index motivates data analysis towards transparency and human readability. But if the "index" is employed as attributes, analysts would write these simple queries in a programmatic manner, which can be avoidable from an analytic point of view.
+A variable representing time is indispensable to a tsibble, referred to as "index". The "index" is an intact data column rather than an attribute, which makes time accessible to users. It is highly advantageous when manipulating time. For example, one could easily extract time components, such as time of day and day of week, from the index to visualize seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indices. The accessibility of tsibble index motivates data analysis towards transparency and human readability. But if the "index" is employed as attributes, analysts would write these simple queries in a programmatic manner, which can be avoidable from an analytic point of view.
 
-How to handle time zone. Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
-
-It is relatively easy to determine if the data is daily or sub-daily since most statistical packages have built-in time representations for date-times and dates, for example their corresponding classes `POSIXct` and `Date` in R. However these turn out inappropriate for weekly, monthly and quarterly data. For example, the smallest time unit of monthly data is months in a year, which is equispaced points in a year. However, using the first day of the month can range from 28 to 31 days, which is irregularly spaced. A genuine year-month representation should avoid associating days with its format. Displaying the year and month components suffice to signal its monthly aggregated values instead of observed values at a particular timestamp. This argument is also applicable to the creation of year-week and year-quarter. (coercion)
+A number of time classes are supported and easily extensible to new types. The base line is that time indices can be potentially ordered in past to future. Characters cannot be ordered, so a variable hosting characters will make it unsupported for index. Ordered factors, however, can be immediately recognized as valid index. For instance, month names have a natural ordering from January to December, and so are weekdays from Monday to Sunday.
 
 ## Key {#sec:key}
 
@@ -177,6 +175,10 @@ We go through the whole exploration circle, and keep iterating and refining unti
 # Software structure
 
 * Extensibility
+
+How to handle time zone. Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
+
+It is relatively easy to determine if the data is daily or sub-daily since most statistical packages have built-in time representations for date-times and dates, for example their corresponding classes `POSIXct` and `Date` in R. However these turn out inappropriate for weekly, monthly and quarterly data. For example, the smallest time unit of monthly data is months in a year, which is equispaced points in a year. However, using the first day of the month can range from 28 to 31 days, which is irregularly spaced. A genuine year-month representation should avoid associating days with its format. Displaying the year and month components suffice to signal its monthly aggregated values instead of observed values at a particular timestamp. This argument is also applicable to the creation of year-week and year-quarter. (coercion)
 
 # Case studies
 
