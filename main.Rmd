@@ -59,6 +59,8 @@ Temporal-context data, $X_{jt}$, consist of $j = 1, \dots, N_{i}$ observational 
 include_graphics("img/time-series-structure.pdf")
 ```
 
+This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
+
 The rest of the paper is structured as follows.
 
 # Data structures {#sec:str}
@@ -85,24 +87,16 @@ The R package **hts** [@R-hts] is the implementation of structured collections o
 
 @wickham2014tidy coined the term "tidy data", which is a rephrasing of the second and third normal forms in relational databases but in a way that makes more sense to data scientists. A suite of paired verbs such as `gather` and `spread` [@R-tidyr] were used to describe the reshape processing from messy data to tidy data. Tidy data, which standardized the mapping from the semantics of a dataset to its physical representation, serves remarkably as a fundamental unit of data analysis. R package **ggplot2** [@wickham2009ggplot2] pioneered developing the grammar of graphics based on tidy data, thus making it possible mapping from data space to visual elements. **dplyr** [@R-dplyr] generalised a coherent and consistent set of verbs to handle a wide range of data transformation tasks. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R]
 
-This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
-
 # Contextual semantics {#sec:semantics}
 
-The choice of representation of temporal-context data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. This data abstraction reflects most common problems of incoming data and transformation in reality. Firstly, a data set must be structured in a "tidy" rectangular layout each row has the same schema and each field has a single value. Secondly, declaring the data set to contain temporal observations is determined by an "index" that represents time and a "key" that uniquely identifies each unit that measurements take place on over time. The "key" serves a similar purpose as the panel variable in the Stata's **tsset** command to define the units or subjects, but it is expanded to include multiple variables rather than a single one. The composition of index and key uniquely defines each observation in a data table, which is equivalent to a primary key [@codd_relational_1970] in a relational database.
-
-Table \@ref(tab:tb-sub) shows a "tidy" temporal data example using a subset of tuberculosis cases estimated by @tb-data. It contains 12 observations and 5 variables arranged in a "long" tabular form. Each observation uniquely records the number of people, who are diagnosed tuberculosis for each gender at three selected countries in the years of 2011 and 2012, where column `year` is declared as the index variable, columns `country`, `continent` and `gender` as key. Detailed discussions about index and key specifications will be given in Section \@ref(sec:index) and \@ref(sec:key). Although column `count` is the only measure in this case, it is sufficiently flexible to hold other measured variables, for example, adding the corresponding population size (if known) in order to calibrate the count later.
-
-Given the nature of temporal ordering, a temporal data set must be sorted by time index as a result. If a key is explicitly declared, the key will be sorted first depending on the ordering of factor levels and the ordering of variables, and followed by arranging time in past-to-future order. The tuberculosis example shows the key is sorted in alphabetic order, followed by ascending years by default, as in Table \@ref(tab:tb-sub). Since time-based operations, for example leading, lagging, or differencing series, require a vector in its time order, the arranged data format assures its validity for these operations without returning unexpected results. There are other possible arrangements in the key, but the baseline is the index (i.e. `year`) ascends within each key element. If any operations on the tidy temporal data results in a deviation from this baseline, it will issue a warning to the users.
-
-This high-level data abstraction is semantically structured, which shed lights on time index and what we call "key".
-
-It encourage users to look into the data as earlier as possible, assessing the data quality issues.
+The choice of tidy representation of temporal data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. Contextual semantics are introduced to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series model inputs. Index, key and time interval are the three stone pillars to this new semantically-structured temporal data, which we name as "tsibble".
 
 ```{r tb-sub}
 ```
 
-(ref:tb-sub) A small subset of estimates of tuberculosis burden generated by World Health Organisation in 2011 and 2012, with 12 observations and 5 variables. The index refers to column `year`, the key to multiple columns: `country` nested under `continent` crossed with `gender`, and the measured variable to column `count`.
+(ref:tb-sub) A small subset of estimates of tuberculosis burden generated by World Health Organisation in 2011 and 2012, with 12 observations and 5 variables. The index refers to column `year`, the key to multiple columns: `country` and `gender`, and the measured variable to column `count`.
+
+Table \@ref(tab:tb-sub) presents a subset of tuberculosis cases estimated by @tb-data. It contains 12 observations and 5 variables arranged in a "long" tabular form. Each observation hosts the number of people who are diagnosed tuberculosis for each gender at three selected countries in the years of 2011 and 2012. To turn this data into a tsibble, (1) column `year` is declared as the index variable; (2) the key can be made up of columns `country` and `gender`. Despite column `count` is the only measurement in this case, it is sufficiently flexible to hold other measured variables, for example, adding the corresponding population size (if known) in order to calibrate the count later.
 
 ## Index {#sec:index}
 
@@ -112,11 +106,11 @@ Time provides a contextual basis for temporal data. Time representation could ra
 
 A variable representing time is indispensable to a tsibble, referred to as "index". The "index" is an intact data column rather than an attribute, which makes time accessible to users. It is highly advantageous when manipulating time. For example, one could easily extract time components, such as time of day and day of week, from the index to visualize seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indices. The accessibility of tsibble index motivates data analysis towards transparency and human readability. But if the "index" is employed as attributes, analysts would write these simple queries in a programmatic manner, which can be avoidable from an analytic point of view.
 
-A number of time classes are supported and easily extensible to new types. The base line is that time indices can be potentially ordered in past to future. Characters cannot be ordered, so a variable hosting characters will make it unsupported for index. Ordered factors, however, can be immediately recognized as valid index. For instance, month names have a natural ordering from January to December, and so are weekdays from Monday to Sunday.
+A number of time classes are supported and easily extensible to new types. The baseline is that time indices can be potentially ordered from past to future. Characters cannot be ordered, so a variable hosting characters will make it unsupported for index. Ordered factors, however, can be immediately recognized as valid index. For instance, month names have a natural ordering from January to December, and so are weekdays from Monday to Sunday.
 
 ## Key {#sec:key}
 
-The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to identify units or subjects that are observed over time in a data table. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, stay the same as they are in the original table, with no further tweaks.
+The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to uniquely identify units or subjects that are observed over time in a data table, which is similar to a primary key [@codd_relational_1970] defining each observation in a relational database. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, stay the same as they are in the original table, with no further tweaks.
 
 Each tsibble must hold a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key, similar to a panel variable for longitudinal data. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
 
@@ -127,6 +121,16 @@ Not only pinpoints a "key" observational units in the tsibble but also provides 
 One of the cornerstones beneath a tsibble is time interval. This information plays a critical role in computing statistics (e.g. seasonal unit root tests) and building models (e.g. seasonal ARIMA). The principal divide is regularly or irregularly spaced in time. Since a tsibble permits implicit missing time, it is impossible to distinguish regularity from the index. It relies on user's specification by switching the `regular` argument off, when the data involves irregular intervals. This type of data can flow into event-based data modelling, not models that expect time series.
 
 As for data indexed in regular time space, the time interval is derived by first computing absolute differences of time indices and then the greatest common divisor, which covers all conceivable cases. This implies that all subjects in a tsibble have one and the only interval. Data collected at different intervals should be organized in separate tsibbles, encouraging well-tailored analysis and models, because each subject may underly different data generating process.
+
+<!--
+
+## Data first
+
+Given the nature of temporal ordering, a temporal data set must be sorted by time index as a result. If a key is explicitly declared, the key will be sorted first depending on the ordering of factor levels and the ordering of variables, and followed by arranging time in past-to-future order. The tuberculosis example shows the key is sorted in alphabetic order, followed by ascending years by default, as in Table \@ref(tab:tb-sub). Since time-based operations, for example leading, lagging, or differencing series, require a vector in its time order, the arranged data format assures its validity for these operations without returning unexpected results. There are other possible arrangements in the key, but the baseline is the index (i.e. `year`) ascends within each key element. If any operations on the tidy temporal data results in a deviation from this baseline, it will issue a warning to the users.
+
+It encourage users to look into the data as earlier as possible, assessing the data quality issues.
+
+-->
 
 # Data pipeline {#sec:pipeline}
 
@@ -174,6 +178,8 @@ We go through the whole exploration circle, and keep iterating and refining unti
 
 # Software structure
 
+data first, function starts with the first argument "data", chained with `%>%`. print display.
+
 * Extensibility
 
 How to handle time zone. Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
@@ -200,7 +206,7 @@ It is relatively easy to determine if the data is daily or sub-daily since most 
 (ref:map-airlines-cap) An overview of US airline traffic in 2017. Points indicate locations of airports, and lines the connecting routes across the country. There are a few hubs connecting most airlines and sporadic airports.
 -->
 
-The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. Every single flight would be uniquely identified by the flight number and its scheduled departure time, from a passenger's point of view. In fact, it fails to pass the tsibble hurdle due to duplicates in the original data. An error is immediately raised when attempting to convert this data into a tsibble, and a closer inspection has to be carried out to locate the issue. The **tsibble** package provides the tool to easily find the duplicates in the data with `find_duplicates()`. Below shows the problematic entries.
+The dataset of 2017 on-time performance for US domestic flights represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics (reference). It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. Every single flight would be uniquely identified by the flight number and its scheduled departure time, from a passenger's point of view. In fact, it fails to pass the tsibble hurdle due to duplicates in the original data. An error is immediately raised when attempting to convert this data into a tsibble, and a closer inspection has to be carried out to locate the issue. The **tsibble** package provides tools to easily locate the duplicates in the data with `duplicates()`. Below shows the problematic entries.
 
 ```{r find-duplicate}
 ```
