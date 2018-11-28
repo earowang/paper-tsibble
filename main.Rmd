@@ -59,8 +59,6 @@ Temporal-context data, $X_{jt}$, consist of $j = 1, \dots, N_{i}$ observational 
 include_graphics("img/time-series-structure.pdf")
 ```
 
-This paper proposes a unified data representation of temporal-context data, blending time series of nested and crossed factors into a two-dimensional column-homogeneous array in a long format. By leveraging the "tidy data" principles, observations and variables position and bridge their meanings in both physical and internal structures. Data manipulation involves in transforming either observations or variables, or both, which can be described and achieved with a collection of shorthand operators. A chain of data transformations lend itself to a data pipeline. 
-
 The rest of the paper is structured as follows.
 
 # Data structures {#sec:str}
@@ -176,11 +174,22 @@ We go through the whole exploration circle, and keep iterating and refining unti
 
 * **rolling window**: `slide()`, `tile()`, `stretch()`
 
-# Software structure
+# Software structure and design decisions
 
-data first, function starts with the first argument "data", chained with `%>%`. print display.
+The **tsibble** package highly features modularity and extensibility.
 
-* Extensibility
+## Data first
+
+The prime force that drives the software's design choices is "data". All functions in **tsibble** starts with `data` or its variants as the first argument, namely "data first". They work naturally with the pipe operator `%>%`, read as "then". This not only lays out a consistent interface but also addresses the significance of the data throughout the software.
+
+Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. Below conveys the pieces of critical and contextual information about the data in Table \ref{tab:tb-sub}: (1) data dimension with its shorthand time interval, alongside time zone if date-times; (2) variables that constitute of the "key" with the number of series. These details aid users in understanding their data better and manipulate the data with care.
+
+```{r tb-print}
+```
+
+## Modularity
+
+## Extensibility
 
 How to handle time zone. Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
 
