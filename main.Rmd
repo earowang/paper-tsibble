@@ -106,6 +106,8 @@ A variable representing time is indispensable to a tsibble, referred to as "inde
 
 A number of time classes are supported and easily extensible to new types. The baseline is that time indices can be potentially ordered from past to future. Characters cannot be ordered, so a variable hosting characters will make it unsupported for index. Ordered factors, however, can be immediately recognized as valid index. For instance, month names have a natural ordering from January to December, and so are weekdays from Monday to Sunday.
 
+How to handle time zone. Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
+
 ## Key {#sec:key}
 
 The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to uniquely identify units or subjects that are observed over time in a data table, which is similar to a primary key [@codd_relational_1970] defining each observation in a relational database. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, stay the same as they are in the original table, with no further tweaks.
@@ -142,7 +144,7 @@ The tidy data abstraction lays a pipeline infrastructure for data analysis modul
 
 What is notable about an effective implementation of a data pipeline is that it coordinates a user's analysis making it cleaner to follow, and permits a wider audience to focus on the data analysis without getting lost in a jungle of computational intricacies. A fluent and fluid pipeline glues tidy data and the grammar of data manipulation together. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes, at least making it possible to trace them through the pipeline.
 
-## Time-based pipeline
+## Time-based pipeline {#sec:timepipeline}
 
 XXX may be good to have a diagram here showing how the time-based pipeline builds on a regular data pipeline
 
@@ -182,7 +184,7 @@ The **tsibble** package highly features modularity and extensibility.
 
 The prime force that drives the software's design choices is "data". All functions in **tsibble** starts with `data` or its variants as the first argument, namely "data first". They work naturally with the pipe operator `%>%`, read as "then". This not only lays out a consistent interface but also addresses the significance of the data throughout the software.
 
-Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. Below conveys the pieces of critical and contextual information about the data in Table \ref{tab:tb-sub}: (1) data dimension with its shorthand time interval, alongside time zone if date-times; (2) variables that constitute of the "key" with the number of series. These details aid users in understanding their data better and manipulate the data with care.
+Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. Below conveys the pieces of critical and contextual picture about the data in Table \ref{tab:tb-sub}: (1) data dimension with its shorthand time interval, alongside time zone if date-times; (2) variables that constitute of the "key" with the number of series. These details aid users in understanding their data better and manipulate the data with care.
 
 ```{r tb-print}
 ```
@@ -191,9 +193,11 @@ Beyond the tools, the print display provides a quick and comprehensive glimpse o
 
 ## Extensibility
 
-How to handle time zone. Additional representations are provided, like year-month, year-quarter. Extensible. Custom index classes can be supported.
+As a fundamental infrastructure, extensibility is highly valued and one of the core design features in the **tsibble** package. Contrary to the "data first" principle for end users, extensibility is developer focused and would be mostly used in dependent packages, which heavily relies on S3 classes and methods in R [@adv-r]. It can be extended in two major aspects: custom index and new tsibble class.
 
-It is relatively easy to determine if the data is daily or sub-daily since most statistical packages have built-in time representations for date-times and dates, for example their corresponding classes `POSIXct` and `Date` in R. However these turn out inappropriate for weekly, monthly and quarterly data. For example, the smallest time unit of monthly data is months in a year, which is equispaced points in a year. However, using the first day of the month can range from 28 to 31 days, which is irregularly spaced. A genuine year-month representation should avoid associating days with its format. Displaying the year and month components suffice to signal its monthly aggregated values instead of observed values at a particular timestamp. This argument is also applicable to the creation of year-week and year-quarter. (coercion)
+Tsibble supports an extensive range of index types from numerics to nano time, but there might be custom indices used for some occasions, for example school semesters. These academic terms vary from one institute to another within an academic year, which is defined differently from a calendar year. New index to be valid (defining `index_valid()`), the bottom line is that it can be ordered from past to future. The interval regarding semesters is further outlined through `pull_interval()`. As a result, the rest software methods such as `has_gaps()`, `count_gaps()` and `fill_gaps()` will have instant support for data that contains this new index.
+
+The class of tsibble is an underlying basis of temporal data, and there is a demand for sub-classing a tsibble. For example, a fable is actually an extension to a tsibble, mentioned in Section \ref{sec:timepipeline}. A low-level constructor `new_tsibble()` provides a vehicle to easily create a new subclass. First of all, this new object itself is a tsibble. It perhaps needs more metadata than those of a tsibble, that gives rise to a new data extension, like prediction distributions to a fable. Tsibble verbs are also S3 generics. Developers will be able to implement these verbs for the new class if needed.
 
 # Case studies
 
