@@ -46,6 +46,7 @@ opts_chunk$set(
 )
 read_chunk('R/demo.R')
 read_chunk('R/flights.R')
+read_chunk('R/smart-meter.R')
 ```
 
 ```{r load-pkg}
@@ -291,7 +292,12 @@ What time of day and day of week should we travel to avoid suffering from horrib
 
 (ref:draw-qtl-cap) Small multiples of lines about departure delay against time of day, faceting day of week and 50%, 80% and 95% quantiles. A blue horizontal line indicates the 15-minute on-time standard to help grasp the delay severity. Passengers are apt to hold up around 18 during a day, and are recommended to travel early. The variations increase substantially as the upper tails.
 
-## Smart-Grid Customer Data in Australia
+## Smart-grid customer data in Australia
+
+```{r load-elec}
+```
+
+Sensors have been put up to collect data for the project of smart city across major cities in Australia. One of the trials is monitoring households' electricity usage through installed smart meters in the area of New Castle over 2010--2014 [@smart-meter]. Year 2013 has been sliced to examine temporal patterns of customer's energy consumption with **tsibble** in this paper. Half-hourly general supply in kwH have been recored for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Customer's demographic data provides explanatory variables other than time in a separate data table. Two data tables might be joined to explore different sources that contribute to daily electricity use when needed.
 
 <https://data.gov.au/dataset/smart-grid-smart-city-customer-trial-data>
 

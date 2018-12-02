@@ -1,3 +1,4 @@
+## ---- load-elec
 library(tidyverse)
 library(lubridate)
 library(tsibble)
@@ -11,6 +12,7 @@ elec_ts <- elec %>%
     validate = FALSE, ordered = TRUE
   )
 
+## ---- gaps-elec
 gap_df <- has_gaps(elec_ts)
 
 # ToDo: use tables to present implicit missingness proportions
