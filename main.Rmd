@@ -101,7 +101,9 @@ Table \@ref(tab:tb-sub) presents a subset of tuberculosis cases estimated by @tb
 
 <!-- note to self: There's a trade-off between data column and attributes. Data column is easily accessible, which gives greater flexibility; however, once the value in the data column is modified, no way to validate for any static approach. Generally, not recommended to modify attributes. -->
 
-Time provides a contextual basis for temporal data. A variable representing time is indispensable to a tsibble, referred to as "index". The "index" is an intact data column rather than an attribute, which makes time accessible to users. It is highly advantageous when manipulating time. For example, one could easily extract time components, such as time of day and day of week, from the index to visualize seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indices. The accessibility of tsibble index motivates data analysis towards transparency and human readability. But if the "index" is employed as attributes, analysts would write these simple queries in a programmatic manner, which can be avoidable from an analytic point of view.
+Time provides a contextual basis for temporal data. A variable representing time is indispensable to a tsibble, referred to as "index". The "index" is an intact data column rather than a masked attribute, which makes time visible and accessible to users. It is highly advantageous when manipulating time. For example, one could easily extract time components, such as time of day and day of week, from the index to visualize seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indices. The accessibility of tsibble index motivates data analysis towards transparency and human readability. When the "index" used to be employed as meta information, it created an obstacle for analysts to write these simple queries in a programmatic manner, which should be discouraged from an analytic point of view.
+
+A variable number of time representation is spotted in the wild. Date-time, universally accepted across systems, is the most commonly used type for representing time. Date-time also typically associates with a time zone with adjustments like summer time. This diversity and time zone is respected and taken into consideration for the *tsibble*'s index.
 
 ## Key {#sec:key}
 
@@ -116,16 +118,6 @@ Not only pinpoints a "key" observational units in the tsibble but also provides 
 One of the cornerstones beneath a tsibble is time interval. This information plays a critical role in computing statistics (e.g. seasonal unit root tests) and building models (e.g. seasonal ARIMA). The principal divide is regularly or irregularly spaced in time. Since a tsibble permits implicit missing time, it is impossible to distinguish regularity from the index. It relies on user's specification by switching the `regular` argument off, when the data involves irregular intervals. This type of data can flow into event-based data modelling, not models that expect time series.
 
 As for data indexed in regular time space, the time interval is derived by first computing absolute differences of time indices and then the greatest common divisor, which covers all conceivable cases. This implies that all subjects in a tsibble have one and the only interval. Data collected at different intervals should be organized in separate tsibbles, encouraging well-tailored analysis and models, because each subject may underly different data generating process.
-
-<!--
-
-## Data first
-
-Given the nature of temporal ordering, a temporal data set must be sorted by time index as a result. If a key is explicitly declared, the key will be sorted first depending on the ordering of factor levels and the ordering of variables, and followed by arranging time in past-to-future order. The tuberculosis example shows the key is sorted in alphabetic order, followed by ascending years by default, as in Table \@ref(tab:tb-sub). Since time-based operations, for example leading, lagging, or differencing series, require a vector in its time order, the arranged data format assures its validity for these operations without returning unexpected results. There are other possible arrangements in the key, but the baseline is the index (i.e. `year`) ascends within each key element. If any operations on the tidy temporal data results in a deviation from this baseline, it will issue a warning to the users.
-
-It encourage users to look into the data as earlier as possible, assessing the data quality issues.
-
--->
 
 # Data pipeline {#sec:pipeline}
 
