@@ -74,14 +74,6 @@ For longitudinal analysis, researchers and analysts are primarily interested in 
 
 Longitudinal data representation has been implemented in Stata's time series module [@Stata] and R package **plm** [@plm2008]. The underpinning data structure is a two-dimensional column-homogeneous array, as other tabular data. Specifying a longitudinal data set from a generic array needs explicitly declaring time and individuals (or panel variable in Stata's `tsset` command). Therefore, each row of the data can be identified by a specific individual and time point. Individuals, however, can be only declared through a single variable, not multiple.
 
-<!--
-## Time series of nested and crossed factors
-
-A collection of time series can often be intrinsically arranged along multivariate data of nested and crossed factors, which is also known as hierarchical and grouped time series [@fpp]. For example, from an operational point of view, a manufacturer can add up every store’s sales by region, by state, and by country along a geographical tree; alternatively, one can group the sales for each product together based on common attributes such as store, brand, price range and so forth, resulting in a non-hierarchical structure. The former gives an example of hierarchical time series, and the latter shows grouped time series. And even when collections of time series are absent from hierarchical structure, it is possible to arrange them empirically into a hierarchy such as regression tree [@sankaran_interactive_2017].
-
-The R package **hts** [@R-hts] is the implementation of structured collections of time series, and provides tools for visualizing, analyzing, and forecasting such data. But it is a pain to configure node list or grouping matrix as the increase in hierarchic depth and grouping factors. This is resulted from the fact that the structure specification is separated from data itself and represented numerically, which is rather counterintuitive from the user's perspective.
--->
-
 ## Tidy data and the grammar of data manipulation
 
 @wickham2014tidy coined the term "tidy data", which is a rephrasing of the second and third normal forms in relational databases but in a way that makes more sense to data scientists. A suite of paired verbs such as `gather` and `spread` [@R-tidyr] were used to describe the reshape processing from messy data to tidy data. Tidy data, which standardized the mapping from the semantics of a dataset to its physical representation, serves remarkably as a fundamental unit of data analysis. R package **ggplot2** [@wickham2009ggplot2] pioneered developing the grammar of graphics based on tidy data, thus making it possible mapping from data space to visual elements. **dplyr** [@R-dplyr] generalised a coherent and consistent set of verbs to handle a wide range of data transformation tasks. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R] The prevalence of grammar
@@ -111,7 +103,7 @@ The "key" specification contributes to creating a tsibble alongside the index. T
 
 Each tsibble must hold a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key, similar to a panel variable for longitudinal data. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
 
-Not only pinpoints a "key" observational units in the tsibble but also provides a solution to seamlessly link between the data, models, and forecasts. This neatly separates the data from models and forecasts, leaving more room for compulsory model components, such as coefficients, fitted values and residuals. More details are given in the following section.
+Not only pinpoints a "key" observational units in the tsibble but also provides a solution to seamlessly link between the data, models, and forecasts. This neatly decouples the data from models and forecasts, leaving more room for compulsory model components, such as coefficients, fitted values and residuals. More details are given in the following section.
 
 ## Interval {#sec:interval}
 
@@ -289,13 +281,15 @@ What time of day and day of week should we travel to avoid suffering from horrib
 ```{r load-elec}
 ```
 
-Sensors have been put up to collect data for the project of smart city across major cities in Australia. One of the trials is monitoring households' electricity usage through installed smart meters in the area of New Castle over 2010--2014 [@smart-meter]. Year 2013 has been sliced to examine temporal patterns of customer's energy consumption with **tsibble** in this paper. Half-hourly general supply in kwH have been recored for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Customer's demographic data provides explanatory variables other than time in a separate data table. Two data tables might be joined to explore different sources that contribute to daily electricity use when needed.
+Sensors have been put up to collect data for the project of smart city across major cities in Australia. One of the trials is monitoring households' electricity usage through installed smart meters in the area of New Castle over 2010--2014 [@smart-meter]. Year 2013 has been sliced to examine temporal patterns of customer's energy consumption with **tsibble** in this paper. Half-hourly general supply in kwH have been recored for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Customer's demographic data provides explanatory variables other than time in a different data table. Two data tables might be joined to explore different sources that contribute to daily electricity use when needed.
 
 <https://data.gov.au/dataset/smart-grid-smart-city-customer-trial-data>
 
 # Conclusion and future work
 
 A new data abstraction representing temporal data named as "tsibble" has been proposed, spotlighting the "tidy data" principles brought to time domain. Tidy data begins to take shape in the state of time with the introduction of contextual semantics: index and key. Declared index provides direct support to time variable; variables that comprise the key defines study subjects over time. These semantics further determines unique data entries required for a valid tsibble. No matter how temporal data arrives, tsibble respects time index and keeps data richness. A tsibble frictionlessly pops into transformation, visualization, modelling and smoothly shifts amongst, allowing for rapid iterations in gaining data insights.
+
+A missing piece of the *tsibble* data is to enable user-defined calendars and respect structural missing observations. For example, a call center operates only between 9:00am and 5:00pm on week days and stock trading resumes on Monday straight after Friday. No data available outside trading hours would be labelled as structural missingess, which *tsibble* currently disregards. However, few R packages provide functionality to create and manage many sorts of calendars, including market-specific business calendar. This delays the implementation. Generally, custom calendars would be easily embedded into the tsibble framework. Consequently these tsibble operators, like `fill_gaps()`, would work out of box; forecasts would be generated within its definable time range.
 
 ```{r write-bib}
 write_bib(c("dplyr", "tidyr"), file = "rpkgs.bib")
