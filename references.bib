@@ -115,6 +115,16 @@ month = apr
    year = 2016
 }
 
+@book{adv-r,
+   title = "Advanced R",
+   author = "Hadley Wickham",
+   publisher = "Chapman \& Hall",
+   url = "https://adv-r.hadley.nz/",
+   isbn = "978-1466586963",
+   edition = 2,
+   year = 2018
+}
+
 @MANUAL{tb-data,
   title       = {Tuberculosis Data},
   author      = "{World Health Organization}",
@@ -125,6 +135,26 @@ month = apr
   address     = "Block 3510, Jalan Teknokrat 6, 63000 Cyberjaya, Selangor, Malaysia"
 }
 
+@MANUAL{smart-meter,
+  title       = {Smart-Grid Smart-City Customer Trial Data},
+  author      = "{Department of the Environment and Energy}",
+  institution = "Department of the Environment and Energy, Australia",
+  year        =  2018,
+  url         = "https://data.gov.au/dataset/4e21dea3-9b87-4610-94c7-15a8a77907ef",
+  urldate     = {2018-11-19},
+  address     = "Australian Government, Department of the Environment and Energy"
+}
+
+@MANUAL{flights-data,
+  title       = {Carrier On-Time Performance},
+  author      = "{Bureau of transportation statistics}",
+  institution = "U.S. Department of Transportation",
+  year        =  2018,
+  url         = "https://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=236",
+  urldate     = {2018-09-26},
+  address     = "1200 New Jersey Avenue, SE Washington, DC 20590"
+}
+
 @Manual{R-base,
   title = {R: A Language and Environment for Statistical Computing},
   author = {{R Core Team}},
@@ -132,15 +162,6 @@ month = apr
   address = {Vienna, Austria},
   year = {2018},
   url = {https://www.R-project.org/},
-}
-
-@Manual{Matlab,
-  title = {MATLAB and Statistics Toolbox Release 2017b},
-  author = {{The MathWorks, Inc.}},
-  organization = {The MathWorks, Inc.},
-  address = {Natick, Massachusetts, United States},
-  year = {2017},
-  url = {http://www.mathworks.com},
 }
 
 @article{zoo2005,
@@ -182,27 +203,6 @@ month = apr
    url = {https://www.jstatsoft.org/v027/i02}
 }
 
-@article{sankaran_interactive_2017,
-  author = {Kris Sankaran and Susan Holmes},
-  title = {Interactive Visualization of Hierarchically Structured Data},
-  journal = {Journal of Computational and Graphical Statistics},
-  volume = {0},
-  number = {ja},
-  pages = {0-0},
-  year  = {2017},
-  publisher = {Taylor & Francis},
-  doi = {10.1080/10618600.2017.1392866},
-
-  URL = { 
-https://doi.org/10.1080/10618600.2017.1392866
-
-  },
-  eprint = { 
-https://doi.org/10.1080/10618600.2017.1392866
-
-  }
-}
-
 @Manual{R-hts,
   title = {hts: Hierarchical and Grouped Time Series},
   author = {Rob Hyndman and Alan Lee and Earo Wang and Shanika Wickramasuriya},
@@ -227,19 +227,52 @@ https://doi.org/10.1080/10618600.2017.1392866
   url = {https://CRAN.R-project.org/package=xts},
 }
 
-@Manual{R-zoo,
-  title = {zoo: S3 Infrastructure for Regular and Irregular Time Series (Z's
-Ordered Observations)},
-  author = {Achim Zeileis and Gabor Grothendieck and Jeffrey A. Ryan},
-  year = {2018},
-  note = {R package version 1.8-3},
-  url = {https://CRAN.R-project.org/package=zoo},
-}
-
 @book{wickham2009ggplot2,
   title={{ggplot2}: Elegant Graphics for Data Analysis},
   author={Wickham, Hadley},
   year={2009},
   address = {New York, NY},
   publisher={Springer-Verlag New York}
+}
+
+@article{xgobi,
+author = { Deborah F.   Swayne  and  Dianne   Cook  and  Andreas   Buja },
+title = {XGobi: Interactive Dynamic Data Visualization in the X Window System},
+journal = {Journal of Computational and Graphical Statistics},
+volume = {7},
+number = {1},
+pages = {113-130},
+year  = {1998},
+publisher = {Taylor & Francis},
+doi = {10.1080/10618600.1998.10474764},
+}
+
+@article{ggobi,
+ author = "Deborah F. Swayne and Duncan {Temple Lang} and Andreas
+   Buja and Dianne Cook",
+ title = "{GG}obi: evolving from {XG}obi into an extensible framework
+   for interactive data visualization",
+ journal = "Computational Statistics \& Data Analysis",
+ volume = 43,
+ year = 2003,
+ pages = "423--444"
+}
+
+@article{orca,
+author = { Peter   Sutherland  and  Anthony   Rossini  and  Thomas   Lumley  and  Nicholas   Lewin-Koh  and  Julie   Dickerson  and  Zach   Cox  and  Dianne   Cook },
+title = {Orca: A Visualization Toolkit for High-Dimensional Data},
+journal = {Journal of Computational and Graphical Statistics},
+volume = {9},
+number = {3},
+pages = {509-529},
+year  = {2000},
+publisher = {Taylor & Francis},
+doi = {10.1080/10618600.2000.10474896},
+}
+
+@misc{wang-calendarviz-2018,
+  Author = {Earo Wang and Dianne Cook and Rob J Hyndman},
+  Title = {Calendar-based graphics for visualizing people's daily schedules},
+  Year = {2018},
+  Eprint = {arXiv:1810.09624},
 }
