@@ -12,32 +12,42 @@ elec_ts <- elec %>%
     validate = FALSE, ordered = TRUE
   )
 
-## ---- gaps-elec
+## ---- elec-gaps
 gap_df <- has_gaps(elec_ts)
+# sum(gap_df$.gaps) / NROW(gap_df)
 
-# ToDo: use tables to present implicit missingness proportions
+## ---- scan-gaps
+elec_gaps <- scan_gaps(elec_ts)
+
+## ---- count-gaps
 customer_na <- elec_ts %>% 
   filter(customer_id %in% (gap_df %>% filter(.gaps) %>% pull(customer_id)))
 
 count_na_df <- customer_na %>% 
   count_gaps()
 
-# ToDo: do a hierarchical clustering for classifying customers
-count_na_10 <- count_na_df %>% 
-  count(customer_id) %>% 
-  top_n(100) %>% 
-  pull(customer_id)
+count_lvl <- count_na_df %>% 
+  group_by(customer_id) %>% 
+  summarise(n_miss = sum(.n)) %>% 
+  mutate(customer_id = fct_reorder(as.character(customer_id), n_miss)) %>% 
+  pull(customer_id) %>% 
+  levels()
 
 count_na_df %>% 
-  filter(customer_id %in% count_na_10) %>% 
-  ggplot(aes(x = as.factor(customer_id))) +
+  mutate(customer_id = factor(customer_id, count_lvl)) %>% 
+  ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to)) +
   geom_point(aes(y = .from)) +
   geom_point(aes(y = .to)) +
   coord_flip() +
-  theme(legend.position = "bottom")
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "bottom"
+  )
 
-qtl_grid <- seq(0.1, 0.9, 0.01)
+## ---- elec-quantiles
+qtl_grid <- seq(0.1, 0.9, 0.002)
 elec_qtl <- elec_ts %>% 
   summarise(
     value = list(quantile(general_supply_kwh, qtl_grid, na.rm = TRUE)),
@@ -49,18 +59,25 @@ elec_qtl <- elec_ts %>%
     date = as_date(reading_datetime)
   )
 
+elec_med <- elec_qtl %>% 
+  filter(qtl == 0.5)
+
 elec_qtl %>% 
   ggplot(aes(x = time, y = value, colour = qtl, group = qtl)) +
   geom_line() +
-  sugrrants::facet_calendar(~ date, ncol = 3) +
-  scale_colour_viridis_c()
+  geom_line(data = elec_med, colour = "#de2d26", size = 0.5) +
+  sugrrants::facet_calendar(~ date, ncol = 3, format = "%m/%d") +
+  scale_x_time(
+    breaks = hms::as.hms(c("6:00:00", "18:00:00")),
+    labels = c("6:00", "18:00")
+  ) +
+  scale_colour_viridis_c() +
+  theme(legend.position = "none")
 
+## ---- fill-gaps
 # make complete series
 elec_ts <- elec_ts %>% 
   fill_gaps()
-
-elec_na <- elec_ts %>% 
-  filter(is.na(general_supply_kwh))
 
 elec_na_mth <- elec_na %>% 
   mutate(

@@ -54,13 +54,15 @@ read_chunk('R/smart-meter.R')
 
 # Introduction {#sec:intro}
 
-Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $1 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. An overview of data science workflow is given in Figure \ref{fig:pipeline-ann}. The divide between data that feeds into the beginning of analysis and the current time series standard that fits into modelling is significant, making data preparation for modeling and forecasting painful. 
+Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. @r4ds succinctly describes the data science workflow given in Figure \ref{fig:pipeline-ann}. It is annotated to show that the divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling is significant, making data preparation for modeling and forecasting painful. 
 
 ```{r pipeline-ann, fig.cap = "(ref:pipeline-ann-cap)"}
 include_graphics("img/time-series-structure.pdf")
 ```
 
 (ref:pipeline-ann-cap) An overview of data science program. The existing standards are model-focused, resulting misalliance between data and model.
+
+The existing standards, particularly time series objects, are model-oriented with little support for non-numeric values, leaning its data abstraction towards matrix. Time series have been isolated from general data problems due to this data choice. Analysts who start analysing time series would be pushed to learn new transformation and visualization toolkits that are different from what they used to operate.
 
 The rest of the paper is structured as follows. Section \ref{sec:str} reviews temporal data structures corresponding to time series and longitudinal analysis, and discusses "tidy data" and the grammar of data manipulation. Section \ref{sec:semantics} proposes contextual semantics for temporal data, built on top of tidy data. The concept of data pipelines with respect to the time domain will be discussed in depth in Section \ref{sec:pipeline}, followed by the design choices of software structure in Section \ref{sec:software}. Section \ref{sec:cases} presents two case studies for temporal data exploration using the newly implemented infrastructure. Section \ref{sec:conclusion} concludes the paper and discusses the future work.
 
@@ -76,7 +78,11 @@ For longitudinal analysis, researchers and analysts are primarily interested in 
 
 ## Tidy data and the grammar of data manipulation
 
-@wickham2014tidy coined the term "tidy data", which is a rephrasing of the second and third normal forms in relational databases but in a way that makes more sense to data scientists. A suite of paired verbs such as `gather` and `spread` [@R-tidyr] were used to describe the reshape processing from messy data to tidy data. Tidy data, which standardized the mapping from the semantics of a dataset to its physical representation, serves remarkably as a fundamental unit of data analysis. R package **ggplot2** [@wickham2009ggplot2] pioneered developing the grammar of graphics based on tidy data, thus making it possible mapping from data space to visual elements. **dplyr** [@R-dplyr] generalised a coherent and consistent set of verbs to handle a wide range of data transformation tasks. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools. [R] The prevalence of grammar
+@wickham2014tidy coined the term "tidy data", which is a rephrasing of the second and third normal forms in relational databases but in a way that makes more sense to data scientists by referring rows to observations and columns to variables. The principles of "tidy data" attempt to standardize the mapping of the semantics of a dataset to its physical representation. This data structure is the fundamental unit of the **tidyverse**, which is a collection of R packages designed for data science; the prevalence of **tidyverse** reversely testifies to the novelty of "tidy data". The **tidyverse** provides abstract yet functional grammars to manipulate and visualize data in easier-to-comprehend manners. One of the **tidyverse** packages, **dplyr** [@R-dplyr] showcases the value of a grammar as a principled vehicle to transform data for a wide range of data challenges, providing a consistent set of verbs: `mutate()`, `select()`, `filter()`, `summarise()`, and `arrange()`. Each verb focuses on a singular task. Almost all data tasks can be rephrased and tackled with these five key verbs, by composing them sequentially.
+
+Community effort for building tidy ecosystem 
+
+Temporal data is integrated to tidy data and the grammar. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools.
 
 # Contextual semantics {#sec:semantics}
 
@@ -141,8 +147,9 @@ Transformation assembles a set of modules. A unit that makes up a module is func
 \begin{tabular}{ lll }
 \toprule
  & Verb & Description \\ \midrule
-\multirow{3}{*}{Time gaps} & \texttt{has\_gaps()} & Test if a tsibble has gaps in time \\
- & \texttt{count\_gaps()} & Count and report time gaps \\
+\multirow{4}{*}{Time gaps} & \texttt{has\_gaps()} & Test if a tsibble has gaps in time \\
+ & \texttt{scan\_gaps()} & Report implicit missing entries \\
+ & \texttt{count\_gaps()} & Summarize time gaps \\
  & \texttt{fill\_gaps()} & Fill in gaps by values and functions \\ \hline
 \multirow{4}{*}{Row-wise} & \textbf{\texttt{filter()}} & Pick rows based on conditions \\
  & \texttt{filter\_index()} & Provide a shorthand for time subsetting \\
@@ -283,6 +290,9 @@ What time of day and day of week should we travel to avoid suffering from horrib
 ```
 
 Sensors have been put up to collect data for the project of smart city across major cities in Australia. One of the trials is monitoring households' electricity usage through installed smart meters in the area of New Castle over 2010--2014 [@smart-meter]. Year 2013 has been sliced to examine temporal patterns of customer's energy consumption with **tsibble** in this paper. Half-hourly general supply in kwH have been recored for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Customer's demographic data provides explanatory variables other than time in a different data table. Two data tables might be joined to explore different sources that contribute to daily electricity use when needed.
+
+```{r elec-gaps}
+```
 
 # Conclusion and future work {#sec:conclusion}
 
