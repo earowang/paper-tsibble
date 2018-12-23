@@ -54,15 +54,15 @@ read_chunk('R/smart-meter.R')
 
 # Introduction {#sec:intro}
 
-Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. @r4ds succinctly describes the data science workflow given in Figure \ref{fig:pipeline-ann}. It is annotated to show that the divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling is significant, making data preparation for modeling and forecasting painful. 
+Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. @r4ds succinctly describes the data science workflow given in Figure \ref{fig:pipeline-ann}. It is annotated to emphasize the significant divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling, making data preparation for modeling and forecasting painful. 
 
 ```{r pipeline-ann, fig.cap = "(ref:pipeline-ann-cap)"}
-include_graphics("img/time-series-structure.pdf")
+include_graphics("img/motivation.pdf")
 ```
 
-(ref:pipeline-ann-cap) An overview of data science program. The existing standards are model-focused, resulting misalliance between data and model.
+(ref:pipeline-ann-cap) An overview of the data science program centering around data. Temporal data should feed into the import stage, but the existing time series objects are model-focused, thus resulting misalliance between data and model.
 
-The existing standards, particularly time series objects, are model-oriented with little support for non-numeric values, leaning its data abstraction towards matrix. Time series have been isolated from general data problems due to this data choice. Analysts who start analysing time series would be pushed to learn new transformation and visualization toolkits that are different from what they used to operate.
+Current time series objects, which are model-oriented matrices with little support for non-numeric values, feed into the framework solely at the modelling stage. Analysts are expected to do their own data pre-processing and take care of anything else needed to get to this stage, which leads to a myriad ad-hoc solutions and duplicated efforts. The diagram correspondingly would place the model at the centre of the analytical universe, and all the transformations, visualisations would hinge on that format.
 
 The rest of the paper is structured as follows. Section \ref{sec:str} reviews temporal data structures corresponding to time series and longitudinal analysis, and discusses "tidy data" and the grammar of data manipulation. Section \ref{sec:semantics} proposes contextual semantics for temporal data, built on top of tidy data. The concept of data pipelines with respect to the time domain will be discussed in depth in Section \ref{sec:pipeline}, followed by the design choices of software structure in Section \ref{sec:software}. Section \ref{sec:cases} presents two case studies for temporal data exploration using the newly implemented infrastructure. Section \ref{sec:conclusion} concludes the paper and discusses the future work.
 
@@ -80,13 +80,17 @@ For longitudinal analysis, researchers and analysts are primarily interested in 
 
 @wickham2014tidy coined the term "tidy data", which is a rephrasing of the second and third normal forms in relational databases but in a way that makes more sense to data scientists by referring rows to observations and columns to variables. The principles of "tidy data" attempt to standardize the mapping of the semantics of a dataset to its physical representation. This data structure is the fundamental unit of the **tidyverse**, which is a collection of R packages designed for data science; the prevalence of **tidyverse** reversely testifies to the novelty of "tidy data". The **tidyverse** provides abstract yet functional grammars to manipulate and visualize data in easier-to-comprehend manners. One of the **tidyverse** packages, **dplyr** [@R-dplyr] showcases the value of a grammar as a principled vehicle to transform data for a wide range of data challenges, providing a consistent set of verbs: `mutate()`, `select()`, `filter()`, `summarise()`, and `arrange()`. Each verb focuses on a singular task. Most common data tasks can be rephrased and tackled with these five key verbs, by composing them sequentially.
 
-The **tidyverse** way of thinking largely formalizes exploratory data analysis. Tidy concepts have been extended to other domains in R community.
-
-Temporal data is integrated to tidy data and the grammar. @r4ds argues that 80% of data analysis tasks can be solved with tidy tools while the remaining 20% requires other tools.
+The **tidyverse** largely formalizes exploratory data analysis. The whole R community has quickly adopted the **tidyverse** way of thinking to much broader domains, such as simple features for spatial data in the **sf** package [@RJ-2018-009] and missing value handling in the **naniar** package [@tierney-naniar-2018]. Temporal data is left behind in this regard. This paper proposes a new tidy representation for temporal data and a unified framework to streamline the workflow from data pre-processing to visualization and forecasting, as an integral part of tidy data analysis.
 
 # Contextual semantics {#sec:semantics}
 
-The choice of tidy representation of temporal data is made from a data-centric perspective, which is taken in the light of the operations that are to be performed on the data. Contextual semantics are introduced to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series model inputs. Index, key and time interval are the three stone pillars to this new semantically-structured temporal data, which we name as "tsibble", inspired by "ts" and "tibble".
+```{r tsibble-fit, fig.cap = "(ref:tsibble-fit-cap)"}
+include_graphics("img/tsibble-fit.pdf")
+```
+
+(ref:tsibble-fit-cap) Tsibble's abstraction arises from a data-centric point of view, which could neatly embed into the tidyverse ecosystem. It should be noted that tsibble positions itself at the "tidy" step rather than "import", which ensures valid tidy data to time series analytics and models.
+
+The choice of tidy representation of temporal data arises from a data-centric perspective, which accommodates all of the operations that are to be performed on the data. Contextual semantics are introduced to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series model inputs. Index, key and time interval are the three stone pillars to this new semantically-structured temporal data, which we name as "tsibble", inspired by "ts" and "tibble".
 
 ```{r tb-sub}
 ```
@@ -186,7 +190,7 @@ We go through the whole exploration circle, and keep iterating and refining unti
 
 ## Rolling window in functional programming
 
-A set of verbs have been implemented to conduct temporal operations. There are three kinds of sliding window operations:
+Temporal data often involves moving window calculations. A set of verbs have been implemented to allow for different variations of sliding windows operations:
 
 * `slide()`/`slide2()`/`pslide()`: sliding window with overlapping observations.
 * `tile()`/`tile2()`/`ptile()`: tiling window without overlapping observations.
@@ -196,7 +200,9 @@ As the name indicates, `slide()` expects one input, `slide2()` two inputs, and `
 
 # Software structure and design decisions {#sec:software}
 
-Time series are represented as matrices, with standards being provided by native `ts` object in R, extended by **zoo** [@zoo2005], and **xts** [@R-xts]. As discussed in Section \ref{sec:time-series}, this data organization sets far apart from data origin. Due to time isolated from the main data, the supporting functions that intend to deal with time must be applied to whole data. That data-centric & human-centered.
+Matrices are a conventional way of organizing time series, with standards being provided by native `ts` object in R, extended by **zoo** [@zoo2005], and **xts** [@R-xts]. Time indices are stored as an attribute, separating from the main body of the data. 
+
+data-centric & human-centered.
 
 ## Data first
 
