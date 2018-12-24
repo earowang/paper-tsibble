@@ -90,7 +90,7 @@ include_graphics("img/tsibble-fit.pdf")
 
 (ref:tsibble-fit-cap) Tsibble's abstraction arises from a data-centric point of view, which could neatly embed into the tidyverse ecosystem. It should be noted that tsibble positions itself at the "tidy" step rather than "import", which ensures valid tidy data to time series analytics and models.
 
-The choice of tidy representation of temporal data arises from a data-centric perspective, which accommodates all of the operations that are to be performed on the data. Contextual semantics are introduced to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series model inputs. Index, key and time interval are the three stone pillars to this new semantically-structured temporal data, which we name as "tsibble", inspired by "ts" and "tibble".
+The choice of tidy representation of temporal data arises from a data-centric perspective, which accommodates all of the operations that are to be performed on the data. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the tidy model, which we name as "tsibble", inspired by "ts" and "tibble". It bridges the gap between raw temporal data and model inputs. Contextual semantics are introduced to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series model inputs. Index, key and time interval are the three stone pillars to this new semantically-structured temporal data.
 
 ```{r tb-sub}
 ```
@@ -111,7 +111,7 @@ A variable number of time representation is spotted in the wild. Date-time, univ
 
 The "key" specification contributes to creating a tsibble alongside the index. The concept of "key" is introduced to uniquely identify units or subjects that are observed over time in a data table, which is similar to a primary key [@codd_relational_1970] defining each observation in a relational database. In the wide format, each column holds a series of values, so that the column itself serves for the sake of identification. In the long format, all column names are melt to the corresponding "key" values. But the "key" is much more flexible than simply column names. Because it is not constrained to a single field, but can be comprised of multiple fields. The identifying variables that the "key" is constituted of, stay the same as they are in the original table, with no further tweaks.
 
-Each tsibble must hold a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key, similar to a panel variable for longitudinal data. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
+Each tsibble must hold a "key". It is normally a priori known by analysts. For example, Table \ref{tab:tb-sub} describes the number of tuberculosis cases for each gender across the countries every year. This data description suggests that columns `gender` and `country` have to be declared as the key, similar to a panel variable for longitudinal data. Lacking in either of two will be inadequate for the key and thus fail to construct a tsibble. The alternative specification of the key is to include a third variable `continent`. Since `country` is nested within `continent`, it is a free variable for use. But this variable brings additional information that can be used for forecasting reconciliation [@fpp]. The key is explicit when multiple units exist in the data. Key can be implicit when it finds a univariate series in the table, but it cannot be absent from a tsibble.
 
 Not only pinpoints a "key" observational units in the tsibble but also provides a solution to seamlessly link between the data, models, and forecasts. This neatly decouples the data from models and forecasts, leaving more room for compulsory model components, such as coefficients, fitted values and residuals. More details are given in the following section.
 
@@ -146,7 +146,7 @@ Time series models typically assume that the input is a complete and regularly-s
 Transformation assembles a set of modules. A unit that makes up a module is function or preferably "verb". A tsibble is an object, conceptually considered as a noun, and hence an action performed on the object can be phrased as a verb. Each verb focuses on one thing and achieve its goal. The verb should be self-explanatory to advise what it is supposed to do or fail, for example `filter()` picks observations, `select()` picks variables, and `left_join()` joins two tables. These general-purpose verbs are made available in the **tidyverse** suite. When manipulating in temporal context, these verbs are adapted to time domain. A perceivable difference is summarizing variables between data frame and tsibble. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. New tsibble-specific verbs are proposed to expand the **tidyverse** vocabulary. We believe that users, who are already familiar with **tidyverse**, will experience a gentle learning curve for mastering tsibble verbs and glide into temporal data analysis with low cognitive load.
 
 \begin{table}[!hbt]
-\caption{A test}\label{tab:verb-table}
+\caption{A list of table verbs working with tsibble. Functions in bold originating from the tidyverse and are adapted for tsibble.}\label{tab:verb-table}
 \centering
 \begin{tabular}{ lll }
 \toprule
@@ -161,21 +161,21 @@ Transformation assembles a set of modules. A unit that makes up a module is func
  & \textbf{\texttt{arrange()}} & Sort the ordering of row by variables \\ \hline
 \multirow{4}{*}{Column-wise} & \textbf{\texttt{select()}} & Pick columns by variables \\
  & \textbf{\texttt{mutate()}} & Add new variables \\
- & \textbf{\texttt{transmute()}} & Add new variables \\
+ & \textbf{\texttt{transmute()}} & Drops existing variables \\
  & \textbf{\texttt{summarise()}} & Aggregate values over time \\ \hline
 \multirow{3}{*}{Group-wise} & \texttt{index\_by()} & Group by new time index \\
  & \textbf{\texttt{group\_by()}} & Group by one or more variables \\
  & \texttt{group\_by\_key()} & Group by key variables \\ \hline
-\multirow{4}{*}{Reshape data} & \textbf{\texttt{gather()}} & David Batty \\
- & \textbf{\texttt{spread()}} & Eirik Bakke \\
- & \textbf{\texttt{nest()}} & Eirik Bakke \\
- & \textbf{\texttt{unnest()}} & Jody Morris \\ \hline
-\multirow{6}{*}{Join data} & \textbf{\texttt{left\_join()}} & David Batty \\
- & \textbf{\texttt{right\_join()}} & Eirik Bakke \\
- & \textbf{\texttt{full\_join()}} & Eirik Bakke \\
- & \textbf{\texttt{inner\_join()}} & Jody Morris \\
- & \textbf{\texttt{semi\_join()}} & Jody Morris \\
- & \textbf{\texttt{anti\_join()}} & Jody Morris \\
+\multirow{4}{*}{Reshape} & \textbf{\texttt{gather()}} & Gather columns into long form \\
+ & \textbf{\texttt{spread()}} & Spread columns into wide form \\
+ & \textbf{\texttt{nest()}} & Nest values in a list-variable \\
+ & \textbf{\texttt{unnest()}} & Unnest a list-variable \\ \hline
+\multirow{6}{*}{Join tables} & \textbf{\texttt{left\_join()}} & \multirow{6}{*}{Join two tables together} \\
+ & \textbf{\texttt{right\_join()}} & \\
+ & \textbf{\texttt{full\_join()}} & \\
+ & \textbf{\texttt{inner\_join()}} & \\
+ & \textbf{\texttt{semi\_join()}} & \\
+ & \textbf{\texttt{anti\_join()}} & \\
 \bottomrule
 \end{tabular}
 \end{table}
