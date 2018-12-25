@@ -159,7 +159,7 @@ sel_monthly %>%
   facet_grid(origin ~ .) +
   scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
   scale_colour_brewer(palette = "Dark2") +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", aspect.ratio = 0.2) +
   xlab("Date") +
   ylab("Departure delay")
 

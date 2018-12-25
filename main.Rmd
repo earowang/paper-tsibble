@@ -302,7 +302,7 @@ A closer examination of New York airports will give an indication about how well
 ```{r sel-monthly-2}
 ```
 
-```{r sel-monthly-plot, fig.cap = "(ref:sel-monthly-plot-cap)", fig.height = 6}
+```{r sel-monthly-plot, fig.cap = "(ref:sel-monthly-plot-cap)", fig.height = 7}
 ```
 
 (ref:sel-monthly-plot-cap) Daily delayed percentages for departure with two-month moving averages overlaid at five international airports. There are many fluctuations observed at LGA airport. The estimates of temporal trend are around 25% across three airports, highlighting relatively less delay in Fall.
