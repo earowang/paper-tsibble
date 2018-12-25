@@ -163,7 +163,7 @@ Transformation assembles a set of modules. A unit that makes up a module is func
  & \textbf{\texttt{mutate()}} & Add new variables \\
  & \textbf{\texttt{transmute()}} & Drops existing variables \\
  & \textbf{\texttt{summarise()}} & Aggregate values over time \\ \hline
-\multirow{3}{*}{Group-wise} & \texttt{index\_by()} & Group by new time index \\
+\multirow{3}{*}{Group-wise} & \texttt{index\_by()} & Group by index candidate \\
  & \textbf{\texttt{group\_by()}} & Group by one or more variables \\
  & \texttt{group\_by\_key()} & Group by key variables \\ \hline
 \multirow{4}{*}{Reshape} & \textbf{\texttt{gather()}} & Gather columns into long form \\
@@ -195,6 +195,24 @@ Temporal data often involves moving window calculations. A set of verbs have bee
 * `slide()`/`slide2()`/`pslide()`: sliding window with overlapping observations.
 * `tile()`/`tile2()`/`ptile()`: tiling window without overlapping observations.
 * `stretch()`/`stretch2()`/`pstretch()`: fixing an initial window and expanding to include more observations.
+
+```{r tb-au}
+```
+
+```{r slide-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:slide-animate-cap)"}
+```
+
+(ref:slide-animate-cap) An illustration of window of size 5 sliding over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
+
+```{r tile-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:tile-aniamte-cap)"}
+```
+
+(ref:tile-animate-cap) An illustration of window of size 5 tiling over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
+
+```{r stretch-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:stretch-animate-cap)"}
+```
+
+(ref:stretch-animate-cap) An illustration of window of size 5 stretching over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
 
 As the name indicates, `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. This family of window functions features functional programming. Any function can be mapped and rolled over a block of elements given a specified window size. For type stability, the functions always return lists. Other variants including `slide_lgl()`, `slide_int()`, `slide_dbl()`, `slide_chr()` return vectors of the corresponding type, as well as `slide_dfr()` and `slide_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_` enable rolling in parallel. This family of functions empowers users to incorporate window-related operations in their workflows.
 
