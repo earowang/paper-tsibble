@@ -200,11 +200,13 @@ We go through the whole exploration circle, and keep iterating and refining unti
 
 ## Rolling window in functional programming
 
-Temporal data often involves moving window calculations. A set of verbs have been implemented to allow for different variations of sliding windows operations:
+Rolling window calculations are widely-used techniques in time series analysis, but are not restricted to temporal applications. These operations are dependent on certain ordering, particularly time ordering for temporal data. Three common types of variations for sliding window operations are:
 
-* `slide()`/`slide2()`/`pslide()`: sliding window with overlapping observations.
-* `tile()`/`tile2()`/`ptile()`: tiling window without overlapping observations.
-* `stretch()`/`stretch2()`/`pstretch()`: fixing an initial window and expanding to include more observations.
+1. **slide**: sliding window with overlapping observations.
+2. **tile**: tiling window without overlapping observations.
+3. **stretch**: fixing an initial window and expanding to include more observations.
+
+Figure \@ref(fig:slide-animate), \@ref(fig:tile-animate) and \@ref(fig:stretch-animate) show the animations of rolling windows for sliding, tiling and stretching respectively on annual tuberculosis cases in Australia. A block of consecutive elements with window size of 5 are initialized and started rolling sequentially till the end of series.
 
 ```{r tb-au}
 ```
@@ -214,7 +216,7 @@ Temporal data often involves moving window calculations. A set of verbs have bee
 
 (ref:slide-animate-cap) An illustration of window of size 5 sliding over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
 
-```{r tile-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:tile-aniamte-cap)"}
+```{r tile-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:tile-animate-cap)"}
 ```
 
 (ref:tile-animate-cap) An illustration of window of size 5 tiling over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
@@ -224,7 +226,9 @@ Temporal data often involves moving window calculations. A set of verbs have bee
 
 (ref:stretch-animate-cap) An illustration of window of size 5 stretching over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
 
-As the name indicates, `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. This family of window functions features functional programming. Any function can be mapped and rolled over a block of elements given a specified window size. For type stability, the functions always return lists. Other variants including `slide_lgl()`, `slide_int()`, `slide_dbl()`, `slide_chr()` return vectors of the corresponding type, as well as `slide_dfr()` and `slide_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_` enable rolling in parallel. This family of functions empowers users to incorporate window-related operations in their workflows.
+Rolling window uses a programming paradigm---functional programming, which is different from those table verbs listed in Table \@ref(tab:verb-table). Table verbs expect and return a tsibble, and does something that the function name suggests. On the contrary, these rolling window functions could accept arbitrary input types and would return arbitrary sorts of output, depending on which method is put into the rolling window. For example, computing moving averages requires numerics and a function like `mean()`, and produce averaged numerics; however, rolling window regression takes a data frame and a linear regression method like `lm()`, and generate a complex object that contains coefficients, fitted values, and etc. In addition, the same function will be called and applied to each window of elements independently, which means programming is done with for-loop statements. But functional programming emphasizes on expressions instead of statements.
+
+As the name indicates, `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. An arbitrary function can be mapped and rolled over a block of elements given a specified window size. For type stability, the functions always return lists. Other variants including `*_lgl()`, `*_int()`, `*_dbl()`, `*_chr()` return vectors of the corresponding type, as well as `*_dfr()` and `*_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_` enable rolling in parallel. This family of functions empowers users to incorporate window-related operations in their workflows.
 
 # Software structure and design decisions {#sec:software}
 
