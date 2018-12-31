@@ -26,15 +26,10 @@ customer_na <- elec_ts %>%
 count_na_df <- customer_na %>% 
   count_gaps()
 
-count_lvl <- count_na_df %>% 
-  group_by(customer_id) %>% 
-  summarise(n_miss = sum(.n)) %>% 
-  mutate(customer_id = fct_reorder(as.character(customer_id), n_miss)) %>% 
-  pull(customer_id) %>% 
-  levels()
-
 count_na_df %>% 
-  mutate(customer_id = factor(customer_id, count_lvl)) %>% 
+  mutate(
+    customer_id = as.factor(customer_id) %>% fct_lump(50) %>% fct_reorder(.n)
+  ) %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to)) +
   geom_point(aes(y = .from)) +
@@ -46,6 +41,21 @@ count_na_df %>%
     legend.position = "bottom"
   )
 
+## ---- calendar-plot
+library(sugrrants)
+elec_cal <- elec_ts %>% 
+  summarise(avg = mean(general_supply_kwh)) %>% 
+  mutate(
+    date = as_date(reading_datetime), 
+    time = hms::as.hms(reading_datetime, tz = "UTC")
+  ) %>% 
+  frame_calendar(x = time, y = avg, date = date)
+
+p_cal <- elec_cal %>% 
+  ggplot(aes(.time, .avg, group = date)) +
+  geom_line()
+prettify(p_cal)
+
 ## ---- elec-quantiles
 qtl_grid <- seq(0.1, 0.9, 0.002)
 elec_qtl <- elec_ts %>% 
@@ -55,7 +65,7 @@ elec_qtl <- elec_ts %>%
   ) %>% 
   unnest(key = id(qtl)) %>% 
   mutate(
-    time = hms::as.hms(reading_datetime),
+    time = hms::as.hms(reading_datetime, tz = "UTC"),
     date = as_date(reading_datetime)
   )
 
