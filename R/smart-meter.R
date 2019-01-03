@@ -163,3 +163,33 @@ gas_aircon_avg %>%
   facet_grid(has_gas ~ ., labeller = "label_both") +
   scale_y_log10()
 names(customer)
+
+## ---- forecast
+library(fable)
+elec_mth <- elec_ts %>% 
+  filter_index(~ "2013-01-30") %>% 
+  index_by(datehour = floor_date(reading_datetime, "hour")) %>% 
+  summarise(avg_supply = mean(general_supply_kwh)) %>% 
+  mutate(
+    hour = hour(datehour),
+    date = as_date(datehour)
+  )
+
+elec_fc <- elec_mth %>% 
+  model(ets = ETS(avg_supply)) %>% 
+  forecast(h = 24)
+elec_fc$date <- as_date(elec_fc$datehour)
+
+# elec_fc %>% 
+#   autoplot(data = elec_mth) +
+#   sugrrants::facet_calendar(~ date)
+
+elec_mth %>% 
+  ggplot(aes(x = datehour, y = avg_supply)) +
+  geom_line() +
+  geom_forecast(
+    aes(ymin = lower, ymax = upper, level = level),
+    fortify(elec_fc) %>% mutate(date = as_date(datehour)), stat = "identity"
+  ) +
+  NULL
+  sugrrants::facet_calendar(~ date)
