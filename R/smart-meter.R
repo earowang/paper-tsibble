@@ -32,13 +32,15 @@ count_na_df %>%
   ) %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to)) +
-  geom_point(aes(y = .from)) +
-  geom_point(aes(y = .to)) +
+  geom_point(aes(y = .from), size = 0.6) +
+  geom_point(aes(y = .to), size = 0.6) +
   coord_flip() +
+  xlab("Customer") +
+  ylab("Time gaps") +
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
-    legend.position = "bottom"
+    legend.position = "none"
   )
 
 ## ---- calendar-plot

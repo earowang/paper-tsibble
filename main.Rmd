@@ -143,7 +143,7 @@ The tidy data abstraction lays a pipeline infrastructure for data analysis modul
 
 What is notable about an effective implementation of a data pipeline is that it coordinates a user's analysis making it cleaner to follow, and permits a wider audience to focus on the data analysis without getting lost in a jungle of computational intricacies. A fluent and fluid pipeline glues tidy data and the grammar of data manipulation together. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes, at least making it possible to trace them through the pipeline.
 
-## Time-based pipeline {#sec:timepipeline}
+## Time-based transformation {#sec:timepipeline}
 
 XXX may be good to have a diagram here showing how the time-based pipeline builds on a regular data pipeline
 
@@ -192,7 +192,9 @@ Transformation assembles a set of modules. A unit that makes up a module is func
 
 @eopl asserted "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." Each verb works with other transformation family members in harmony. This set of verbs can result in many combinations to prepare tsibble for a broad range of visualization and modeling problems. Chaining operations is achieved with the pipe operator `%>%` introduced in the **magrittr** package. A sequence of functions can be composed in a way that can be naturally read from left to right, which incredibly increase the readability of the code. It consequently generates a block of code without worrying naming intermediate values. Most importantly, the ecosystem for tidy time series analysis has been undertaking on the basis of tsibble in R, known as "tidyverts".
 
-As a special case of data frame, a tsibble pipes into the grammar of graphics straight way, making most use of this powerful graphical system. It should be easy to create and extend some specialist plotting methods based on tsibble structure, such as autocorrelation plots and calendar-based graphics [@wang-calendarviz-2018].
+## Time series visualization and models {#sec:ts-models}
+
+As a special case of the data frame, a tsibble pipes into the grammar of graphics straight way, making most use of this powerful graphical system. It should be easy to create and extend some specialized time-related plotting methods based on tsibble structure, such as autocorrelation plots and calendar-based graphics [@wang-calendarviz-2018].
 
 Modeling is crucial to explanatory and predictive analytics, but often imposes stricter assumptions on tsibble data. The verbs listed in Table \ref{tab:verb-table} ease the transition to a tsibble that suits modeling. A tidy forecasting framework built on top of tsibble is under development, which aims at promoting transparent forecasting practices and concise model representation. A tsibble usually contains multiple time series. Batch forecasting will be enabled if a univariate model, such as ARIMA and Exponential Smoothing, is applied to each time series independently. This yields a "mable" (short for model table), where each model only tags to each "key" value in tsibble to avoid expensive data copying and reduce model storage. The mable is further supplied to forecasting methods, to produce a tsibble in which each "key" along with its future time holds predictions. It also underlines the advantage of tsibble's "key" in linking between data inputs, models and forecasts. Advanced forecasting techniques, such as vector autocorrelation, hierarchical reconciliation, and ensembles, can be developed in alike spirit. The modeling module will be fulfilled and integrated eventually.
 
@@ -298,7 +300,7 @@ include_graphics("img/flight-pipeline1")
 
 (ref:flight-pipeline1-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:carrier-mosaic}.
 
-A closer examination of New York airports will give an indication about how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for EWR, JFK and LGA airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). LGA fluctuates a lot compared to the other two. What superimposes on these lines is two-month moving averages so that a temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without worrying weights specification. The sliding with large window size smoothes out the fluctuations and gives a stable trend around 25% over the year.
+A closer examination of some big airports across the US will give an indication about how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (Hawaii), Los Angeles (LAX) and Seatle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. What superimposes on these lines is two-month moving averages so that a temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without worrying weights specification. The sliding operation with large window size smoothes out the fluctuations and gives a stable trend around 25% over the year. The LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady control of delays over time. The IAH and JFK airports have undergone more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year.
 
 ```{r sel-flights}
 ```
@@ -315,7 +317,7 @@ A closer examination of New York airports will give an indication about how well
 ```{r sel-monthly-plot, fig.cap = "(ref:sel-monthly-plot-cap)", fig.height = 7}
 ```
 
-(ref:sel-monthly-plot-cap) Daily delayed percentages for departure with two-month moving averages overlaid at five international airports. There are many fluctuations observed at LGA airport. The estimates of temporal trend are around 25% across three airports, highlighting relatively less delay in Fall.
+(ref:sel-monthly-plot-cap) Daily delayed percentages for departure with two-month moving averages overlaid at five international airports. There are least fluctuations and relatively fewer delays observed at KOA airport. The estimates of temporal trend are around 25% across the other four airports, but highlight different time periods of severe delays.
 
 What time of day and day of week should we travel to avoid suffering from horrible delay? Figure \@ref(fig:draw-qtl) plots hourly quantile estimates across day of week in the form of small multiples. The upper-tail delay behaviors are of primary interest, and hence 50%, 80% and 95% quantiles are shown. To reduce the likelihood of delay suffering, it is recommended to avoid the peak hour at 18. As moving towards the upper extremes, the variations considerably increase, making departure time unpredictable.
 
@@ -335,15 +337,20 @@ What time of day and day of week should we travel to avoid suffering from horrib
 ```{r load-elec}
 ```
 
-Sensors have been put up to collect data for the project of smart city across major cities in Australia. One of the trials is monitoring households' electricity usage through installed smart meters in the area of New Castle over 2010--2014 [@smart-meter]. Year 2013 has been sliced to examine temporal patterns of customer's energy consumption with **tsibble** in this paper. Half-hourly general supply in kwH have been recored for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Customer's demographic data provides explanatory variables other than time in a different data table. Two data tables might be joined to explore different sources that contribute to daily electricity use when needed.
+Sensors have been put up to collect data for the project of smart city across major cities in Australia. One of the trials is monitoring households' electricity usage through installed smart meters in the area of Newcastle over 2010--2014 [@smart-meter]. Year 2013 has been sliced to examine temporal patterns of customer's energy consumption with **tsibble** in this paper. Half-hourly general supply in kwH have been recored for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Customer's demographic data provides explanatory variables other than time in a different data table. Two data tables might be joined to explore different sources that contribute to daily electricity use when needed.
 
 ```{r elec-gaps}
 ```
 
+Aggregation over all the individuals helps to grasp a big picture about if the behaviors are affected by the time.
+
 ```{r calendar-plot, fig.height = 7, fig.cap = "(ref:calendar-plot-cap)"}
 ```
 
-(ref:calendar-plot-cap) Half-hourly average electricity use.
+(ref:calendar-plot-cap) Half-hourly average electricity use across all customers in the region, organized in the calendar format. Distinctive patterns between summer and winter months occur to daily residential energy consumption. Air conditioning drives the peak in the late afternoon in January and December, however, peaks in the morning and evening are more pronounced in the winter months due to heating use.
+
+```{r count-gaps, fig.height = 7, fig.cap = "(ref:count-gaps-cap)"}
+```
 
 # Conclusion and future work {#sec:conclusion}
 
