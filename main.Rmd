@@ -349,7 +349,7 @@ During a power outage, electricity usage for some households may become unavaila
 
 (ref:count-gaps-cap) Time gap plots for the top 49 customers with most implicit missing values and the rest grouped into the one. Each cross represents the missing in time and a line between two dots shows continuous missingness over time. Each row corresponds to one customer describes the incidences of time gaps.
 
-Aggregation over all the individuals helps to grasp a big picture about if the behaviors are affected by the time.
+Aggregation across all individuals helps to sketch a big picture about if the representative behaviors change over time, laid out in the calendar display shown as Figure \@ref(fig:calendar-plot). Each glyph represents the daily pattern of residential electricity usage every thirty minutes with higher consumption in the time when human are more active. The daily snapshots diverge in traces, depending on the season in the year. During the summer months (December and January), the late-afternoon peak becomes predominant driven by the use of air conditioning, especially in the extremely hot days. However, the winter time (July and August) sees two peaks in a day, which is probably due to heating in the morning and evening. This also illustrates how nicely the tsibble data plays with other tools and graphics.
 
 ```{r calendar-plot, fig.height = 7, fig.cap = "(ref:calendar-plot-cap)"}
 ```
