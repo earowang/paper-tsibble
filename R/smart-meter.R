@@ -28,12 +28,13 @@ count_na_df <- customer_na %>%
 
 count_na_df %>% 
   mutate(
-    customer_id = as.factor(customer_id) %>% fct_lump(50) %>% fct_reorder(.n)
+    customer_id = as.factor(customer_id) %>% 
+      fct_lump(50) %>% fct_reorder(.n, sum)
   ) %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to)) +
-  geom_point(aes(y = .from), size = 0.6) +
-  geom_point(aes(y = .to), size = 0.6) +
+  geom_point(aes(y = .from), size = 0.6, shape = 4) +
+  geom_point(aes(y = .to), size = 0.6, shape = 4) +
   coord_flip() +
   xlab("Customer") +
   ylab("Time gaps") +

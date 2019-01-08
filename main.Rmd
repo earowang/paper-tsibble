@@ -342,15 +342,19 @@ Sensors have been put up to collect data for the project of smart city across ma
 ```{r elec-gaps}
 ```
 
+During a power outage, electricity usage for some households may become unavailable, thus resulting in implicit missing values in the database. Gaps in time occur to `r scales::percent(sum(gap_df$.gaps) / NROW(gap_df))` of the households in this dataset. It would be interesting to explore these missing patterns as part of preliminary analysis. Since the smart meter has been installed at different dates for each household, it is reasonable to assume that the records are obtainable for different time lengths for the households, instead of full lengths across the households. Figure \@ref(fig:count-gaps) reveals the gaps for the top 49 households and the rest collapsed into a single batch arranged in rows from high to low in tallies. Missing values can be found at any time point during the entire time span. A small number of customers have undergone energy unavailability in consecutive hours, indicated by a line range in the plot. On the other hand, the majority suffer occasional breakdown with more frequent happenings in January.
+
+```{r count-gaps, fig.height = 7, fig.cap = "(ref:count-gaps-cap)"}
+```
+
+(ref:count-gaps-cap) Time gap plots for the top 49 customers with most implicit missing values and the rest grouped into the one. Each cross represents the missing in time and a line between two dots shows continuous missingness over time. Each row corresponds to one customer describes the incidences of time gaps.
+
 Aggregation over all the individuals helps to grasp a big picture about if the behaviors are affected by the time.
 
 ```{r calendar-plot, fig.height = 7, fig.cap = "(ref:calendar-plot-cap)"}
 ```
 
 (ref:calendar-plot-cap) Half-hourly average electricity use across all customers in the region, organized in the calendar format. Distinctive patterns between summer and winter months occur to daily residential energy consumption. Air conditioning drives the peak in the late afternoon in January and December, however, peaks in the morning and evening are more pronounced in the winter months due to heating use.
-
-```{r count-gaps, fig.height = 7, fig.cap = "(ref:count-gaps-cap)"}
-```
 
 # Conclusion and future work {#sec:conclusion}
 
