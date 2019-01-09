@@ -54,13 +54,21 @@ read_chunk('R/smart-meter.R')
 
 # Introduction {#sec:intro}
 
-Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. @r4ds succinctly describes the data science workflow given in Figure \ref{fig:pipeline-ann}. It is annotated to emphasize the significant divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling, making data preparation for modeling and forecasting painful. 
+Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. @r4ds succinctly describes the data science workflow given in Figure \ref{fig:tsibble-fit}. It is annotated to emphasize the significant divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling, making data preparation for modeling and forecasting painful. 
 
+<!--
 ```{r pipeline-ann, fig.cap = "(ref:pipeline-ann-cap)"}
 include_graphics("img/motivation.pdf")
 ```
 
 (ref:pipeline-ann-cap) An overview of the data science program centering around data. Temporal data should feed into the import stage, but the existing time series objects are model-focused, thus resulting misalliance between data and model.
+-->
+
+```{r tsibble-fit, fig.cap = "(ref:tsibble-fit-cap)"}
+include_graphics("img/tsibble-fit.pdf")
+```
+
+(ref:tsibble-fit-cap) Illustration of data science workflow, drawn from @r4ds, showing how current time series tools interface with the workflow and how tsibble structure and tools integrate. The new data structure, tsibble, makes the connection between temporal data input, and specialist modeling formats. It provides elements at the "tidy" step, which produce tidy temporal data for time series visualisation and modeling.
 
 Current time series objects, which are model-oriented matrices with little support for non-numeric values, feed into the framework solely at the modelling stage. Analysts are expected to do their own data pre-processing and take care of anything else needed to get to this stage, which leads to a myriad ad-hoc solutions and duplicated efforts.
 
@@ -91,12 +99,6 @@ A new temporal data class is needed in the upstream of the workflow, which could
 This paper proposes a new tidy representation for temporal data and a unified framework to streamline the workflow from data pre-processing to visualization and forecasting, as an integral part of tidy data analysis.
 
 # Contextual semantics {#sec:semantics}
-
-```{r tsibble-fit, fig.cap = "(ref:tsibble-fit-cap)"}
-include_graphics("img/tsibble-fit.pdf")
-```
-
-(ref:tsibble-fit-cap) Tsibble's abstraction arises from a data-centric point of view, which could neatly embed into the tidyverse ecosystem. It should be noted that tsibble positions itself at the "tidy" step rather than "import", which ensures valid tidy data to time series analytics and models.
 
 The choice of tidy representation of temporal data arises from a data-centric perspective, which accommodates all of the operations that are to be performed on the data. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the tidy model, which we refer to as "tsibble".
 
