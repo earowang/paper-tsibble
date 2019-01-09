@@ -100,6 +100,12 @@ This paper proposes a new tidy representation for temporal data and a unified fr
 
 # Contextual semantics {#sec:semantics}
 
+```{r tsibble-semantics, fig.cap = "(ref:tsibble-semantics-cap)"}
+include_graphics("img/tsibble-semantics.pdf")
+```
+
+(ref:tsibble-semantics-cap) The architecture of the tsibble structure is built on top of the data frame---a two-dimensional array in R, with time series semantics: index and key.
+
 The choice of tidy representation of temporal data arises from a data-centric perspective, which accommodates all of the operations that are to be performed on the data. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the tidy model, which we refer to as "tsibble".
 
 ```{r tb-sub}
@@ -147,7 +153,11 @@ What is notable about an effective implementation of a data pipeline is that it 
 
 ## Time-based transformation {#sec:timepipeline}
 
-XXX may be good to have a diagram here showing how the time-based pipeline builds on a regular data pipeline
+```{r tsibble-pipeline, fig.cap = "(ref:tsibble-pipeline-cap)"}
+include_graphics("img/tsibble-pipeline.pdf")
+```
+
+(ref:tsibble-pipeline-cap) A time series pipeline is different from a regular data pipeline: (1) check if the key and index uniquely identify each observation in the data whist creating a tsibble; (2) check if there are time gaps in the tsibble before analysis.
 
 The time-based pipeline shepards raw temporal data through to time series analysis, and plots. It is possible and recommended to check for identical entries of key and index before analysis. Duplicates signal the data quality issue, which would likely affect succeeding analyses and hence decision making. Analysts are encouraged to gaze at data early and reason about the process of data cleaning. When the data meets the tsibble standard, it flows neatly into the analysis stage.
 

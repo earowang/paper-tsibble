@@ -166,17 +166,16 @@ sel_monthly %>%
 ## ---- quantile
 hr_qtl <- us_flights %>% 
   index_by(dep_datehour = floor_date(sched_dep_datetime, "hour")) %>% 
-  summarise(    
-    qtl50 = quantile(dep_delay, 0.5),
-    qtl80 = quantile(dep_delay, 0.8),
-    qtl95 = quantile(dep_delay, 0.95)
+  summarise(
+    value = list(quantile(dep_delay, c(0.5, 0.8, 0.95))),
+    qtl = list(paste0("qtl", c(50, 80, 95)))
   ) %>% 
+  unnest(key = id(qtl)) %>% 
   mutate(
     hour = hour(dep_datehour), 
     wday = wday(dep_datehour, label = TRUE, week_start = 1),
     date = as_date(dep_datehour)
-  ) %>% 
-  gather(key = qtl, value = dep_delay, qtl50:qtl95)
+  )
 
 ## ---- draw-qtl-prep
 break_cols <- c(
