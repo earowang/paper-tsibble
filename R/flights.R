@@ -128,20 +128,14 @@ sel_flights <- us_flights %>%
 
 ## ---- sel-delay
 sel_delay <- sel_flights %>% 
-  mutate(delayed = dep_delay > 15) %>% 
   group_by(origin) %>% 
   index_by(sched_dep_date = as_date(sched_dep_datetime)) %>% 
-  summarise(
-    n_flights = n(),
-    n_delayed = sum(delayed)
-  ) %>% 
-  mutate(pct_delay = n_delayed / n_flights)
+  summarise(pct_delay = sum(dep_delay > 15) / n())
 
 ## ----- sel-monthly-1
 sel_lst <- sel_delay %>% 
   mutate(yrmth = yearmonth(sched_dep_date)) %>% 
-  group_by(origin, yrmth) %>% 
-  nest()
+  nest(-origin, -yrmth)
 
 ## ---- sel-monthly-2
 sel_monthly <- sel_lst %>% 

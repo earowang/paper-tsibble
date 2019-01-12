@@ -312,7 +312,7 @@ include_graphics("img/flight-pipeline1")
 
 (ref:flight-pipeline1-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:carrier-mosaic}.
 
-A closer examination of some big airports across the US will give an indication about how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (Hawaii), Los Angeles (LAX) and Seatle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. What superimposes on these lines is two-month moving averages so that a temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without worrying weights specification. The sliding operation with large window size smoothes out the fluctuations and gives a stable trend around 25% over the year. The LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady control of delays over time. The IAH and JFK airports have undergone more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year.
+A closer examination of some big airports across the US will give an indication about how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (KOA), Los Angeles (LAX) and Seatle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. What superimposes on these lines is two-month moving averages so that a temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without worrying weights specification. The sliding operation with large window size smoothes out the fluctuations and gives a stable trend around 25% over the year. The LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady control of delays over time. The IAH and JFK airports have undergone more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year.
 
 ```{r sel-flights}
 ```
@@ -331,6 +331,12 @@ A closer examination of some big airports across the US will give an indication 
 
 (ref:sel-monthly-plot-cap) Daily delayed percentages for departure with two-month moving averages overlaid at five international airports. There are least fluctuations and relatively fewer delays observed at KOA airport. The estimates of temporal trend are around 25% across the other four airports, but highlight different time periods of severe delays.
 
+```{r flight-pipeline2, fig.cap = "(ref:flight-pipeline2-cap)"}
+include_graphics("img/flight-pipeline2")
+```
+
+(ref:flight-pipeline2-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:sel-monthly-plot}.
+
 What time of day and day of week should we travel to avoid suffering from horrible delay? Figure \@ref(fig:draw-qtl) plots hourly quantile estimates across day of week in the form of small multiples. The upper-tail delay behaviors are of primary interest, and hence 50%, 80% and 95% quantiles are shown. To reduce the likelihood of delay suffering, it is recommended to avoid the peak hour at 18. As moving towards the upper extremes, the variations considerably increase, making departure time unpredictable.
 
 ```{r quantile}
@@ -343,6 +349,12 @@ What time of day and day of week should we travel to avoid suffering from horrib
 ```
 
 (ref:draw-qtl-cap) Small multiples of lines about departure delay against time of day, faceting day of week and 50%, 80% and 95% quantiles. A blue horizontal line indicates the 15-minute on-time standard to help grasp the delay severity. Passengers are apt to hold up around 18 during a day, and are recommended to travel early. The variations increase substantially as the upper tails.
+
+```{r flight-pipeline3, fig.cap = "(ref:flight-pipeline3-cap)"}
+include_graphics("img/flight-pipeline3")
+```
+
+(ref:flight-pipeline3-cap) Flow chart illustrates the pipeline that pre-processes the data for creating Figure \ref{fig:draw-qtl}.
 
 ## Smart-grid customer data in Australia
 
