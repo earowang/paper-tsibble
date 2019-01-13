@@ -5,6 +5,11 @@ library(tsibble)
 
 customer <- read_rds("data/customer.rds")
 elec <- read_rds("data/smart-meter13.rds")
+weather <- read_rds("data/weather13.rds") %>% 
+  group_by(date) %>% 
+  mutate(avg_temp = mean(c(max_temp, min_temp))) %>% 
+  ungroup() %>% 
+  mutate(hot = if_else(avg_temp > 25, "Hot day", "Not hot day"))
 
 elec_ts <- elec %>% 
   build_tsibble(
@@ -52,11 +57,14 @@ elec_cal <- elec_ts %>%
     date = as_date(reading_datetime), 
     time = hms::as.hms(reading_datetime, tz = "UTC")
   ) %>% 
+  left_join(weather, by = "date") %>% 
   frame_calendar(x = time, y = avg, date = date)
 
 p_cal <- elec_cal %>% 
-  ggplot(aes(.time, .avg, group = date)) +
-  geom_line()
+  ggplot(aes(.time, .avg, group = date, colour = hot)) +
+  geom_line() +
+  scale_colour_brewer(palette = "Dark2", direction = -1) +
+  theme(legend.position = "bottom")
 prettify(p_cal)
 
 ## ---- elec-quantiles
@@ -166,33 +174,3 @@ gas_aircon_avg %>%
   facet_grid(has_gas ~ ., labeller = "label_both") +
   scale_y_log10()
 names(customer)
-
-## ---- forecast
-library(fable)
-elec_mth <- elec_ts %>% 
-  filter_index(~ "2013-01-30") %>% 
-  index_by(datehour = floor_date(reading_datetime, "hour")) %>% 
-  summarise(avg_supply = mean(general_supply_kwh)) %>% 
-  mutate(
-    hour = hour(datehour),
-    date = as_date(datehour)
-  )
-
-elec_fc <- elec_mth %>% 
-  model(ets = ETS(avg_supply)) %>% 
-  forecast(h = 24)
-elec_fc$date <- as_date(elec_fc$datehour)
-
-# elec_fc %>% 
-#   autoplot(data = elec_mth) +
-#   sugrrants::facet_calendar(~ date)
-
-elec_mth %>% 
-  ggplot(aes(x = datehour, y = avg_supply)) +
-  geom_line() +
-  geom_forecast(
-    aes(ymin = lower, ymax = upper, level = level),
-    fortify(elec_fc) %>% mutate(date = as_date(datehour)), stat = "identity"
-  ) +
-  NULL
-  sugrrants::facet_calendar(~ date)
