@@ -103,11 +103,11 @@ The **tidyverse** largely formalizes exploratory data analysis. Many in the R co
 
 ## Existing time series standards in R
 
-Current standards, provided by native `ts` object in R and extended by **zoo** [@zoo2005], and **xts** [@R-xts], organize temporal data in matrices with implicit time indexes. These objects were designed for modelling methods. The diagram correspondingly would place the model at the center of the analytical universe, and all the transformations, visualisations would hinge on that format. This is contrary to the tidyverse conceptualisation, which wholistically captures the full data workflow.
+Current standards, provided by the native `ts` object in R, extended by **zoo** [@zoo2005], and **xts** [@R-xts], assemble temporal data into matrices with implicit time indexes. These objects were designed for modelling methods. The diagram in the style of Figure \ref{fig:tsibble-fit}, would place the model at the center of the analytical universe, and all the transformations, visualisations would hinge on that format. This is contrary to the tidyverse conceptualisation, which wholistically captures the full data workflow.
 
 A new temporal data class is needed in the upstream of the workflow, which could incorporate all the downstream modules. A relatively new R package **tibbletime** proposed a data class of *time tibble* to represent temporal data in heterogeneous tabular format. It only requires an index variable to declare a temporal data object, thus placing at the import stage. However, this is a loosely-defined structure and insufficient for time series analytics and models. Because it does not define interested subjects ($i$) over time and time uniqueness.
 
-This paper proposes a new tidy representation for temporal data and a unified framework to streamline the workflow from data pre-processing to visualization and forecasting, as an integral part of tidy data analysis.
+This paper describes a new tidy representation for temporal data, and a unified framework to streamline the workflow from data pre-processing to visualization and forecasting, as an integral part of a tidy data analysis.
 
 # Contextual semantics {#sec:semantics}
 
