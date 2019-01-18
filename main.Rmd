@@ -54,7 +54,20 @@ read_chunk('R/smart-meter.R')
 
 # Introduction {#sec:intro}
 
-Suppose that temporal data consists of $N$ subjects/observational units. Given subject $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. Temporal data arrives in many possible formats, so does time. For example, time can carry with various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. @r4ds succinctly describes the data science workflow given in Figure \ref{fig:tsibble-fit}. It is annotated to emphasize the significant divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling, making data preparation for modeling and forecasting painful. 
+<!--Suppose that temporal data consists of $N$ observational units. Given observation $i$ $(i = 1, 2, \dots, N)$, $X_{ijt}$ denotes the $j$th measurement $(j = 1, 2, \dots, p)$ indexed at a unique sequence of time points $0 \le t \le T_{i}$. 
+-->
+Temporal data arrives in many possible formats, as does the time context. For example, time can carry with it various time resolutions (hours, minutes, and seconds), and they are typically associated with different time zones with adjustments like summer time. It could be irregularly recorded, which is particularly true with longitudinal measurements like patient visits to a doctor's office. Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, multiple grouping factors. Temporal data may be occurence of events, like flight departures, that need to be induced into a regular structure. 
+
+Current time series objects, tend to be model-oriented matrices. Analysts are expected to do their own data pre-processing and take care of anything else needed to get to this stage, which leads to a myriad ad-hoc solutions and duplicated efforts. 
+
+In recent work, there has been exciting developments, that conceptually and practically streamline the pre-processing of data. Figure \ref{fig:tsibble-fit} (adapted from @r4ds) illustrates the tidy data workflow. Time series modeling and forecasting enters the picture at the *modeling* stage. While temporal data enters at the start, there isn't a current framework for getting temporal data into the matrix format for modeling. That's the part of the workflow that the work descirbed in this paper improves. 
+
+<!--
+with little support for non-numeric values, feed into the framework solely at the modelling stage. Analysts are expected to do their own data pre-processing and take care of anything else needed to get to this stage, which leads to a myriad ad-hoc solutions and duplicated efforts.
+
+
+@r4ds succinctly describes the data science workflow given in Figure \ref{fig:tsibble-fit}. It is annotated to emphasize the significant divide between data that feeds into the beginning of analysis and the current time series objects that fits into modelling, making data preparation for modeling and forecasting painful. 
+-->
 
 <!--
 ```{r pipeline-ann, fig.cap = "(ref:pipeline-ann-cap)"}
@@ -70,9 +83,7 @@ include_graphics("img/tsibble-fit.pdf")
 
 (ref:tsibble-fit-cap) Illustration of data science workflow, drawn from @r4ds, showing how current time series tools interface with the workflow and how tsibble structure and tools integrate. The new data structure, tsibble, makes the connection between temporal data input, and specialist modeling formats. It provides elements at the "tidy" step, which produce tidy temporal data for time series visualisation and modeling.
 
-Current time series objects, which are model-oriented matrices with little support for non-numeric values, feed into the framework solely at the modelling stage. Analysts are expected to do their own data pre-processing and take care of anything else needed to get to this stage, which leads to a myriad ad-hoc solutions and duplicated efforts.
-
-The rest of the paper is structured as follows. Section \ref{sec:str} reviews temporal data structures corresponding to time series and longitudinal analysis, and discusses "tidy data" and the grammar of data manipulation. Section \ref{sec:semantics} proposes contextual semantics for temporal data, built on top of tidy data. The concept of data pipelines with respect to the time domain will be discussed in depth in Section \ref{sec:pipeline}, followed by the design choices of software structure in Section \ref{sec:software}. Section \ref{sec:cases} presents two case studies for temporal data exploration using the newly implemented infrastructure. Section \ref{sec:conclusion} concludes the paper and discusses the future work.
+The paper is structured as follows. Section \ref{sec:str} reviews temporal data structures corresponding to time series and longitudinal analysis, and discusses "tidy data" and the grammar of data manipulation. Section \ref{sec:semantics} proposes contextual semantics for temporal data, built on top of tidy data. The concept of data pipelines with respect to the time domain will be discussed in depth in Section \ref{sec:pipeline}, followed by a discussion of the design choices made in the software structure in Section \ref{sec:software}. Two case studies are presented in Section \ref{sec:cases} illustrating temporal data exploration using the newly implemented infrastructure. Section \ref{sec:conclusion} discusses the future work.
 
 # Data structures {#sec:str}
 
