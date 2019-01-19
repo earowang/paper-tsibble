@@ -277,9 +277,9 @@ The **purrr** package provides a good example of functional programming in R. It
 
 ## Modularity
 
-Modular programming is adopted while designing the **tsibble** package. Modularity benefits users with variety and flexibility and developers with easy maintenance. 
+Modular programming is adopted in the design of the **tsibble** package. Modularity benefits users by providing small focused and manageable chunks, and provides developers with simpler maintenance. 
 
-All user-facing functions can be roughly organized into three major chunks according to their functionality: vector functions (1d), table verbs (2d), and window family. Each chunk is an independent module, but works interdependently. Vector functions in the package mostly deal with time. When collapsing a tsibble to less granular interval, these atomic functions can be combined with the `index_by()` table verb to accomplish this. A different function results in easily switching to aggregation of different time resolution. Since these functions are not exclusive to a tsibble, they can be used in a variety of applications in conjunction with other packages. On the other hand, these tsibble verbs can incorporate many third-party vector functions to step out of current tsibble zone. It is generally easier to trace back the errors users encounter from separating 1d and 2d functions. (lost in a web of functions)
+All user-facing functions can be roughly organized into three major chunks according to their functionality: vector functions (1d), table verbs (2d), and window family. Each chunk is an independent module, but works interdependently. Vector functions in the package mostly deal with time. When collapsing a tsibble to a less granular interval, these atomic functions can be combined with the `index_by()` table verb. A different function results in easily switching to aggregation of different time resolution. Since these functions are not exclusive to a tsibble, they can be used in a variety of applications in conjunction with other packages. On the other hand, these tsibble verbs can incorporate many third-party vector functions to step out of current tsibble zone. It is generally easier to trace back the errors users encounter from separating 1d and 2d functions. <!--(lost in a web of functions)-->
 
 ## Extensibility
 
