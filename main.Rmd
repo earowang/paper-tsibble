@@ -237,20 +237,20 @@ We go through the whole exploration circle, and keep iterating and refining unti
 
 The prime force that drives the software's design choices is "data". All functions in **tsibble** start with `data` or its variants as the first argument, namely "data first". They work naturally with the pipe operator `%>%`, read as "then". This not only lays out a consistent interface but also addresses the significance of the data throughout the software.
 
-Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. The  contextual summary provided by the print function on the data is shown in Table \ref{tab:tb-sub} contains (1) data dimension with its shorthand time interval, alongside time zone if date-time, (2) variables that constitute the "key" with the number of series. These details aid users in understanding their data better.
+Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. The  contextual summary provided by the print function shown below, on the data from Table \ref{tab:tb-sub}, contains (1) data dimension with its shorthand time interval, alongside time zone if date-time, (2) variables that constitute the "key" with the number of series. These details aid users in understanding their data better.
 
 ```{r tb-print}
 ```
 
 ## Functional programming
 
-Rolling window calculations are widely-used techniques in time series analysis, but are not restricted to temporal applications. These operations are dependent on certain ordering, particularly time ordering for temporal data. Three common types of variations for sliding window operations are:
+Rolling window calculations are widely-used techniques in time series analysis, but are not restricted to temporal applications. These operations are dependent on having an ordering, particularly time ordering for temporal data. Three common types of variations for sliding window operations are:
 
 1. **slide**: sliding window with overlapping observations.
 2. **tile**: tiling window without overlapping observations.
 3. **stretch**: fixing an initial window and expanding to include more observations.
 
-Figure \@ref(fig:slide-animate), \@ref(fig:tile-animate) and \@ref(fig:stretch-animate) show the animations of rolling windows for sliding, tiling and stretching respectively on annual tuberculosis cases in Australia. A block of consecutive elements with window size of 5 are initialized and started rolling sequentially till the end of series.
+Figures \@ref(fig:slide-animate), \@ref(fig:tile-animate) and \@ref(fig:stretch-animate) show the animations of rolling windows for sliding, tiling and stretching, respectively, on annual tuberculosis cases for Australia. A block of consecutive elements with a window size of 5 are initialized and started rolling sequentially till the end of series.
 
 ```{r tb-au}
 ```
@@ -258,21 +258,22 @@ Figure \@ref(fig:slide-animate), \@ref(fig:tile-animate) and \@ref(fig:stretch-a
 ```{r slide-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:slide-animate-cap)"}
 ```
 
-(ref:slide-animate-cap) An illustration of window of size 5 sliding over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
+(ref:slide-animate-cap) An illustration of window of size 5 sliding over annual tuberculosis cases in Australia. (Animation needs to be viewed with Adobe Acrobat Reader.)
 
 ```{r tile-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:tile-animate-cap)"}
 ```
 
-(ref:tile-animate-cap) An illustration of window of size 5 tiling over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
+(ref:tile-animate-cap) An illustration of window of size 5 tiling over annual tuberculosis cases in Australia. (Animation needs to be viewed with Adobe Acrobat Reader.)
 
 ```{r stretch-animate, fig.show = "animate", fig.height = 2.5, fig.cap = "(ref:stretch-animate-cap)"}
 ```
 
-(ref:stretch-animate-cap) An illustration of window of size 5 stretching over annual tuberculosis cases in Australia. View the animation with Adobe Acrobat Reader.
+(ref:stretch-animate-cap) An illustration of window of size 5 stretching over annual tuberculosis cases in Australia. (Animation needs to be viewed with Adobe Acrobat Reader.)
 
-Rolling window uses a programming paradigm---functional programming, which is different from those table verbs listed in Table \@ref(tab:verb-table). Table verbs expect and return a tsibble, and does something that the function name suggests. On the contrary, these rolling window functions could accept arbitrary input types and would return arbitrary sorts of output, depending on which method is put into the rolling window. For example, computing moving averages requires numerics and a function like `mean()`, and produce averaged numerics; however, rolling window regression takes a data frame and a linear regression method like `lm()`, and generate a complex object that contains coefficients, fitted values, and etc. In addition, the same function will be called and applied to each window of elements independently, which means programming is done with for-loop statements. But functional programming emphasizes on expressions instead of statements.
+Rolling window uses a programming paradigm---functional programming, which is different from those table verbs listed in Table \@ref(tab:verb-table). Table verbs expect and return a tsibble, and does what the function name suggests. On the contrary, these rolling window functions could accept arbitrary input types and would return arbitrary sorts of output, depending on which method is put into the rolling window. For example, computing moving averages requires numerics and a function like `mean()`, and produces averaged numerics. However, rolling window regression takes a data frame and a linear regression method like `lm()`, and generates a complex object that contains coefficients, fitted values, and etc.
+<!-- In addition, the same function is called and applied to each window of data independently, which means programming is done with for-loop statements. But functional programming emphasizes  expressions instead of statements.-->
 
-The **purrr** package sets a great example of functional programming in R. It provides a complete and consistent set of tools to iterate each element of a vector with a function. Rolling window not just iterates but roll over a sequence of elements, with `slide()`, `tile()` and `stretch()`. `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. For type stability, the functions always return lists. Other variants including `*_lgl()`, `*_int()`, `*_dbl()`, `*_chr()` return vectors of the corresponding type, as well as `*_dfr()` and `*_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_` enable rolling in parallel. This family of functions empowers users to incorporate window-related operations in their workflows.
+The **purrr** package provides a good example of functional programming in R. It provides a complete and consistent set of tools to iterate each element of a vector with a function. Rolling window doesn't just iterate but rolls over a sequence of elements, with `slide()`, `tile()` and `stretch()`. `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. For type stability, the functions always return lists. Other variants including `*_lgl()`, `*_int()`, `*_dbl()`, `*_chr()` return vectors of the corresponding type, as well as `*_dfr()` and `*_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_` enable rolling in parallel. This family of functions empowers users to incorporate window-related operations in their workflows.
 
 ## Modularity
 
