@@ -394,7 +394,7 @@ The **tsibble** package provides the grammar of temporal data manipulation, rega
 
 # Acknowledgments {-}
 
-The authors would like to thank Mitchell O'Hara-Wild for many discussions on the software development and Davis Vaughan for contributing ideas on rolling window functions. This article was created with knitr [@knitr] and R Markdown [@rmarkdown]. The project's Github repository <https://github.com/earowang/paper-tsibble> houses all materials required to reproduce this article and a history of the changes. To produce the analysis results as described in Section \autoref{sec:cases}, we require the **tsibble** package (`v0.6.2`) and the **dplyr** package (`v0.7.8`) installed.
+The authors would like to thank Mitchell O'Hara-Wild for many discussions on the software development and Davis Vaughan for contributing ideas on rolling window functions. This article was created with knitr [@knitr] and R Markdown [@rmarkdown]. The project's Github repository <https://github.com/earowang/paper-tsibble> houses all materials required to reproduce this article and a history of the changes. <!-- To produce the analysis results as described in Section \autoref{sec:cases}, we require the **tsibble** package (`v0.6.2`) and the **dplyr** package (`v0.7.8`) installed. -->
 
 ```{r write-bib}
 write_bib(c("dplyr", "tidyr", "purrr", "nanotime", "tibbletime", "tsibble", "magrittr"), file = "rpkgs.bib")
