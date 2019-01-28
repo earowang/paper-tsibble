@@ -102,7 +102,7 @@ The **tidyverse** largely formalizes exploratory data analysis. Many in the R co
 
 ## Existing time series standards in R
 
-Current standards, provided by the native `ts` object in R, extended by **zoo** [@zoo2005], and **xts** [@R-xts], assemble temporal data into matrices with implicit time indexes. These objects were designed for modelling methods. The diagram in the style of \autoref{fig:tsibble-fit}, would place the model at the center of the analytical universe, and all the transformations and visualisations would hinge on that format. This is contrary to the tidyverse conceptualisation, which holistically captures the full data workflow.
+Current standards, provided by the native `ts` object in R, and extended by **zoo** [@zoo2005] and **xts** [@R-xts], assemble temporal data into matrices with implicit time indexes. These objects were designed for modeling methods. The diagram in the style of \autoref{fig:tsibble-fit} would place the model at the center of the analytical universe, and all the transformations and visualizations would hinge on that format. This is contrary to the tidyverse conceptualization, which holistically captures the full data workflow.
 
 A new temporal data class is needed in the upstream of the workflow, which could incorporate all the downstream modules. A relatively new R package **tibbletime** proposed a data class of *time tibble* to represent temporal data in heterogeneous tabular format. It only requires an index variable to declare a temporal data object, thus placing it at the import stage. However, this is a loosely defined structure, and insufficient for time series analytics and models because it does not define interested subjects\todo{Needs explanation} over time or impose time uniqueness.
 
