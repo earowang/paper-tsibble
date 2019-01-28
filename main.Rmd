@@ -236,7 +236,7 @@ We go through the whole exploration circle, and keep iterating and refining unti
 
 The primary force that drives the software's design choices is "data". All functions in **tsibble** start with `data` or its variants as the first argument, namely "data first". They work naturally with the pipe operator `%>%`, read as "then". This not only lays out a consistent interface but also addresses the significance of the data throughout the software.
 
-Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. The contextual summary provided by the print function shown below, on the data from \autoref{tab:tb-sub}, contains (1) data dimension with its shorthand time interval, alongside time zone if date-time, (2) variables that constitute the "key" with the number of series. These details aid users in understanding their data better.
+Beyond the tools, the print display provides a quick and comprehensive glimpse of data in temporal context, particularly useful when handling a large collection of data. The contextual summary provided by the print function, shown below on the data from \autoref{tab:tb-sub}, contains (1) data dimension with its shorthand time interval, alongside time zone if date-time, (2) variables that constitute the "key" with the number of series. These details aid users in understanding their data better.
 
 ```{r tb-print}
 ```
