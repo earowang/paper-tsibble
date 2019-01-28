@@ -171,7 +171,7 @@ include_graphics("img/tsibble-pipeline.pdf")
 
 ## Time-based transformations {#sec:timepipeline}
 
-Many time operations like lag/lead and time series models, assume an intact vector input ordered in time. To prevent inviting these errors into the analysis, it is a good practice to check and inspect any time gaps of the tsibble in the first place. Several tools are provided to understand and tackle implicit missing values in: (1) `has_gaps()` checks if there exists time gaps; (2) `scan_gaps()` reports all implicit missing observations; (3) `count_gaps()` summarises the time ranges that are absent from the data; (4) `fill_gaps()` turns them into explicit ones, along with imputing by values or functions.
+Many time operations like lag/lead and time series models, assume an intact vector input ordered in time. To prevent inviting these errors into the analysis, it is a good practice to check and inspect any time gaps of the tsibble in the first place. Several tools are provided to understand and tackle implicit missing values in: (1) `has_gaps()` checks if there exists time gaps; (2) `scan_gaps()` reports all implicit missing observations; (3) `count_gaps()` summarizes the time ranges that are absent from the data; (4) `fill_gaps()` turns them into explicit ones, along with imputing by values or functions.
 
 A suite of verbs, and corresponding functions, are used to flatten the lumpy path from temporal data to an object that can be directly modeled in the tsibble framework, and transformed for visualization. A tsibble is an object, conceptually considered as a noun, and hence an action performed on the object can be phrased as a verb. The principle that underpins most verbs is a tsibble in and a tsibble out, thereby striving to retain a valid tsibble by automating index and key updates under the hood. Attention has been paid to error handling. If a tsibble cannot be maintained in the output of a pipeline module, for example the index is dropped by aggregation, an error informs users of the problem and suggests alternatives. This avoids surprising users and reminds them of the time context.
 
@@ -198,7 +198,7 @@ Each verb focuses on one operation to achieve its goal. The verb should be self-
 \multirow{4}{*}{Column-wise} & \textbf{\texttt{select()}} & Pick columns by variables \\
  & \textbf{\texttt{mutate()}} & Add new variables \\
  & \textbf{\texttt{transmute()}} & Drops existing variables \\
- & \textbf{\texttt{summarise()}} & Aggregate values over time \\ \hline
+ & \textbf{\texttt{summarize()}} & Aggregate values over time \\ \hline
 \multirow{3}{*}{Group-wise} & \texttt{index\_by()} & Group by index candidate \\
  & \textbf{\texttt{group\_by()}} & Group by one or more variables \\
  & \texttt{group\_by\_key()} & Group by key variables \\ \hline
