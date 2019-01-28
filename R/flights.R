@@ -3,65 +3,9 @@ library(lubridate)
 library(tidyverse)
 library(tsibble)
 library(forcats)
-# devtools::install_github("heike/ggmapr")
-library(ggmapr)
 
 ## ---- load-flights
 flights <- read_rds("data/flights.rds")
-
-## ---- map-prep
-origin_dest <- flights %>% 
-  distinct(origin, origin_state, dest, dest_state)
-airports <- read_rds("data/airports.rds")
-map_dat <- origin_dest %>% 
-  left_join(airports, by = c("origin" = "faa")) %>% 
-  rename(long = lon) %>% 
-  shift(origin_state == "HI", shift_by = c(52.5, 5.5)) %>%
-  scale(origin_state == "AK", scale = 0.3, set_to = c(-117, 27)) %>%
-  rename(origin_lat = lat, origin_lon = long)  %>% 
-  left_join(select(airports, faa, lon, lat), by = c("dest" = "faa")) %>% 
-  rename(long = lon) %>% 
-  shift(dest_state == "HI", shift_by = c(52.5, 5.5)) %>%
-  scale(dest_state == "AK", scale = 0.3, set_to = c(-117, 27)) %>%
-  rename(dest_lat = lat, dest_lon = long)
-
-states <- states %>%
-  shift(NAME == "Hawaii", shift_by = c(52.5, 5.5)) %>%
-  scale(NAME == "Alaska", scale = 0.3, set_to = c(-117, 27)) %>%
-  filter(lat > 20)
-
-## ---- map-airlines
-ggplot() +
-  geom_polygon(data= states, aes(x = long, y = lat, group = group), 
-    fill = "white", colour = "grey60") +
-  geom_segment(data = map_dat, aes(
-    x = origin_lon, y = origin_lat, xend = dest_lon, yend = dest_lat
-  ), alpha = 0.1, size = 0.4, colour = "#762a83") +
-  geom_point(data = map_dat, aes(x = origin_lon, y = origin_lat), 
-    colour = "#a6dba0", size  = 0.7) +
-  coord_map("albers", parameters = c(30, 45)) +
-  ggthemes::theme_map()
-
-## ---- dl771
-dl771 <- flights %>% 
-  filter(flight_num == "DL771") %>% 
-  left_join(map_dat) %>% 
-  arrange(sched_dep_datetime)
-
-ggplot() +
-  geom_polygon(data= states, aes(x = long, y = lat, group = group), 
-    fill = "white", colour = "grey60") +
-  geom_segment(data = dl771, aes(
-    x = origin_lon, y = origin_lat, xend = dest_lon, yend = dest_lat
-  ), colour = "#762a83", size = 1, alpha = 0.6, 
-    arrow = arrow(length = unit(0.2, "inches"))
-  ) +
-  geom_point(data = dl771, aes(x = origin_lon, y = origin_lat), 
-    colour = "#f1a340", size  = 1.5) +
-  geom_point(data = dl771, aes(x = dest_lon, y = dest_lat), 
-    colour = "#f1a340", size  = 1.5) +
-  coord_map("albers", parameters = c(30, 45)) +
-  ggthemes::theme_map()
 
 ## ---- find-duplicate
 flights %>% 
@@ -80,25 +24,6 @@ us_flights <- flights %>%
 
 ## ---- tsibble-header
 cat(format(us_flights)[1:2], sep = "\n")
-
-## ---- filter
-us_flights %>% 
-  filter(sched_dep_datetime < yearmonth("201703"))
-
-## ---- select
-us_flights %>% 
-  select(flight_num, origin, dep_delay)
-
-## ---- summarise
-us_flights %>% 
-  summarise(avg_delay = mean(dep_delay))
-
-## ---- index-by
-us_flights %>% 
-  index_by(
-    dep_datehour = floor_date(sched_dep_datetime, unit = "hour")
-  ) %>% 
-  summarise(avg_delay = mean(dep_delay))
 
 ## ---- carrier-delayed
 delayed_carrier <- us_flights %>% 
