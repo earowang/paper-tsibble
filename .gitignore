@@ -7,6 +7,7 @@ cache/
 data-raw/flights/
 data-raw/airports.dat
 data-raw/customer.csv
+arxiv*
 
 main\.tex
 main\.log
