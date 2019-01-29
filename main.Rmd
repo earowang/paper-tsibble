@@ -161,9 +161,7 @@ A suite of verbs are used to flatten the lumpy path from temporal data to an obj
 
 A tsibble is an object, conceptually considered as a noun, and hence an action performed on the object can be phrased as a verb. The principle that underpins most verbs is a tsibble in and a tsibble out, thereby striving to retain a valid tsibble by automating index and key updates under the hood. Attention has been paid to error handling. If a tsibble cannot be maintained in the output of a pipeline module, for example the index is dropped by aggregation, an error informs users of the problem and suggests alternatives. This avoids surprising users and reminds them of the time context.
 
-Each verb focuses on one operation to achieve its goal. The verb should be self-explanatory to advise what it is supposed to do or fail, for example `filter()` picks observations, `select()` picks variables, and `left_join()` joins two tables. These general-purpose verbs are made available in the **tidyverse** suite. When used in the temporal context, these verbs are adapted to the time domain. A perceivable difference is summarizing variables between data frame and tsibble. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. New tsibble-specific verbs (\autoref{tab:verb-table}) are provided to expand the **tidyverse** vocabulary. Users who are already familiar with **tidyverse**, will experience a gentle learning curve for mastering tsibble verbs and glide into temporal data analysis with low cognitive load.
-
-\begin{table}[!hbt]
+\begin{table}[!ht]
 \caption{A list of table verbs working with tsibble. Functions in bold originating from the tidyverse and are adapted for tsibble.}\label{tab:verb-table}
 \centering
 \begin{tabular}{ lll }
@@ -197,6 +195,8 @@ Each verb focuses on one operation to achieve its goal. The verb should be self-
 \bottomrule
 \end{tabular}
 \end{table}
+
+Each verb focuses on one operation to achieve its goal. The verb should be self-explanatory to advise what it is supposed to do or fail, for example `filter()` picks observations, `select()` picks variables, and `left_join()` joins two tables. These general-purpose verbs are made available in the **tidyverse** suite. When used in the temporal context, these verbs are adapted to the time domain. A perceivable difference is summarizing variables between data frame and tsibble. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. New tsibble-specific verbs (\autoref{tab:verb-table}) are provided to expand the **tidyverse** vocabulary. Users who are already familiar with **tidyverse**, will experience a gentle learning curve for mastering tsibble verbs and glide into temporal data analysis with low cognitive load.
 
 @eopl asserted "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." Each verb works with other transformation family members in harmony. This set of verbs can result in many combinations to prepare tsibble for a broad range of visualization and modeling problems. Chaining operations is achieved with the pipe operator `%>%` introduced in the **magrittr** package [@R-magrittr]. A sequence of functions can be composed in a way that can be naturally read from left to right, which improves the readability of the code. It consequently generates a block of code without saving intermediate values. Most importantly, a new ecosystem for tidy time series analysis has been undertaken, using the tsibble framework, and is called "tidyverts", a play on tidyverse that acknowledges the time series analysis purpose.
 
