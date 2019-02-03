@@ -21,14 +21,8 @@ elec_ts <- elec %>%
 gap_df <- has_gaps(elec_ts)
 # sum(gap_df$.gaps) / NROW(gap_df)
 
-## ---- scan-gaps
-elec_gaps <- scan_gaps(elec_ts)
-
 ## ---- count-gaps
-customer_na <- elec_ts %>% 
-  filter(customer_id %in% (gap_df %>% filter(.gaps) %>% pull(customer_id)))
-
-count_na_df <- customer_na %>% 
+count_na_df <- elec_ts %>% 
   count_gaps()
 
 count_na_df %>% 
