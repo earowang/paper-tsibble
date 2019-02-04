@@ -3,7 +3,6 @@ library(tidyverse)
 library(lubridate)
 library(tsibble)
 
-customer <- read_rds("data/customer.rds")
 elec <- read_rds("data/smart-meter13.rds")
 weather <- read_rds("data/weather13.rds") %>% 
   group_by(date) %>% 
