@@ -77,12 +77,12 @@ revealed <- bind_rows(slide_revealed, tile_revealed, stretch_revealed)
 
 ggplot() +
   geom_line(aes(x = year, y = count), data = tb_au, colour = "grey", size = 1.2) +
-  geom_vline(aes(xintercept = xmin), data = window, colour = "#9ecae1", alpha = 0.6, size = 1.5) +
   geom_rect(aes(
     xmin = xmin, xmax = xmax,
     ymin = ymin, ymax = ymax,
     group = group
-  ), data = window, fill = "#9ecae1", alpha = 0.6) +
+  ), data = window, 
+  fill = "#9ecae1", colour = "#9ecae1", size = 1.5, alpha = 0.6) +
   geom_point(aes(x = year, y = ma), data = mean, size = 2, colour = "#de2d26") +
   geom_line(aes(x = year, y = ma), data = revealed, size = 1.2, colour = "#de2d26") +
   xlab("Year") +
