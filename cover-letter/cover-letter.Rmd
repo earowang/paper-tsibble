@@ -1,0 +1,23 @@
+---
+from: Earo Wang
+fromqualifications: B.Comm.(Hons)
+fromtitle: PhD candidate
+fromWWW: earo.me
+fromemail: earo.wang@monash.edu
+fromphone: +61 4 4919 1031
+fromsignature: signature.png
+toname: Editor
+toaddress: Journal of Computational and Graphical Statistics
+opening: Dear Dr McCormick,
+closing: Sincerely
+spacing: 1.4
+output: MonashEBSTemplates::letter
+---
+
+Please consider our manuscript titled, "A new tidy data structure to support exploration and modeling of temporal data," for publication in the Journal of Computational and Graphical Statistics.
+
+This paper proposes a new data abstraction to represent temporal data, referred to as "tsibble", allowing the "tidy data" principles to be brought to the time domain. It helps to reduce the pain from going raw data to model-ready time series data. The tsibble data structure lays the plumbing for time series data analysis modules of transformation, visualization and modeling, to achieve rapid iteration in gaining data insights. The infrastructure of tidy temporal data and tools has been implemented in the R package `tsibble`, which is on CRAN. The paper is written in RMarkdown, which contains the R code to reproduce the results.
+
+The `tsibble` package won the 2019 John Chambers Statistical Software Award. It also lays the foundation of a new ecosystem for tidy time series analysis, known as "tidyverts", including data sets (the `tsibbledata` package), time series statistical methods (the `feasts` package), and forecasting (the `fable` package).
+
+We believe that this manuscript is a good fit for the Journal of Computational and Graphical Statistics, because it provides tidy methodology to make time series analysis easier. Because the software has already received considerable attention, we expect that the work will be of interest to readers of the journal.

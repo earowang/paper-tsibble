@@ -8,6 +8,7 @@ data-raw/flights/
 data-raw/airports.dat
 data-raw/customer.csv
 arxiv*
+cover-letter/signature.png
 
 main\.tex
 main\.log
