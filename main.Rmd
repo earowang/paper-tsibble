@@ -20,7 +20,7 @@ wpnumber: no/yr
 blind: false
 cover: false
 toc: false
-bibliography: [references.bib, rpkgs.bib]
+bibliography: [references.bib]
 biblio-style: authoryear-comp
 output:
   MonashEBSTemplates::workingpaper:
@@ -242,7 +242,7 @@ The **purrr** package [@R-purrr] provides a good example of functional programmi
 
 Modular programming is adopted in the design of the **tsibble** package. Modularity benefits users by providing small focused and manageable chunks, and provides developers with simpler maintenance.
 
-All user-facing functions can be roughly organized into three major chunks according to their functionality: vector functions (1d), table verbs (2d), and window family. Each chunk is an independent module, but works interdependently. Vector functions in the package mostly deal with time. The atomic functions (such as `yearmonth()` and `yearquarter()`) embedded in the `index_by()` table verb achieves in collapsing a tsibble to a less granular interval. The substitution of another time function in the `index_by()` results in the aggregation of different time resolution. Since these time functions are not exclusive to a tsibble, they can be used in a variety of applications in conjunction with other packages. On the other hand, these tsibble verbs can incorporate many third-party vector functions to step out of the current tsibble zone. It is also generally easier to trace back the errors users encounter from separating 1d and 2d functions, and increase the readability.
+All user-facing functions can be roughly organized into three major chunks according to their functionality: vector functions (1d), table verbs (2d), and window family. Each chunk is an independent module, but works interdependently. Vector functions in the package mostly deal with time. The atomic functions (such as `yearmonth()` and `yearquarter()`) embedded in the `index_by()` table verb achieves in collapsing a tsibble to a less granular interval. The substitution of another time function in the `index_by()` results in the aggregation of different time resolution. Since these time functions are not exclusive to a tsibble, they can be used in a variety of applications in conjunction with other packages. On the other hand, these tsibble verbs can incorporate many third-party vector functions to step out of the current tsibble zone. It is also generally easier to trace back the errors users encounter from separating 1d and 2d functions, and increase the code readability.
 
 ## Extensibility
 
