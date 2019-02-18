@@ -64,7 +64,7 @@ stretch_window <- stretcher(tb_au$year, .init = 5) %>%
   mutate(ymin = -Inf, ymax = Inf, group = row_number(), type = types[3])
 stretch_mean <- tb_au %>%
   mutate(
-    ma = c(rep(NA_real_, 4), stretch_dbl(count, ~ mean(.x), .init = 5)),
+    ma = stretch_dbl(count, ~ mean(.x), .init = 5),
     group = pmax(0, row_number() - 4),
     type = types[3]
   )
