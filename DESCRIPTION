@@ -1,0 +1,27 @@
+Type: Compendium
+Package: paperTsibble
+Version: 1.0
+Authors@R: 
+    person(given = "Earo",
+           family = "Wang",
+           role = c("aut", "cre"),
+           email = "earo.wang@gmail.com")
+URL: https://github.com/earowang/paper-tsibble/issues
+BugReports: https://github.com/earowang/paper-tsibble/issues
+Depends:
+    forcats (>= 0.4.0),
+    gganimate (>= 1.0.3),
+    lubridate (>= 1.7.4),
+    R (>= 3.2),
+    sugrrants (>= 0.2.4),
+    tidyverse (>= 1.2.1),
+    tsibble (>= 0.8.0),
+    MonashEBSTemplates (>= 0.2)
+Imports:
+    bookdown (>= 0.9),
+    knitr (>= 1.22),
+    spelling (>= 2.1)
+Remotes:
+    robjhyndman/MonashEBSTemplates
+Encoding: UTF-8
+Language: en-GB
