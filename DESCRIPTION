@@ -19,6 +19,7 @@ Depends:
     MonashEBSTemplates (>= 0.2)
 Imports:
     bookdown (>= 0.9),
+    here,
     knitr (>= 1.22),
     spelling (>= 2.1)
 Remotes:
