@@ -12,3 +12,5 @@ cover-letter/signature.png
 figure/
 main\.tex
 main\.log
+/*.jpg
+/*.png
