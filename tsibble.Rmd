@@ -36,7 +36,7 @@ output:
     dev: "pdf"
 ---
 
-```{r initial, echo = FALSE, cache = FALSE, include = FALSE}
+```{r setup, echo = FALSE, cache = FALSE, include = FALSE}
 options("knitr.graphics.auto_pdf" = TRUE)
 library(knitr)
 opts_chunk$set(
@@ -45,10 +45,6 @@ opts_chunk$set(
   cache = FALSE, cache.path = 'cache/', 
   out.width = ifelse(is_html_output(), "100%", "\\textwidth")
 )
-knitr::opts_knit$set(root.dir = here::here())
-```
-
-```{r external, include = FALSE}
 read_chunk('scripts/demo.R')
 read_chunk('scripts/flights.R')
 read_chunk('scripts/smart-meter.R')
