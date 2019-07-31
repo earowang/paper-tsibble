@@ -10,7 +10,12 @@ data-raw/customer.csv
 arxiv*
 cover-letter/signature.png
 figure/
-main\.tex
-main\.log
+*\.tex
+*\.log
+*\.aux
+*\.bcf
+*\.out
+*\.knit.md
+*\.utf8.md
 /*.jpg
 /*.png
