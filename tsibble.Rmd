@@ -14,7 +14,7 @@ author:
     othernames: Rob J
     address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia.
     email : rob.hyndman@monash.edu
-abstract: 'Mining temporal data for information is often inhibited by a multitude of formats: irregular or multiple time intervals, point events that need aggregating, multiple observational units or repeated measurements on multiple individuals, and heterogeneous data types. On the other hand, the software supporting time series modeling and forecasting, makes strict assumptions on the data to be provided, typically requiring a matrix of numeric data with implicit time indexes. Going from raw data to model-ready data is painful. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization, modeling and forecasting routines. Tidy data principles are extended to temporal data by: (1) mapping the semantics of a dataset into its physical layout; (2) including an explicitly declared index variable representing time; (3) incorporating a "key" comprising single or multiple variables to uniquely identify units over time. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based contexts. A sound data pipeline facilitates a fluent workflow for analyzing temporal data. The infrastructure of tidy temporal data has been implemented in the R package **tsibble**.'
+abstract: 'Mining temporal data for information is often inhibited by a multitude of formats: irregular or multiple time intervals, point events that need aggregating, multiple observational units or repeated measurements on multiple individuals, and heterogeneous data types. On the other hand, the software supporting time series modeling and forecasting, makes strict assumptions on the data to be provided, typically requiring a matrix of numerical data with implicit time indexes. Going from raw data to model-ready data is painful. This work presents a cohesive and conceptual framework for organizing and manipulating temporal data, which in turn flows into visualization, modeling and forecasting routines. Tidy data principles are extended to temporal data by: (1) mapping the semantics of a dataset into its physical layout; (2) including an explicitly declared index variable representing time; (3) incorporating a "key" comprising single or multiple variables to uniquely identify units over time. This tidy data representation most naturally supports thinking of operations on the data as building blocks, forming part of a "data pipeline" in time-based contexts. A sound data pipeline facilitates a fluent workflow for analyzing temporal data. The infrastructure of tidy temporal data has been implemented in the R package **tsibble**.'
 keywords: "time series, data wrangling, tidy data, R, forecasting, data science, exploratory data analysis, data pipelines"
 wpnumber: 12/19
 jelcodes: C88, C81, C82, C22, C32
@@ -36,15 +36,19 @@ output:
     dev: "pdf"
 ---
 
-```{r setup, echo = FALSE, cache = FALSE, include = FALSE}
+```{r initial, echo = FALSE, cache = FALSE, include = FALSE}
 options("knitr.graphics.auto_pdf" = TRUE)
 library(knitr)
 opts_chunk$set(
   echo = FALSE, warning = FALSE, message = FALSE, comment = "#>",
   fig.path = 'figure/', fig.align = 'center', fig.show = 'hold', 
-  cache = FALSE, cache.path = 'cache/', 
+  cache = TRUE, cache.path = 'cache/', 
   out.width = ifelse(is_html_output(), "100%", "\\textwidth")
 )
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+```{r external, include = FALSE, cache = FALSE}
 read_chunk('scripts/demo.R')
 read_chunk('scripts/flights.R')
 read_chunk('scripts/smart-meter.R')
@@ -55,7 +59,7 @@ read_chunk('scripts/smart-meter.R')
 
 # Introduction {#sec:intro}
 
-Temporal data arrives in many possible formats, with many different time contexts. For example, time can have various resolutions (hours, minutes, and seconds), and can be associated with different time zones with possible adjustments such as summer time. Time can be regular (such as quarterly economic data or daily weather data), or irregular (such as patient visits to a doctor's office). Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, and multiple grouping factors. Temporal data may comprise the occurrence of events, such as flight departures, that need to be reduced to a regular structure.
+Temporal data arrives in many possible formats, with many different time contexts. For example, time can have various resolutions (hours, minutes, and seconds), and can be associated with different time zones with possible adjustments such as daylight saving time. Time can be regular (such as quarterly economic data or daily weather data), or irregular (such as patient visits to a doctor's office). Temporal data also often contains rich information: multiple observational units of different time lengths, multiple and heterogeneous measured variables, and multiple grouping factors. Temporal data may comprise the occurrence of events, such as flight departures, that need to be reduced to a regular structure.
 
 Despite this variety and heterogeneity of temporal data, current software typically requires time series objects to be model-oriented matrices. Analysts are expected to do their own data preprocessing and take care of anything else needed to allow model fitting, which leads to a myriad of ad hoc solutions and duplicated efforts.
 
@@ -114,9 +118,9 @@ The new data structure, tsibble, bridges the gap between raw temporal data and m
 
 ## Index {#sec:index}
 
-Time provides a contextual basis for temporal data. A variable representing time is essential for a tsibble, and is referred to as an "index". The "index" is an intact data column rather than a masked attribute, which makes time visible and accessible to users. This is highly advantageous when manipulating time. For example, one could easily extract time components, such as time of day and day of week, from the index to visualize seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indexes. The accessibility of the tsibble index motivates data analysis towards transparency and human readability. When the "index" is available only as meta information (such as in the `ts` class), it creates an obstacle for analysts to write these simple queries in a programmatic manner, which should be discouraged from an analytic point of view.
+Time provides a contextual basis for temporal data. A variable representing time is essential for a tsibble, and is referred to as an "index". The "index" is an intact data column rather than a masked attribute, which makes time visible and accessible to users. This is highly advantageous when manipulating time. For example, one could easily extract time components, such as time of day and day of week, from the index to visualize seasonal effects of response variables. One could also join other data sources to the tsibble based on common time indexes. The accessibility of the tsibble index motivates data analysis towards transparency and human readability. When the "index" is available only as meta information (such as in the `ts` class), it creates an obstacle for analysts to write these simple queries in a programmatic manner, which should be discouraged from an analytical point of view.
 
-Many different representations of time can be spotted in the wild. A date-time object, universally accepted across computing systems, is the most commonly used type for representing time. Date-time also typically associates with a time zone including adjustments such as summer time. This diversity and time zone is acknowledged and accommodated by tsibble's index. When creating a tsibble, time indices are arranged from past to future within each series for the strict temporal ordering that is assumed by time series operations.
+Many different representations of time can be spotted in the wild. A date-time object, universally accepted across computing systems, is the most commonly used type for representing time. Date-time also typically associates with a time zone including adjustments such as daylight saving time. This diversity and time zone is acknowledged and accommodated by tsibble's index. When creating a tsibble, time indices are arranged from past to future within each series for the strict temporal ordering that is assumed by time series operations.
 
 ## Key {#sec:key}
 
@@ -252,7 +256,7 @@ The class of tsibble is an underlying basis of temporal data, and there is a dem
 
 ## Tidy evaluation
 
-The **tsibble** packages leverages the **tidyverse** grammars and pipelines through tidy evaluation [@tidy-eval] via the **rlang** package [@R-rlang]. In particular, the table verbs extensively use tidy evaluation to evaluate computation in the context of tsibble data and spotlights the "tidy" interface that is compatible with the **tidyverse**. This not only saves a few keystrokes without explicitly repeated references to the data source, but the resulting code is typically cleaner and more expressive.
+The **tsibble** packages leverages the **tidyverse** grammars and pipelines through tidy evaluation [@tidy-eval] via the **rlang** package [@R-rlang]. In particular, the table verbs extensively use tidy evaluation to evaluate computation in the context of tsibble data and spotlights the "tidy" interface that is compatible with the **tidyverse**. This not only saves a few keystrokes without explicitly repeating references to the data source, but the resulting code is typically cleaner and more expressive.
 
 # Case studies {#sec:cases}
 

@@ -48,7 +48,7 @@ elec_cal <- elec_ts %>%
   summarise(avg = mean(general_supply_kwh)) %>% 
   mutate(
     date = as_date(reading_datetime), 
-    time = hms::as.hms(reading_datetime, tz = "UTC")
+    time = hms::as_hms(reading_datetime)
   ) %>% 
   left_join(weather, by = "date") %>% 
   frame_calendar(x = time, y = avg, date = date)

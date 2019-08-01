@@ -12,6 +12,48 @@ We thank the reviewers for their helpful feedback which has led to many improvem
 
 # Reviewer 1 comments {-}
 
+> More mini examples embeded throughout the manuscript. Mainly it didn't show- case to me tsibble's capability well enough but understandably this may make the manuscript long and may be better left to vignettes.
+
+TODO.
+
+> Finding a duplicate is a nice touch but I don't understand the significance of the Figure 5 mosaic plot in demonstration for the capability of tsibble. I understand that finding duplicate/wrong entry is made easier by tsibble but besides filtering those duplicate/wrong entries, the data wrangling for mosaic plot is easily done without tsibble. More specifically what is the significance `tsibble::index_by` below? Could the authors explain what is the benefit of explicit defining index at this stage as opposed to explicit specification at a later stage?
+
+TODO.
+
+> In relation to the above point, perhaps it would be helpful to have a definition of tidy temporal data much like the three rules in tidy data (every row is an observation etc..). E.g. in tsibble the semantics index is a variable with some inherent ordering from past to present.
+
+TODO.
+
+> I hold a similar sentiment regarding the calendar plot in Figure 12. It's a great plot but I don't necessary think this is a plot that show cased the benefit of tsibble.
+
+TODO.
+
+> Figure 11 with missing data was a great demonstration for tsibble and the data times series pipeline shown in Figure 3. It may be helpful to reduce the opacity of the points as there is a lot of overplotting. The top line which lumps a number of customers together is not particularly informative here. Perhaps it is better replaced with a histogram.
+
+TODO.
+
+> Authors may like to add/change `spread`/`gather` verbs to `pivot_longer`/`pivot_wider` with the recent move to deprecate the former in tidyr. Likewise au- thors may like to consider to replace “long data” to “longer data” and “wide data” to “wider data” as long/wide implies absolute terms. https: //tidyr.tidyverse.org/dev/articles/pivot.html
+
+TODO.
+
+> Manuscript does implicitly feel more time series data oriented rather than a general temporal data. E.g. references of time points as index seems inherent from other time series data infrastructure (i.e. zoo and xts) and the presented case studies is not representative of any longitudinal study. This does not mean it should be changed but index to me was not as intuitive to be the temporal variable.
+
+TODO.
+
+> Figure 4 animation doesn't play so authors may like to ensure that the final publication works. Github version works.
+
+The JCGS peer-reviewed version is watermarked, which prevents the animation playing.
+
+> Have the authors thought about how to deal with mixed time resolutions for index? E.g. some subjects have exact day recorded; some missing day but month & year recorded; some only date range recorded.
+
+TODO.
+
+> The emphasis of the manuscripts is in R but do other languages also tend to define time index implicitly?
+
+TODO.
+
+
+Thanks for the careful reading. We have done with minor comments.
 
 # Reviewer 2 comments {-}
 
