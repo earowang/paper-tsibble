@@ -12,7 +12,7 @@ We thank the reviewers for their helpful feedback which has led to many improvem
 
 # Reviewer 1 comments {-}
 
-> More mini examples embeded throughout the manuscript. Mainly it didn't show- case to me tsibble's capability well enough but understandably this may make the manuscript long and may be better left to vignettes.
+> More mini examples embeded throughout the manuscript. Mainly it didn't showcase to me tsibble's capability well enough but understandably this may make the manuscript long and may be better left to vignettes.
 
 TODO.
 
@@ -22,7 +22,7 @@ TODO.
 
 > In relation to the above point, perhaps it would be helpful to have a definition of tidy temporal data much like the three rules in tidy data (every row is an observation etc..). E.g. in tsibble the semantics index is a variable with some inherent ordering from past to present.
 
-TODO.
+Thanks for this great suggestion. We've given a definition of "tsibble" following the "tidy data" principles in the beginning of Section 3.
 
 > I hold a similar sentiment regarding the calendar plot in Figure 12. It's a great plot but I don't necessary think this is a plot that show cased the benefit of tsibble.
 
@@ -32,7 +32,7 @@ TODO.
 
 TODO.
 
-> Authors may like to add/change `spread`/`gather` verbs to `pivot_longer`/`pivot_wider` with the recent move to deprecate the former in tidyr. Likewise au- thors may like to consider to replace “long data” to “longer data” and “wide data” to “wider data” as long/wide implies absolute terms. https: //tidyr.tidyverse.org/dev/articles/pivot.html
+> Authors may like to add/change `spread`/`gather` verbs to `pivot_longer`/`pivot_wider` with the recent move to deprecate the former in tidyr. Likewise authors may like to consider to replace “long data” to “longer data” and “wide data” to “wider data” as long/wide implies absolute terms. https: //tidyr.tidyverse.org/dev/articles/pivot.html
 
 TODO.
 
