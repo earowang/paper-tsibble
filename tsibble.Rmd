@@ -99,14 +99,14 @@ This paper describes a new tidy representation for temporal data, and a unified 
 
 # Contextual semantics {#sec:semantics}
 
-The choice of tidy representation of temporal data arises from a data- and model-oriented perspective, which can accommodate all of the operations that are to be performed on the data in time-based contexts. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the "tidy" model, which is referred to as a "tsibble". In tsibble:
+The choice of tidy representation of temporal data arises from a data- and model-oriented perspective, which can accommodate all of the operations that are to be performed on the data in time-based contexts. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the "tidy" model, which is referred to as a "tsibble". Adhering to the "tidy data" principles, in tsibble:
 
 1. Index is a variable with inherent ordering from past to present.
 2. Key is a set of variables that define observational units over time.
 3. Each observation should be uniquely identified by index and key.
 4. Each observational unit should be measured at a common interval, if regularly spaced.
 
-Figure \@ref(fig:tsibble-semantics) sketches out the data form required for a tsibble, an equivalent of the "tidy" format. Beyond the layout, tsibble gives the contextual meaning to variables in order to construct the temporal data object, as newly introduced "index" and "key" semantics stated in the definitions 1 and 2 above. Variables other than "index" and "key" are considered as measurements. The definitions of 1 and 2 imply that tsibble is *tidier* than "tidy data", positioning itself as a model input that gives rise to more robust and reliable downstream analytics.
+Figure \@ref(fig:tsibble-semantics) sketches out the data form required for a tsibble, an extension of the "tidy" format to the time domain. Beyond the layout, tsibble gives the contextual meaning to variables in order to construct the temporal data object, as newly introduced "index" and "key" semantics stated in the definitions 1 and 2 above. Variables other than "index" and "key" are considered as measurements. The definitions of 1 and 2 imply that tsibble is *tidier* than "tidy data", positioning itself as a model input that gives rise to more robust and reliable downstream analytics.
 
 ```{r tsibble-semantics, fig.cap = "(ref:tsibble-semantics-cap)"}
 include_graphics("img/tsibble-semantics.png")
@@ -135,11 +135,11 @@ Index is an explicit data variable rather than a masked attribute (such as in th
 
 > *Key is a set of variables that define observational units over time.*
 
-What subjects/entities to be observed over time leads to the second component of a tsibble--key. Key can consist of empty, single, or multiple variables identifying units measured along the way. When only a single observational unit is present in the table, key can be left with no variables to be specified. But when multiple units exist in the data, key should be supplied by identifying variables to sufficiently define the units. In longitudinal data, key can be thought of as "panel" (such as in the Stata) constrained to a single variable. In tsibble, key allows for multiple variables of nesting and crossing relations [@wilkinson2006grammar] to be useful for forecasting reconciliation [@fpp; @R-hts] and other advanced models. For example, Table \@ref(tab:tb-sub) describes the number of tuberculosis cases for each gender across the countries every year. This suggests that the key comprises at least columns `gender` and `country`. Since `country` is nested within `continent`, it is a free variable to be included in the key specification.
+What subjects/entities to be observed over time leads to the second component of a tsibble--key. Key can consist of empty, single, or multiple variables identifying units measured along the way. When only a single observational unit is present in the table, key can be left with no variables to be specified. However, when multiple units exist in the data, key should be supplied by identifying variables to sufficiently define the units. In longitudinal data, key can be thought of as "panel" (such as in the Stata) but constrained to a single variable. In tsibble, key allows for multiple variables of nesting, crossing, or union relations [@wilkinson2006grammar] to be useful for forecasting reconciliation [@fpp; @R-hts] and other advanced models. For example, Table \@ref(tab:tb-sub) describes the number of tuberculosis cases for each gender across the countries every year. This suggests that the key comprises at least columns `gender` and `country`. Since `country` is nested within `continent`, it is a free variable to be included in the key specification.
 
 > *Each observation should be uniquely identified by index and key.*
 
-Inspired by "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, tsibble key also uniquely identifies each observational unit over time. Any duplicates of key-index pairs will fail upon the construction of a tsibble. This is, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage. It highlights the primary difference from *time tibble* provided by **tibbletime**.
+Inspired by "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, tsibble key also uniquely identifies each observational unit over time. Any duplicates of key-index (i.e. key-value) pairs will fail upon the construction of a tsibble. This is, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage. It highlights the primary difference from *time tibble* provided by **tibbletime**.
 
 Since observational units are embedded, modelling and forecasting for each unit in a tsibble will be accelerated. The tsibble key plays a role of the central transit hub in connecting multiple tables managed by the data, models, and forecasts. This neatly decouples the data copy from models and forecasts, significantly reducing the storage space. More details are given in Section \@ref(sec:ts-models).
 
@@ -147,9 +147,11 @@ Since observational units are embedded, modelling and forecasting for each unit 
 
 > *Each observational unit should be measured at a common interval, if regularly spaced.*
 
-One of the cornerstones of time series data, and hence beneath a tsibble, is the time interval. This information plays a critical role in computing statistics (e.g. seasonal unit root tests) and building models (e.g. seasonal ARIMA). The principal divide is between regularly or irregularly spaced observations in time. A tsibble permits implicit missing time, making it difficult to distinguish regularity from the index. It relies on a user's specification by switching the `regular` argument off, when the data involves irregular intervals. This type of data can flow into event-based data modeling, but would need to be processed or regularized to fit models that expect regular time series.
+The principal divide of temporal data is regularly versus irregularly spaced data. Event data typically involves irregular time intervals, such as flight schedules or customer transactions. This type of data can flow into event-based data modeling, but would need to be processed or regularized to fit models that expect data with a fixed interval. When data indexed in regular time space, tsibble computes the greatest common divisor as the time interval from the index, or an unknown interval if one observation is available for each unit.
 
-For data indexed in regular time space, the time interval is automatically calculated, by first computing absolute differences of time indexes and then finding the greatest common divisor. This covers all conceivable cases, assuming that all observations in a tsibble have only one interval. Data collected at different intervals should be organized in separate tsibbles, encouraging well-tailored analysis and models, because each observation may have different underlying data generating processes.
+By extending one of the "tidy data" rules, "Each type of observational units should form a table", each observational unit is expected to share a common interval in a tsibble. Although tsibble reports one single interval despite data of fixed or mixed intervals, data of mixed intervals should be organized in separate tsibbles instead for well-tailored analysis and models.
+
+This tiny piece of information will make implicit missing time handlers handy and be in harmony with statistics and models that use seasonal periods.
 
 # Data pipelines {#sec:pipeline}
 
