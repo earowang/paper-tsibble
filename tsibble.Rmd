@@ -95,7 +95,7 @@ Current standards, provided by the native `ts` object in R, and extended by **zo
 
 A new temporal data class is needed in the upstream of the workflow, which could incorporate all the downstream modules. A relatively new R package **tibbletime** [@R-tibbletime] proposed a data class of *time tibble* to represent temporal data in heterogeneous tabular format. It only requires an index variable to declare a temporal data object, thus placing it at the import stage. However, as proposed in Section \@ref(sec:semantics) a more rigid data structure is required for time series analytics and models. 
 
-This paper describes a new tidy representation for temporal data, and a unified framework to streamline the workflow from data preprocessing to visualization and forecasting, as an integral part of a tidy data analysis.
+This paper describes a new uniform representation for time series and longitudinal data, and a unified framework to streamline the workflow from data preprocessing to visualization and forecasting, as an integral part of a tidy data analysis.
 
 # Contextual semantics {#sec:semantics}
 
@@ -139,9 +139,15 @@ What subjects/entities to be observed over time leads to the second component of
 
 > *Each observation should be uniquely identified by index and key.*
 
-Inspired by "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, tsibble key also uniquely identifies each observational unit over time. Any duplicates of key-index (i.e. key-value) pairs will fail upon the construction of a tsibble. This is, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage. It highlights the primary difference from *time tibble* provided by **tibbletime**.
+Inspired by "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, tsibble key also uniquely identifies each observational unit over time. When constructing a tsibble, any duplicates of key-index (i.e. key-value) pairs will fail, because duplicates signal a data quality issue, which would likely affect subsequent analyses and hence decision making. For example, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. Analysts are encouraged to better understand the data, or reason about the process of data cleaning when needed. Figure \@ref(fig:tsibble-tidy) peels the "tidy" module with clear guidance required for a tsibble. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage.
 
-Since observational units are embedded, modelling and forecasting for each unit in a tsibble will be accelerated. The tsibble key plays a role of the central transit hub in connecting multiple tables managed by the data, models, and forecasts. This neatly decouples the data copy from models and forecasts, significantly reducing the storage space. More details are given in Section \@ref(sec:ts-models).
+```{r tsibble-tidy, fig.cap = "(ref:tsibble-tidy-cap)"}
+include_graphics("img/tsibble-tidy.png")
+```
+
+(ref:tsibble-tidy-cap) Details about the "tidy" stage for a tsibble. Built on top of "tidy data", each observation should be uniquely identified by index and key, thereby no duplicated key-index pairs.
+
+Since observational units are embedded, modelling and forecasting for each unit in a tsibble will be accelerated. The tsibble key plays a role of the central transit hub in connecting multiple tables managed by the data, models, and forecasts. This neatly decouples the expensive data copy from downstream summaries, significantly reducing the storage space.
 
 ## Interval {#sec:interval}
 
@@ -149,7 +155,7 @@ Since observational units are embedded, modelling and forecasting for each unit 
 
 The principal divide of temporal data is regularly versus irregularly spaced data. Event data typically involves irregular time intervals, such as flight schedules or customer transactions. This type of data can flow into event-based data modeling, but would need to be processed or regularized to fit models that expect data with a fixed interval. When data indexed in regular time space, tsibble computes the greatest common divisor as the time interval from the index, or an unknown interval if one observation is available for each unit.
 
-By extending one of the "tidy data" rules, "Each type of observational units should form a table", each observational unit is expected to share a common interval in a tsibble. Although tsibble reports one single interval despite data of fixed or mixed intervals, data of mixed intervals should be organized in separate tsibbles instead for well-tailored analysis and models.
+By extending one of the "tidy data" rules, "Each type of observational units should form a table", each observational unit shares a common interval in a tsibble. Although tsibble reports one single interval despite data of fixed or mixed intervals, data of mixed intervals should be organized in separate tsibbles instead for well-tailored analysis and models.
 
 This tiny piece of information will be carried over for tsibble-centric functions, for example to make implicit missing time handling handy and be in harmony with statistics and models that use seasonal periods.
 
@@ -165,13 +171,7 @@ A fluent data pipeline anticipates a standard data structure. The tsibble data a
 
 ## Temporal transformation {#sec:timepipeline}
 
-Figure \@ref(fig:tsibble-pipeline) illustrates the distinction of a time series pipeline from a regular data pipeline. It is highly recommended to check for identical entries of key and index before constructing a tsibble. Duplicates signal a data quality issue, which would likely affect subsequent analyses and hence decision making. Analysts are encouraged to gaze at data early and reason about the process of data cleaning. When the data meets the tsibble standard, it flows neatly into the analysis stage and takes full advantage of the tsibble infrastructure.
-
-```{r tsibble-pipeline, fig.cap = "(ref:tsibble-pipeline-cap)"}
-include_graphics("img/tsibble-pipeline.png")
-```
-
-(ref:tsibble-pipeline-cap) A time series pipeline is different from a regular data pipeline: (1) check if the key and index uniquely identify each observation in the data whist creating a tsibble; (2) check if there are time gaps in the tsibble before analysis.
+The **tsibble** package not only provides a "tsibble" data object but also a domain specific language in R for transforming temporal data. It takes advantage of the wrangling verbs implemented in the **dplyr** package, and develops a suite of new tools for facilitating temporal manipulation with ease.
 
 Many time operations such as lag/lead and time series models, assume an intact vector input ordered in time. Since a tsibble permits time gaps in the index, it is good practice to check and inspect any gaps in time following the creation of a tsibble, in order to prevent inviting these avoidable errors into the analysis. The first suite of verbs (rephrasing actions performed on the object) are provided to understand and tackle implicit missing values: (1) `has_gaps()` checks if there exists time gaps; (2) `scan_gaps()` reveals all implicit missing observations; (3) `count_gaps()` summarizes the time ranges that are absent from the data; (4) `fill_gaps()` turns them into explicit ones, along with imputing by values or functions. To look into gaps over individual time periods or full-length time span, the common argument `.full` in these functions gives an option to easily switch between. The specification of `.full = TRUE` will result in fully balanced panels in other words.
 
@@ -218,7 +218,7 @@ The tsibble structure and operations support data pipelines for sequencing analy
 
 It coordinates a user's analysis making it cleaner to follow, and permits a wider audience to focus on the data analysis without getting lost in a jungle of computational intricacies. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes, at least making it possible to trace them through the pipeline. New data tools developed in the R package **tsibble** [@R-tsibble] articulate the temporal data pipeline, which shepherds wild temporal data through to robust analysis, and plots.
 
-## Time series visualization {#sec:ts-vis}
+## Temporal visualization {#sec:ts-vis}
 
 As a tsibble is a subclassing of data frame, it integrates well with the grammar of graphics. It is easy to create and extend specialist time series plotting methods based on the tsibble structure, for example autocorrelation plots and calendar-based graphics [@wang-calendarviz-2018].
 
