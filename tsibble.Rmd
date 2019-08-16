@@ -159,7 +159,7 @@ By extending one of the "tidy data" rules, "Each type of observational units sho
 
 This tiny piece of information will be carried over for tsibble-centric functions, for example to make implicit missing time handling handy and be in harmony with statistics and models that use seasonal periods.
 
-# Data pipelines {#sec:pipeline}
+# Temporal data pipelines {#sec:pipeline}
 
 A data pipeline describes the flow of data through an analysis, and can generally assist in conceptualizing the process for a stream of problems. @unix coined the term "pipelines" in software development while developing Unix at Bell Labs. In Unix-based computer operating systems, a pipeline chains together a series of operations based on their standard streams, so that the output of each program becomes the input to another. The Extract, Transform, and Load (ETL) process from recent data warehousing literature dating back to @kimball2011data outlines the workflow to prepare data for analysis, and can also be considered a data pipeline. @viewing-pipeline describes a viewing pipeline for interactive statistical graphics, that takes control of the transformation from data to plot. @xgobi, @ggobi, @orca, @plumbing and @xie2014reactive implemented data pipelines for the interactive statistical software **XGobi**, **GGobi**, **Orca**, **plumbr** and **cranvas**, respectively.
 
@@ -169,7 +169,7 @@ The pipeline is typically described with a one way flow, from data to plot. For 
 
 A fluent data pipeline anticipates a standard data structure. The tsibble data abstraction lays the plumbing for data analysis modules of transformation, visualization and modeling in temporal contexts. It provides a data infrastructure to a new ecosystem, **tidyverts**, a play on tidyverse that acknowledges the time series analysis purpose, in the spirit of "tidy data" to the **tidyverse**.
 
-## Temporal transformation {#sec:timepipeline}
+## Transformation {#sec:timepipeline}
 
 The **tsibble** package not only provides a "tsibble" data object but also a domain specific language in R for transforming temporal data. It takes advantage of the wrangling verbs implemented in the **dplyr** package, and develops a suite of new tools for facilitating temporal manipulation with ease primarily in two aspects: implicit missingness handlers and time-aware aggregations.
 
@@ -180,23 +180,25 @@ Implicit missingness are values that should be present but are absent. Regarding
 * `count_gaps()` summarizes the time ranges that are absent from the data.
 * `fill_gaps()` turns them into explicit ones, along with imputing by values or functions.
 
-These verbs are evocative and of simple interface. They by default look into gaps for each individual time period. Switching on the option `.full = TRUE` will fill in the full-length time span, creating fully balanced panels with respect to longitudinal data analysis.
+These verbs are evocative and of simple interface. They by default look into gaps for each individual time period. Switching on the option `.full = TRUE` will fill in the full-length time span, creating fully balanced panels with respect to longitudinal study.
 
-Besides the time gap verbs, the **tidyverse** vocabulary is adapted and expanded to facilitate time series transformations, as listed in Table \@ref(tab:verb-table). The **tidyverse** suite showcases the general-purpose verbs for effectively manipulating tabular data, for example `filter()` picks observations, `select()` picks variables, and `left_join()` joins two tables. But these verbs need handling with care when used in the time series domain. A perceivable difference is summarizing variables between data frame and tsibble using `summarize()`. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. Users who are already familiar with the **tidyverse**, will experience a gentle learning curve for mastering these verbs and glide into time series analysis with low cognitive load.
+The other key verb is `index_by()`, the counterpart of `group_by()` in **dplyr**, grouping and partitioning the index only. It is most useful to be used in conjunction with `summarize()`, and thus aggregations to upper-level time resolutions will take place. This combination automatically produces new index and interval, and helps to regularize data of irregular interval.
 
-Attention has been paid to warning and error handling. The principle that underpins most verbs is a tsibble in and a tsibble out, thereby striving to maintain a valid tsibble by automatically updating index and key under the hood. If the desired temporal ordering is changed by row-wise verbs, a warning is broadcast. If a tsibble cannot be maintained in the output of a pipeline module (likely occurring to column-wise verbs), for example the index is removed by selection, an error informs users of the problem and suggests alternatives. This avoids surprising users and reminds them of the time context.
+Besides new verbs, the **dplyr** vocabulary has been adapted and expanded to facilitate temporal transformations. The **dplyr** suite showcases the general-purpose verbs for effectively manipulating tabular data. But these verbs need handling with care due to the context switch. A perceivable difference is summarizing variables between normal data and tsibble using `summarize()`. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. Attention has been paid to warning and error handling. The principle that underpins most verbs is a tsibble in and a tsibble out, thereby striving to maintain a valid tsibble by automatically updating index and key under the hood. If the desired temporal ordering is changed by row-wise verbs (such as `arrange()` and `slice()`), a warning is broadcast. If a tsibble cannot be maintained in the output of a pipeline module (likely occurring to column-wise verbs), for example the index is removed by `select()`-ing, an error informs users of the problem and suggests alternatives. This avoids surprising users and reminds them of the time context. In general, users who are already familiar with the **tidyverse**, should have less resistance to learning the new semantics and verbs.
+
+## Visualization {#sec:ts-vis}
+
+As a tsibble is a subclassing of data frame, it integrates well with the grammar of graphics. It is easy to create and extend specialist time series plotting methods based on the tsibble structure, for example autocorrelation plots and calendar-based graphics [@wang-calendarviz-2018].
+
+## Models {#sec:ts-models}
+
+Modeling is crucial to explanatory and predictive analytics, but often imposes stricter assumptions on tsibble data. The verbs listed in Table \@ref(tab:verb-table) ease the transition to a tsibble that suits modeling. A tidy forecasting framework built on top of tsibble is under development, which aims at promoting transparent forecasting practices and concise model representation. A tsibble usually contains multiple time series. Batch forecasting will be enabled if a univariate model, such as ARIMA and Exponential Smoothing, is applied to each time series independently. This yields a "mable" (short for model table), where each model relates to each "key" value in tsibble. This avoids expensive data copying and reduces model storage. The mable is further supplied to forecasting methods, to produce a "fable" (short for forecasting table) in which each "key" along with its future time holds predictions. It also underlines the advantage of tsibble's "key" in acting as linkage between data inputs, models and forecasts. Advanced forecasting techniques, such as vector autocorrelation, hierarchical reconciliation, and ensembles, can be developed in a similar spirit. The modeling module is a current endeavor.
+
+## Summary
 
 The tsibble structure and operations support data pipelines for sequencing analysis. @eopl asserted "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." Each verb works with other transformation family members in harmony. This set of verbs can result in many combinations to prepare tsibble for a broad range of visualization and modeling problems. Chaining operations is achieved with the pipe operator `%>%` introduced in the **magrittr** package [@R-magrittr], read as "then". A sequence of functions can be composed in a way that can be naturally read from left to right, which improves the readability of the code. It consequently generates a block of code without saving intermediate values.
 
 It coordinates a user's analysis making it cleaner to follow, and permits a wider audience to focus on the data analysis without getting lost in a jungle of computational intricacies. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes, at least making it possible to trace them through the pipeline. New data tools developed in the R package **tsibble** [@R-tsibble] articulate the temporal data pipeline, which shepherds wild temporal data through to robust analysis, and plots.
-
-## Temporal visualization {#sec:ts-vis}
-
-As a tsibble is a subclassing of data frame, it integrates well with the grammar of graphics. It is easy to create and extend specialist time series plotting methods based on the tsibble structure, for example autocorrelation plots and calendar-based graphics [@wang-calendarviz-2018].
-
-## Time series models {#sec:ts-models}
-
-Modeling is crucial to explanatory and predictive analytics, but often imposes stricter assumptions on tsibble data. The verbs listed in Table \@ref(tab:verb-table) ease the transition to a tsibble that suits modeling. A tidy forecasting framework built on top of tsibble is under development, which aims at promoting transparent forecasting practices and concise model representation. A tsibble usually contains multiple time series. Batch forecasting will be enabled if a univariate model, such as ARIMA and Exponential Smoothing, is applied to each time series independently. This yields a "mable" (short for model table), where each model relates to each "key" value in tsibble. This avoids expensive data copying and reduces model storage. The mable is further supplied to forecasting methods, to produce a "fable" (short for forecasting table) in which each "key" along with its future time holds predictions. It also underlines the advantage of tsibble's "key" in acting as linkage between data inputs, models and forecasts. Advanced forecasting techniques, such as vector autocorrelation, hierarchical reconciliation, and ensembles, can be developed in a similar spirit. The modeling module is a current endeavor.
 
 # Software structure and design decisions {#sec:software}
 
