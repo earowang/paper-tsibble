@@ -139,7 +139,7 @@ What subjects/entities to be observed over time leads to the second component of
 
 > *Each observation should be uniquely identified by index and key.*
 
-Inspired by "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, tsibble key also uniquely identifies each observational unit over time. When constructing a tsibble, any duplicates of key-index (i.e. key-value) pairs will fail, because duplicates signal a data quality issue, which would likely affect subsequent analyses and hence decision making. For example, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. Analysts are encouraged to better understand the data, or reason about the process of data cleaning when needed. Figure \@ref(fig:tsibble-tidy) peels the "tidy" module with clear guidance required for a tsibble. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage.
+Inspired by "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, tsibble key also uniquely identifies each observational unit over time. When constructing a tsibble, any duplicates of key-index (i.e. key-value) pairs will fail, because duplicates signal a data quality issue, which would likely affect subsequent analyses and hence decision making. For example, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. Analysts are encouraged to better understand the data, or reason about the process of data cleaning when handling duplicates. Figure \@ref(fig:tsibble-tidy) peels the "tidy" module with clear routes required for a tsibble. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage.
 
 ```{r tsibble-tidy, fig.cap = "(ref:tsibble-tidy-cap)"}
 include_graphics("img/tsibble-tidy.png")
@@ -171,44 +171,16 @@ A fluent data pipeline anticipates a standard data structure. The tsibble data a
 
 ## Temporal transformation {#sec:timepipeline}
 
-The **tsibble** package not only provides a "tsibble" data object but also a domain specific language in R for transforming temporal data. It takes advantage of the wrangling verbs implemented in the **dplyr** package, and develops a suite of new tools for facilitating temporal manipulation with ease.
+The **tsibble** package not only provides a "tsibble" data object but also a domain specific language in R for transforming temporal data. It takes advantage of the wrangling verbs implemented in the **dplyr** package, and develops a suite of new tools for facilitating temporal manipulation with ease primarily in two aspects: implicit missingness handlers and time-aware aggregations.
 
-Many time operations such as lag/lead and time series models, assume an intact vector input ordered in time. Since a tsibble permits time gaps in the index, it is good practice to check and inspect any gaps in time following the creation of a tsibble, in order to prevent inviting these avoidable errors into the analysis. The first suite of verbs (rephrasing actions performed on the object) are provided to understand and tackle implicit missing values: (1) `has_gaps()` checks if there exists time gaps; (2) `scan_gaps()` reveals all implicit missing observations; (3) `count_gaps()` summarizes the time ranges that are absent from the data; (4) `fill_gaps()` turns them into explicit ones, along with imputing by values or functions. To look into gaps over individual time periods or full-length time span, the common argument `.full` in these functions gives an option to easily switch between. The specification of `.full = TRUE` will result in fully balanced panels in other words.
+Implicit missingness are values that should be present but are absent. Regarding regularly-spaced temporal data, data entries that should be available at certain time points but are missing, leaving gaps in time. It will be a problem when temporal models and operations like lag/lead are applied. A family of verbs help to explore implicit missing values and turn them into the state of explicitness to eliminate potential concerns, listed as follows:
 
-\begin{table}[!ht]
-\caption{A list of table verbs working with tsibble. Functions in bold originating from the tidyverse and are adapted for tsibble.}\label{tab:verb-table}
-\centering
-\begin{tabular}{ lll }
-\toprule
- & Verb & Description \\ \midrule
-\multirow{4}{*}{Time gaps} & \texttt{has\_gaps()} & Test if a tsibble has gaps in time \\
- & \texttt{scan\_gaps()} & Reveal implicit missing entries \\
- & \texttt{count\_gaps()} & Summarize time gaps \\
- & \texttt{fill\_gaps()} & Fill in gaps by values and functions \\ \hline
-\multirow{4}{*}{Row-wise} & \textbf{\texttt{filter()}} & Pick rows based on conditions \\
- & \texttt{filter\_index()} & Provide a shorthand for time subsetting \\
- & \textbf{\texttt{slice()}} & Select rows based on row positions \\
- & \textbf{\texttt{arrange()}} & Sort the ordering of row by variables \\ \hline
-\multirow{4}{*}{Column-wise} & \textbf{\texttt{select()}} & Pick columns by variables \\
- & \textbf{\texttt{mutate()}} & Add new variables \\
- & \textbf{\texttt{transmute()}} & Drops existing variables \\
- & \textbf{\texttt{summarize()}} & Aggregate values over time \\ \hline
-\multirow{3}{*}{Group-wise} & \texttt{index\_by()} & Group by index candidate \\
- & \textbf{\texttt{group\_by()}} & Group by one or more variables \\
- & \texttt{group\_by\_key()} & Group by key variables \\ \hline
-\multirow{4}{*}{Reshape} & \textbf{\texttt{gather()}} & Gather columns into longer form \\
- & \textbf{\texttt{spread()}} & Spread columns into wider form \\
- & \textbf{\texttt{nest()}} & Nest values in a list-variable \\
- & \textbf{\texttt{unnest()}} & Unnest a list-variable \\ \hline
-\multirow{6}{*}{Join tables} & \textbf{\texttt{left\_join()}} & \multirow{6}{*}{Join two tables together} \\
- & \textbf{\texttt{right\_join()}} & \\
- & \textbf{\texttt{full\_join()}} & \\
- & \textbf{\texttt{inner\_join()}} & \\
- & \textbf{\texttt{semi\_join()}} & \\
- & \textbf{\texttt{anti\_join()}} & \\
-\bottomrule
-\end{tabular}
-\end{table}
+* `has_gaps()` checks the existence of time gaps.
+* `scan_gaps()` reveals all implicit missing observations.
+* `count_gaps()` summarizes the time ranges that are absent from the data.
+* `fill_gaps()` turns them into explicit ones, along with imputing by values or functions.
+
+These verbs are evocative and of simple interface. They by default look into gaps for each individual time period. Switching on the option `.full = TRUE` will fill in the full-length time span, creating fully balanced panels with respect to longitudinal data analysis.
 
 Besides the time gap verbs, the **tidyverse** vocabulary is adapted and expanded to facilitate time series transformations, as listed in Table \@ref(tab:verb-table). The **tidyverse** suite showcases the general-purpose verbs for effectively manipulating tabular data, for example `filter()` picks observations, `select()` picks variables, and `left_join()` joins two tables. But these verbs need handling with care when used in the time series domain. A perceivable difference is summarizing variables between data frame and tsibble using `summarize()`. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries. Users who are already familiar with the **tidyverse**, will experience a gentle learning curve for mastering these verbs and glide into time series analysis with low cognitive load.
 
