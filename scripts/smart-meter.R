@@ -12,7 +12,7 @@ weather <- read_rds("data/weather13.rds") %>%
 
 elec_ts <- elec %>% 
   build_tsibble(
-    key = id(customer_id), index = reading_datetime,
+    key = customer_id, index = reading_datetime,
     validate = FALSE, ordered = TRUE
   )
 
@@ -24,15 +24,24 @@ gap_df <- has_gaps(elec_ts)
 count_na_df <- elec_ts %>% 
   count_gaps()
 
-count_na_df %>% 
+lumped_na_df <- count_na_df %>% 
   mutate(
     customer_id = as.factor(customer_id) %>% 
       fct_lump(50) %>% fct_reorder(.n, sum)
-  ) %>% 
+  ) 
+
+# lumped_na_df %>% 
+#   filter(customer_id == "Other") %>% 
+#   ggplot(aes(x = .n)) +
+#   geom_histogram(bins = 300) +
+#   scale_y_sqrt()
+
+lumped_na_df %>% 
+  filter(customer_id != "Other") %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to)) +
-  geom_point(aes(y = .from), size = 0.6, shape = 4) +
-  geom_point(aes(y = .to), size = 0.6, shape = 4) +
+  geom_point(aes(y = .from), size = 0.6, shape = 4, alpha = 0.5) +
+  geom_point(aes(y = .to), size = 0.6, shape = 4, alpha = 0.5) +
   coord_flip() +
   xlab("Customer") +
   ylab("Time gaps") +
@@ -56,6 +65,6 @@ elec_cal <- elec_ts %>%
 p_cal <- elec_cal %>% 
   ggplot(aes(.time, .avg, group = date, colour = hot)) +
   geom_line() +
-  scale_colour_brewer(palette = "Dark2", direction = -1) +
+  scale_colour_brewer(palette = "Dark2", direction = -1, name = "") +
   theme(legend.position = "bottom")
 prettify(p_cal)

@@ -1,6 +1,6 @@
 Type: Compendium
 Package: paperTsibble
-Version: 1.0
+Version: 2.0
 Authors@R: 
     person(given = "Earo",
            family = "Wang",
@@ -9,13 +9,14 @@ Authors@R:
 URL: https://github.com/earowang/paper-tsibble/issues
 BugReports: https://github.com/earowang/paper-tsibble/issues
 Depends:
+    fable (>= 0.1.0),
     forcats (>= 0.4.0),
     gganimate (>= 1.0.3),
     lubridate (>= 1.7.4),
     R (>= 3.2),
     sugrrants (>= 0.2.4),
     tidyverse (>= 1.2.1),
-    tsibble (>= 0.8.0),
+    tsibble (>= 0.8.4),
     MonashEBSTemplates (>= 0.2)
 Imports:
     bookdown (>= 0.9),
@@ -23,6 +24,7 @@ Imports:
     knitr (>= 1.22),
     spelling (>= 2.1)
 Remotes:
-    robjhyndman/MonashEBSTemplates
+    robjhyndman/MonashEBSTemplates,
+    tidyverts/fable
 Encoding: UTF-8
 Language: en-GB

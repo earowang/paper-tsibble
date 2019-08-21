@@ -52,6 +52,7 @@ knitr::opts_knit$set(root.dir = here::here())
 read_chunk('scripts/demo.R')
 read_chunk('scripts/flights.R')
 read_chunk('scripts/smart-meter.R')
+ggplot2::theme_set(ggplot2::theme_bw())
 ```
 
 ```{r load-pkg}
@@ -293,6 +294,8 @@ This dataset is intrinsically heterogeneous, encoded in numbers, strings, and da
 
 Transforming a tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can result in well-constructed pipelines. From the perspective of a passenger, for example, one needs to travel smart by choosing an efficient carrier to fly with and the time of day to avoid congestion. To explore this data, we drill down starting with annual carrier performance and followed by disaggregation to finer time resolutions.
 
+<!--
+
 ```{r carrier-delayed}
 ```
 
@@ -308,6 +311,8 @@ include_graphics("img/flight-pipeline1")
 (ref:flight-pipeline1-cap) Flow chart illustrating the pipeline that preprocessed the data for creating Figure \@ref(fig:carrier-mosaic).
 
 Figure \@ref(fig:carrier-mosaic) visually presents the end product of aggregating the number of on-time and delayed flights to the year interval by carriers. This pipeline is initialized by defining a new variable if the flight is delayed, and involves summarizing the tallies of on-time and delayed flights for each carrier annually. To prepare the summarized data for a mosaic plot, it is further manipulated by melting new tallies into a single column. The flow chart (Figure \@ref(fig:flight-pipeline1)) demonstrates the operations undertaking in the data pipeline. The input to this pipeline is a tsibble of irregular interval, and the output ends up with a tsibble of unknown interval (as each carrier ends up with only one annual summary). The final data set includes each carrier along with a single year, with the interval undetermined, which in turn feeds into the mosaic display. Note that Southwest Airlines (WN), as the largest carrier, operates less efficiently than Delta (DL).
+
+-->
 
 A closer examination of some big airports across the US will give an indication of how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (KOA), Los Angeles (LAX) and Seattle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. Superimposed on the plot are two-month moving averages, so the temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without weight specification. The sliding operation with a large window size smooths out the fluctuations and gives a stable trend around 25% over the year. LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady number delays over time. The IAH and JFK airports have more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year.
 
