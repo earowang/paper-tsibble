@@ -277,7 +277,7 @@ The **tsibble** packages leverages the **tidyverse** grammars and pipelines thro
 ```{r load-flights, cache.extra = tools::md5sum("data/flights.rds")}
 ```
 
-The dataset of on-time performance for US domestic flights in 2017 represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics [@flights-data]. It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. Every single flight should be uniquely identified by the flight number and its scheduled departure time, from a passenger's point of view. In fact, it fails to pass the tsibble hurdle due to duplicates in the original data. An error is immediately raised when attempting to convert this data into a tsibble, and closer inspection has to be carried out to locate the issue. The **tsibble** package provides tools to easily locate the duplicates in the data with `duplicates()`. The problematic entries are shown below.
+The dataset of on-time performance for US domestic flights in 2017 represents event-driven data caught in the wild, sourced from US Bureau of Transportation Statistics [@flights-data]. It contains `r format(NROW(flights), big.mark = ",")` operating flights with many measurements (such as departure delay, arrival delay in minutes, and other performance metrics) and detailed flight information (such as origin, destination, plane number and etc.) in a tabular format. This kind of event describes each flight scheduled for departure at a time point in its local time zone. Every single flight should be uniquely identified by the flight number and its scheduled departure time, from a passenger's point of view. In fact, it fails to pass the tsibble hurdle due to duplicates in the original data. An error is immediately raised when attempting to convert this data into a tsibble, and a closer inspection has to be carried out to locate the issue. The **tsibble** package provides tools to easily locate the duplicates in the data with `duplicates()`. The problematic entries are shown below.
 
 ```{r find-duplicate}
 ```
@@ -287,34 +287,33 @@ The issue was perhaps introduced when updating or entering the data into a syste
 ```{r tsibble}
 ```
 
-This dataset is intrinsically heterogeneous, encoded in numbers, strings, and date-times. The tsibble framework, as expected, incorporates this type of data without any loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as the "index", and column `flight_num` as the "key". As a result of event timing, the data are irregularly spaced, and hence switching to the irregular option is necessary. The software internally validates if the key and index produce distinct rows, and then sorts the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, including dimensions, irregular interval (``r tibble::tbl_sum(us_flights)[1]``) and the number of time-based observational units (``r tibble::tbl_sum(us_flights)[2]``).
+This dataset is intrinsically heterogeneous, encoded in numbers, strings, and date-times. The tsibble framework, as expected, incorporates this type of data without any loss of data richness and heterogeneity. To declare the flight data as a valid tsibble, column `sched_dep_datetime` is specified as the "index", and column `flight_num` as the "key". This data happens to be irregularly spaced, and hence switching to the irregular option is necessary. The software internally validates if the key and index produce distinct rows, and then sorts the key and the index from past to recent. When the tsibble creation is done, the print display is data-oriented and contextually informative, including dimensions, irregular interval with the time zone (``r tibble::tbl_sum(us_flights)[1]``) and the number of observational units (``r tibble::tbl_sum(us_flights)[2]``).
 
 ```{r tsibble-header}
 ```
 
-Transforming a tsibble for exploratory data analysis with a suite of time-specific and general-purpose manipulation verbs can result in well-constructed pipelines. From the perspective of a passenger, for example, one needs to travel smart by choosing an efficient carrier to fly with and the time of day to avoid congestion. To explore this data, we drill down starting with annual carrier performance and followed by disaggregation to finer time resolutions.
+Transforming a tsibble for exploratory data analysis with a suite of time-aware and general-purpose manipulation verbs can result in well-constructed pipelines. A couple of use cases are described to show how to approach the interested questions by wrangling the tsibble while maintaining its temporal context.
 
-<!--
+What time of day and day of week should passengers travel to avoid suffering from horrible delay? Figure \@ref(fig:draw-qtl) plots hourly quantile estimates across day of week in the form of small multiples. The upper-tail delay behaviors are of primary interest, and hence 50%, 80% and 95% quantiles are computed. This pipeline is initialized by regularizing and reshaping the list of the upper quantiles of departure delays for each hour. To visualize the temporal profiles, the time components (for example hours and weekdays) are extracted from the index. The flow chart (Figure \@ref(fig:flight-pipeline3)) demonstrates the operations undertaking in the data pipeline. The input to this pipeline is a tsibble of irregular interval for all flights, and the output ends up with a tsibble of one-hour interval by quantiles. To reduce the likelihood of suffering a delay, it is recommended to avoid the peak hour around 6pm (18) from Figure \@ref(fig:draw-qtl).
 
-```{r carrier-delayed}
+```{r quantile}
 ```
 
-```{r carrier-mosaic, fig.cap = "(ref:carrier-mosaic-cap)"}
+```{r draw-qtl-prep}
 ```
 
-(ref:carrier-mosaic-cap) Mosaic plot showing the association between the size of airline carriers and the delayed proportion of departures in 2017. Southwest Airlines is the largest operator, but does not operate as efficiently as Delta. Hawaiian Airlines, a small operator, outperforms the rest.
-
-```{r flight-pipeline1, fig.cap = "(ref:flight-pipeline1-cap)"}
-include_graphics("img/flight-pipeline1")
+```{r draw-qtl, fig.cap = "(ref:draw-qtl-cap)"}
 ```
 
-(ref:flight-pipeline1-cap) Flow chart illustrating the pipeline that preprocessed the data for creating Figure \@ref(fig:carrier-mosaic).
+(ref:draw-qtl-cap) Small multiples of lines about departure delay against time of day, faceting day of week and 50%, 80% and 95% quantiles. A blue horizontal line indicates the 15-minute on-time standard to help grasp the delay severity. Passengers are apt to hold up around 18 during a day, and are recommended to travel early. The variations increase substantially as the upper tails.
 
-Figure \@ref(fig:carrier-mosaic) visually presents the end product of aggregating the number of on-time and delayed flights to the year interval by carriers. This pipeline is initialized by defining a new variable if the flight is delayed, and involves summarizing the tallies of on-time and delayed flights for each carrier annually. To prepare the summarized data for a mosaic plot, it is further manipulated by melting new tallies into a single column. The flow chart (Figure \@ref(fig:flight-pipeline1)) demonstrates the operations undertaking in the data pipeline. The input to this pipeline is a tsibble of irregular interval, and the output ends up with a tsibble of unknown interval (as each carrier ends up with only one annual summary). The final data set includes each carrier along with a single year, with the interval undetermined, which in turn feeds into the mosaic display. Note that Southwest Airlines (WN), as the largest carrier, operates less efficiently than Delta (DL).
+```{r flight-pipeline3, fig.cap = "(ref:flight-pipeline3-cap)"}
+include_graphics("img/flight-pipeline3")
+```
 
--->
+(ref:flight-pipeline3-cap) Flow chart illustrates the pipeline that preprocesses the data for creating Figure \@ref(fig:draw-qtl).
 
-A closer examination of some big airports across the US will give an indication of how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (KOA), Los Angeles (LAX) and Seattle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. Superimposed on the plot are two-month moving averages, so the temporal trend is more visible. The number of days for each month is variable. Moving averages for two months call for computing weighted mean. But this can also be accomplished using a pair of commonly used verbs--`nest()` and `unnest()` to handle list-columns, without weight specification. The sliding operation with a large window size smooths out the fluctuations and gives a stable trend around 25% over the year. LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady number delays over time. The IAH and JFK airports have more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year.
+A closer examination of some big airports across the US will give an indication of how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (KOA), Los Angeles (LAX) and Seattle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are framed as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. Superimposed on the plot are two-month moving averages, so the temporal trend is more visible. Since the number of days for each month is variable, moving averages over two months will require weights input. But the weights specification can be avoid using a pair of commonly used rectangling verbs--`nest()` and `unnest()`, to wrap data frames partitioned by months into list-columns. The sliding operation with a large window size smooths out the fluctuations and gives a stable trend around 25% over the year. LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady number delays over time. The IAH and JFK airports have more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year. This pipeline gets the data into the daily series, and shifts the focus to five major airports.
 
 ```{r sel-flights}
 ```
@@ -339,26 +338,7 @@ include_graphics("img/flight-pipeline2")
 
 (ref:flight-pipeline2-cap) Flow chart illustrating the pipeline that preprocessed the data for creating Figure \@ref(fig:sel-monthly-plot).
 
-What time of day and day of week should we travel to avoid suffering from horrible delay? Figure \@ref(fig:draw-qtl) plots hourly quantile estimates across day of week in the form of small multiples. The upper-tail delay behaviors are of primary interest, and hence 50%, 80% and 95% quantiles are shown. To reduce the likelihood of suffering a delay, it is recommended to avoid the peak hour around 6pm (18).
-
-```{r quantile}
-```
-
-```{r draw-qtl-prep}
-```
-
-```{r draw-qtl, fig.cap = "(ref:draw-qtl-cap)"}
-```
-
-(ref:draw-qtl-cap) Small multiples of lines about departure delay against time of day, faceting day of week and 50%, 80% and 95% quantiles. A blue horizontal line indicates the 15-minute on-time standard to help grasp the delay severity. Passengers are apt to hold up around 18 during a day, and are recommended to travel early. The variations increase substantially as the upper tails.
-
-```{r flight-pipeline3, fig.cap = "(ref:flight-pipeline3-cap)"}
-include_graphics("img/flight-pipeline3")
-```
-
-(ref:flight-pipeline3-cap) Flow chart illustrates the pipeline that preprocesses the data for creating Figure \@ref(fig:draw-qtl).
-
-\FloatBarrier
+This case study begins with duplicates fixing, that resolved the issue for constructing the tsibble. A range of temporal transformations can be handled by many free-form combinations of verbs, facilitating exploratory visualization. 
 
 ## Smart-grid customer data in Australia
 
