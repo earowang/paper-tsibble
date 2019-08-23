@@ -16,7 +16,7 @@ Depends:
     R (>= 3.2),
     sugrrants (>= 0.2.4),
     tidyverse (>= 1.2.1),
-    tsibble (>= 0.8.4),
+    tsibble (>= 0.8.3),
     MonashEBSTemplates (>= 0.2)
 Imports:
     bookdown (>= 0.9),
