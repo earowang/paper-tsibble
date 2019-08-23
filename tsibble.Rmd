@@ -148,7 +148,7 @@ include_graphics("img/tsibble-tidy.png")
 
 (ref:tsibble-tidy-cap) Details about the "tidy" stage for a tsibble. Built on top of "tidy data", each observation should be uniquely identified by index and key, thereby no duplicated key-index pairs.
 
-Since observational units are embedded, modelling and forecasting for each unit in a tsibble will be accelerated. The tsibble key plays a role of the central transit hub in connecting multiple tables managed by the data, models, and forecasts. This neatly decouples the expensive data copy from downstream summaries, significantly reducing the storage space.
+Since observational units are embedded, modelling and forecasting across units and time in a tsibble will be simplified. The tsibble key plays a role of the central transit hub in connecting multiple tables managed by the data, models, and forecasts. This neatly decouples the expensive data copy from downstream summaries, significantly reducing the storage space.
 
 ## Interval {#sec:interval}
 
@@ -197,7 +197,7 @@ Line charts are universally accepted for ordered data, such as time series plots
 
 ## Model {#sec:ts-models}
 
-Modeling is crucial to explanatory and predictive analytics, where time series and longitudinal data analysis start to diverge. Nevertheless, tsibble as a model-oriented object can flow into both types of models, with new semantics (index and key) to be internally utilized.
+Modeling is crucial to explanatory and predictive analytics, where time series and longitudinal data analysis start to diverge. Nevertheless, tsibble as a model-oriented object can flow into both types of models, with new semantics (index and key) to be internally utilized, to accelerate modelling.
 
 Most time series models are univariate, such as ARIMA and Exponential Smoothing, modelling temporal dynamics for each series independently. The **fable** package [@R-fable] provides a tidy forecasting framework built on top of tsibble, which is under development, with the goal of promoting transparent and human-centered forecasting practices. With the presence of the key, tsibble holds many series. Since models are fundamentally scalable, the `model()` and `forecast()` generics will take care of fitting and forecasting univariate models to each series across time in a tsibble at once.
 
@@ -345,7 +345,7 @@ This case study begins with duplicates fixing, that resolved the issue for const
 ```{r load-elec}
 ```
 
-Sensors have been installed in households across major cities in Australia to collect data for the smart city project. One of the trials is monitoring households' electricity usage through installed smart meters in the area of Newcastle over 2010--2014 [@smart-meter]. Data from 2013 have been sliced to examine temporal patterns of customer's energy consumption with **tsibble** for this case study. Half-hourly general supply in kwH have been recorded for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Daily high and low temperatures in Newcastle in 2013 provides explanatory variables other than time in a different data table [@newcastle-temp], obtained using the R package **bomrang** [@R-bomrang]. Two data tables might be joined to explore how local weather can contribute to the variations of daily electricity use when needed.
+Sensors have been installed in households across major cities in Australia to collect data for the smart city project. One of the trials is monitoring households' electricity usage through installed smart meters in the area of Newcastle over 2010--2014 [@smart-meter]. Data from 2013 have been sliced to examine temporal patterns of customer's energy consumption with **tsibble** for this case study. Half-hourly general supply in kwH have been recorded for `r format(tsibble::n_keys(elec_ts), big.mark = ",")` customers in the data set, resulting in `r format(NROW(elec_ts), big.mark = ",")` observations in total. Daily high and low temperatures in Newcastle in 2013 provides explanatory variables other than time in a different data table [@newcastle-temp], obtained using the R package **bomrang** [@R-bomrang]. Aggregating the half-hourly energy data to the same daily time interval as the temperature data allows to join the two data tables to explore how local weather can contribute to the variations of daily electricity use and the accuracy of demand forecasting.
 
 ```{r elec-gaps}
 ```
@@ -357,18 +357,40 @@ During a power outage, electricity usage for some households may become unavaila
 
 (ref:count-gaps-cap) Time gap plots for the 49 customers with most implicit missing values, and the remaining customers grouped into the one line at top. Each cross represents an observation missing in time and a line between two dots shows continuous missingness over time. Each row corresponds to one customer. Missing values occur at various times, with more in January and February than other months.
 
-Aggregation across all individuals helps to sketch a big picture of the behavioral change over time, organized into a calendar display (Figure \@ref(fig:calendar-plot)). Each glyph represents the daily pattern of average residential electricity usage every thirty minutes. Higher consumption is indicated by higher values, and typically occurs in daylight hours. Color indicates hot days. The daily snapshots vary depending on the season in the year. During the summer months (December and January), the late-afternoon peak becomes predominant driven by the use of air conditioning, especially on hot days with daily average temperature greater than 25 degrees Celsius. However, the winter time (July and August) sees two peaks in a day, which is probably due to heating in the morning and evening. This plot illustrates how the tsibble data can easily integrate with other tools and graphics.
+Aggregation across all individuals helps to sketch a big picture of the behavioral change over time in the region, organized into a calendar display (Figure \@ref(fig:calendar-plot)) using the **sugrrants** package [@wang-calendarviz-2018]. Each glyph represents the daily pattern of average residential electricity usage every thirty minutes. Higher consumption is indicated by higher values, and typically occurs in daylight hours. Color indicates hot days. The daily snapshots vary depending on the season in the year. During the summer months (December and January), the late-afternoon peak becomes predominant driven by the use of air conditioning, especially on hot days with daily average temperature greater than 25 degrees Celsius. However, the winter time (July and August) sees two peaks in a day, which is probably due to heating in the morning and evening.
 
 ```{r calendar-plot, fig.height = 7, fig.cap = "(ref:calendar-plot-cap)"}
 ```
 
 (ref:calendar-plot-cap) Half-hourly average electricity use across all customers in the region, organized into calendar format, with color indicating hot days. Energy use of hot days tends to be higher, suggesting air conditioner use. Days in the winter months have a double peak suggesting heater use.
 
+Lastly, a common practice in the energy sector is load forecasting. Forecasting the demand for the last day of 2013 is undertaken, holding the original energy data as the validation set. The most recent December data is fitted by ARIMA models with and without temporature information using automatic order selection [cite]. The logarithmic transformation is applied to the average demand to ensure the positive forecasts. Figure \@ref(fig:elec-forecast) plots the one-day forecasts obtained from both models against the actual demand within the last week window. ARIMA regressed by average temporatures gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
+
+```{r elec-model}
+```
+
+```{r elec-forecast, fig.height = 3, fig.cap = "(ref:elec-forecast-cap)"}
+```
+
+(ref:elec-forecast-cap) One-day forecasts generated by ARIMA models with and without temporatures plotted against the actual demand. Both nicely capture the temporal dynamics, but ARIMA with temporatures performs better than the one without.
+
+<!--
+
 ```{r elec-pipeline2, fig.cap = "(ref:elec-pipeline2-cap)"}
 include_graphics("img/elec-pipeline2")
 ```
 
 (ref:elec-pipeline2-cap) Flow chart illustrating the pipeline that preprocessed the data for creating Figure \@ref(fig:calendar-plot).
+
+-->
+
+
+```{r elec-accuracy}
+```
+
+(ref:elec-accuracy) Accuracy measures to evaluate the forecasting performance between ARIMA models with and without temporatures, using the validation set.
+
+This case study demonstrates the significance of tsibble in lubricating the plumbing of handling time gaps, visualizing, and forecasting in general.
 
 # Conclusion and future work {#sec:conclusion}
 

@@ -2,6 +2,7 @@
 library(tidyverse)
 library(lubridate)
 library(tsibble)
+library(fable)
 
 elec <- read_rds("data/smart-meter13.rds")
 weather <- read_rds("data/weather13.rds") %>% 
@@ -53,13 +54,15 @@ lumped_na_df %>%
 
 ## ---- calendar-plot
 library(sugrrants)
-elec_cal <- elec_ts %>% 
+elec_full <- elec_ts %>% 
   summarise(avg = mean(general_supply_kwh)) %>% 
   mutate(
     date = as_date(reading_datetime), 
     time = hms::as_hms(reading_datetime)
   ) %>% 
-  left_join(weather, by = "date") %>% 
+  left_join(weather, by = "date")
+
+elec_cal <- elec_full %>% 
   frame_calendar(x = time, y = avg, date = date)
 
 p_cal <- elec_cal %>% 
@@ -68,3 +71,33 @@ p_cal <- elec_cal %>%
   scale_colour_brewer(palette = "Dark2", direction = -1, name = "") +
   theme(legend.position = "bottom")
 prettify(p_cal)
+
+## ---- elec-model
+elec_train <- elec_full %>% 
+  filter_index("2013-12-01" ~ "2013-12-30")
+elec_test <- elec_full %>% 
+  filter_index("2013-12-31" ~ .)
+
+elec_fc <- elec_train %>% 
+  model(
+    `ARIMA w/ temperature` = ARIMA(log(avg) ~ avg_temp),
+    `ARIMA w/o temperature` = ARIMA(log(avg))
+  ) %>% 
+  forecast(new_data = elec_test)
+
+## ---- elec-forecast
+elec_fc %>% 
+  autoplot(data = filter_index(elec_train, "2013-12-25" ~ .), level = NULL) +
+  geom_line(aes(y = avg), data = elec_test, linetype = "dashed") +
+  scale_colour_brewer(palette = "Dark2", direction = -1, name = "") +
+  scale_x_datetime(date_breaks = "1 day", date_labels = "%b %d") +
+  theme(legend.position = "bottom") +
+  xlab("Reading time") +
+  ylab("Average electricity use")
+
+## ---- elec-accuracy
+accuracy(elec_fc, elec_test) %>% 
+  rename(model = .model) %>% 
+  select(-.type, -MASE, -ACF1) %>% 
+  knitr::kable(booktabs = TRUE, caption = "(ref:elec-accuracy)", linesep = "") %>%
+  kableExtra::kable_styling(position = "center", latex_options= "hold_position")
