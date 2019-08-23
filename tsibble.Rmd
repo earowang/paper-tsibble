@@ -70,7 +70,7 @@ Despite this variety and heterogeneity, little organization or conceptual oversi
 include_graphics("img/tsibble-fit.png")
 ```
 
-(ref:tsibble-fit-cap) Illustration of the data science workflow regarding temporal data, drawn from @r4ds. The new data structure, tsibble, makes the connection between temporal data input, and downstream analytics. It provides elements at the "tidy" step, which produce tidy temporal data for temporal visualization and modeling.
+(ref:tsibble-fit-cap) Annotation of the data science workflow regarding temporal data, drawn from @r4ds. The new data structure, tsibble, makes the connection between temporal data input, and downstream analytics. It provides elements at the "tidy" step, which produce tidy temporal data for temporal visualization and modeling.
 
 The paper is structured as follows. Section \@ref(sec:str) reviews temporal data structures corresponding to time series and longitudinal analysis, and discusses "tidy data" and the grammar of data manipulation. Section \@ref(sec:semantics) proposes contextual semantics for temporal data, built on top of tidy data. The concept of data pipelines with respect to the time domain will be discussed in depth in Section \@ref(sec:pipeline), followed by a discussion of the design choices made in the software structure in Section \@ref(sec:software). Two case studies are presented in Section \@ref(sec:cases) illustrating temporal data exploration using the newly implemented infrastructure. Section \@ref(sec:conclusion) discusses future work.
 
@@ -187,7 +187,7 @@ The other key function, an adverb `index_by()`, is the counterpart of `group_by(
 
 Besides new verbs, the **dplyr** vocabulary has been adapted and expanded to facilitate temporal transformations. The **dplyr** suite showcases the general-purpose verbs for effectively manipulating tabular data. But these verbs need handling with care due to the context switch. A perceivable difference is summarizing variables between normal data and tsibble using `summarize()`. The former will reduce to a single summary, whereas the latter will obtain the index and their corresponding summaries.
 
-Attention has been paid to warning and error handling. The principle that underpins all the verbs is a tsibble in and a tsibble out, thereby striving to maintain a valid tsibble over the course of transformation. If the desired temporal ordering is changed by row-wise verbs (such as `arrange()` and `slice()`), a warning is broadcast. If a tsibble cannot be maintained in the output of a pipeline module (likely occurring to column-wise verbs), for example the index is dropped by `select()`-ing, an error informs users of the problem and suggests alternatives. This avoids surprising users and reminds them of the time context. In general, users who are already familiar with the **tidyverse**, should have less resistance to learning the new semantics and verbs.
+Attention has been paid to warning and error handling. The principle that underpins most verbs is a tsibble in and a tsibble out, thereby striving to maintain a valid tsibble over the course of transformation. If the desired temporal ordering is changed by row-wise verbs (such as `arrange()` and `slice()`), a warning is broadcast. If a tsibble cannot be maintained in the output of a pipeline module (likely occurring to column-wise verbs), for example the index is dropped by `select()`-ing, an error informs users of the problem and suggests alternatives. This avoids surprising users and reminds them of the time context. In general, users who are already familiar with the **tidyverse**, should have less resistance to learning the new semantics and verbs.
 
 ## Visualization {#sec:ts-vis}
 
@@ -364,7 +364,7 @@ Aggregation across all individuals helps to sketch a big picture of the behavior
 
 (ref:calendar-plot-cap) Half-hourly average electricity use across all customers in the region, organized into calendar format, with color indicating hot days. Energy use of hot days tends to be higher, suggesting air conditioner use. Days in the winter months have a double peak suggesting heater use.
 
-Lastly, a common practice in the energy sector is load forecasting. Forecasting the demand for the last day of 2013 is undertaken, holding the original energy data as the validation set. The most recent December data is fitted by ARIMA models with and without temporature information using automatic order selection [cite]. The logarithmic transformation is applied to the average demand to ensure the positive forecasts. Figure \@ref(fig:elec-forecast) plots the one-day forecasts obtained from both models against the actual demand within the last week window. ARIMA regressed by average temporatures gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
+Lastly, a common practice in the energy sector is load forecasting. Forecasting the demand for the last day of 2013 is undertaken, holding the original energy data as the validation set. The most recent December data is fitted by ARIMA models with and without temperature information using automatic order selection [@autoarima]. The logarithmic transformation is applied to the average demand to ensure the positive forecasts. Figure \@ref(fig:elec-forecast) plots the one-day forecasts obtained from both models against the actual demand within the last week window. ARIMA regressed by average temperatures gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
 
 ```{r elec-model}
 ```
@@ -372,23 +372,19 @@ Lastly, a common practice in the energy sector is load forecasting. Forecasting 
 ```{r elec-forecast, fig.height = 3, fig.cap = "(ref:elec-forecast-cap)"}
 ```
 
-(ref:elec-forecast-cap) One-day forecasts generated by ARIMA models with and without temporatures plotted against the actual demand. Both nicely capture the temporal dynamics, but ARIMA with temporatures performs better than the one without.
-
-<!--
+(ref:elec-forecast-cap) One-day forecasts generated by ARIMA models with and without temperatures plotted against the actual demand. Both nicely capture the temporal dynamics, but ARIMA with temperatures performs better than the one without.
 
 ```{r elec-pipeline2, fig.cap = "(ref:elec-pipeline2-cap)"}
 include_graphics("img/elec-pipeline2")
 ```
 
-(ref:elec-pipeline2-cap) Flow chart illustrating the pipeline that preprocessed the data for creating Figure \@ref(fig:calendar-plot).
-
--->
+(ref:elec-pipeline2-cap) Flow chart illustrating the pipeline involved for creating Figure \@ref(fig:calendar-plot) and Figure \@ref(fig:elec-forecast).
 
 
 ```{r elec-accuracy}
 ```
 
-(ref:elec-accuracy) Accuracy measures to evaluate the forecasting performance between ARIMA models with and without temporatures, using the validation set.
+(ref:elec-accuracy) Accuracy measures to evaluate the forecasting performance between ARIMA models with and without temperatures, using the validation set.
 
 This case study demonstrates the significance of tsibble in lubricating the plumbing of handling time gaps, visualizing, and forecasting in general.
 
