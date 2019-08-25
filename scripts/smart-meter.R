@@ -3,6 +3,7 @@ library(tidyverse)
 library(lubridate)
 library(tsibble)
 library(fable)
+theme_set(theme_bw())
 
 elec <- read_rds("data/smart-meter13.rds")
 weather <- read_rds("data/weather13.rds") %>% 

@@ -23,7 +23,7 @@ Along with these major changes, we have done lots of minor tweaks to improve the
 
 > More mini examples embeded throughout the manuscript. Mainly it didn't showcase to me tsibble's capability well enough but understandably this may make the manuscript long and may be better left to vignettes.
 
-TODO.
+We have added a code snippet (featuring new `pedestrian` dataset) in a new subsection 4.4, and the load forecasting example to the energy consumption case study to show the cleaner, more expressive temporal data pipeline.
 
 > Finding a duplicate is a nice touch but I don't understand the significance of the Figure 5 mosaic plot in demonstration for the capability of tsibble. I understand that finding duplicate/wrong entry is made easier by tsibble but besides filtering those duplicate/wrong entries, the data wrangling for mosaic plot is easily done without tsibble. More specifically what is the significance `tsibble::index_by` below? Could the authors explain what is the benefit of explicit defining index at this stage as opposed to explicit specification at a later stage?
 
@@ -43,11 +43,15 @@ TODO.
 
 > Authors may like to add/change `spread`/`gather` verbs to `pivot_longer`/`pivot_wider` with the recent move to deprecate the former in tidyr. Likewise authors may like to consider to replace “long data” to “longer data” and “wide data” to “wider data” as long/wide implies absolute terms. <https://tidyr.tidyverse.org/dev/articles/pivot.html>
 
-We'd like to upgrade `spread`/`gather` verbs to `pivot_longer`/`pivot_wider`. But they are not S3 generics yet, and embedding tsibble into the new vctrs framework will take a long time, which delays the implementation. Conceptually the newly melt columns will be added to the key specification.
+We'd like to upgrade `spread`/`gather` verbs to `pivot_longer`/`pivot_wider`. But they are not S3 generics yet, which delays the implementation. Conceptually the newly melt columns will be added to the key specification.
 
 > Manuscript does implicitly feel more time series data oriented rather than a general temporal data. E.g. references of time points as index seems inherent from other time series data infrastructure (i.e. zoo and xts) and the presented case studies is not representative of any longitudinal study. This does not mean it should be changed but index to me was not as intuitive to be the temporal variable.
 
-TODO.
+[TODO]
+
+Time indexes lay the contextual foundation to both time series and longitudinal data. `zoo` and `xts` store indices as metadata due the matrix structure, but tsibble's indices are explicitly a data column that can be manipulated. Tsibble also has the capacity of custom index support and interval extraction.
+
+Tsibble is aimed at general temporal data, to unify time series and longitudinal **data**. In the revised manuscript (Section 4), we note the focuses of time series and longitudinal **analysis** are different in the modelling practice. Yes, the presented case studies are time series oriented, because currently time series model functions are available for tsibble.
 
 > Figure 4 animation doesn't play so authors may like to ensure that the final publication works. Github version works.
 
@@ -111,7 +115,7 @@ We removed the mosaic plot (previously Figure 5).
 
 > Fig 6 Consider replacing gather() with pivot_longer() which is intended to be easier to use particularly for more complex "gathering" operations. <https://tidyr.tidyverse.org/dev/articles/pivot.html>
 
-We'd like to upgrade `spread`/`gather` verbs to `pivot_longer`/`pivot_wider`. But they are not S3 generics yet, and embedding tsibble into the new vctrs framework will take a long time, which delays the implementation. Conceptually the newly melt columns will be added to the key specification.
+We'd like to upgrade `spread`/`gather` verbs to `pivot_longer`/`pivot_wider`. But they are not S3 generics yet, which delays the implementation. Conceptually the newly melt columns will be added to the key specification.
 
 
 > Fig 7 y-axis label should be "Proportion of flights delayed" or similar. Legend label "Originating airport" (but legend can also be removed, because it is covered by the facet labels.

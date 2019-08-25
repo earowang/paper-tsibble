@@ -3,6 +3,7 @@ library(lubridate)
 library(tidyverse)
 library(tsibble)
 library(forcats)
+theme_set(theme_bw())
 
 ## ---- load-flights
 flights <- read_rds("data/flights.rds")

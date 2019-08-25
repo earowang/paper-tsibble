@@ -52,7 +52,6 @@ knitr::opts_knit$set(root.dir = here::here())
 read_chunk('scripts/demo.R')
 read_chunk('scripts/flights.R')
 read_chunk('scripts/smart-meter.R')
-ggplot2::theme_set(ggplot2::theme_bw())
 ```
 
 ```{r load-pkg}

@@ -1,5 +1,5 @@
 Type: Compendium
-Package: paperTsibble
+Package: paper.tsibble
 Version: 2.0
 Authors@R: 
     person(given = "Earo",
@@ -27,4 +27,4 @@ Remotes:
     robjhyndman/MonashEBSTemplates,
     tidyverts/fable
 Encoding: UTF-8
-Language: en-GB
+Language: en-US
