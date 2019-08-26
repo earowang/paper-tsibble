@@ -10,7 +10,7 @@ data-raw/customer.csv
 arxiv*
 cover-letter/signature.png
 figure/
-*\.tex
+tsibble.tex
 *\.log
 *\.aux
 *\.bcf
