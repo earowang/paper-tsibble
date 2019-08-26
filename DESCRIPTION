@@ -13,6 +13,7 @@ Depends:
     forcats (>= 0.4.0),
     gganimate (>= 1.0.3),
     lubridate (>= 1.7.4),
+    patchwork,
     R (>= 3.2),
     sugrrants (>= 0.2.4),
     tidyverse (>= 1.2.1),
@@ -25,6 +26,7 @@ Imports:
     spelling (>= 2.1)
 Remotes:
     robjhyndman/MonashEBSTemplates,
-    tidyverts/fable
+    tidyverts/fable,
+    thomasp85/patchwork
 Encoding: UTF-8
 Language: en-US

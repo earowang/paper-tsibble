@@ -3,6 +3,7 @@ library(tidyverse)
 library(lubridate)
 library(tsibble)
 library(fable)
+library(patchwork)
 theme_set(theme_bw())
 
 elec <- read_rds("data/smart-meter13.rds")
@@ -32,26 +33,38 @@ lumped_na_df <- count_na_df %>%
       fct_lump(50) %>% fct_reorder(.n, sum)
   ) 
 
-# lumped_na_df %>% 
-#   filter(customer_id == "Other") %>% 
-#   ggplot(aes(x = .n)) +
-#   geom_histogram(bins = 300) +
-#   scale_y_sqrt()
-
-lumped_na_df %>% 
+p_49 <- lumped_na_df %>% 
   filter(customer_id != "Other") %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to)) +
-  geom_point(aes(y = .from), size = 0.6, shape = 4, alpha = 0.5) +
-  geom_point(aes(y = .to), size = 0.6, shape = 4, alpha = 0.5) +
+  geom_point(aes(y = .from), size = 0.6, shape = 4) +
+  geom_point(aes(y = .to), size = 0.6, shape = 4) +
   coord_flip() +
   xlab("Customer") +
+  ylab("") +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "none",
+    plot.margin = unit(c(0, 0, -1, -1), "line")
+  )
+
+p_other <- lumped_na_df %>% 
+  filter(customer_id == "Other") %>% 
+  ggplot(aes(x = customer_id)) +
+  geom_linerange(aes(ymin = .from, ymax = .to), alpha = 0.1) +
+  geom_point(aes(y = .from), size = 0.6, shape = 4, alpha = 0.1) +
+  geom_point(aes(y = .to), size = 0.6, shape = 4, alpha = 0.1) +
+  coord_flip() +
+  xlab("Others") +
   ylab("Time gaps") +
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     legend.position = "none"
   )
+
+p_49 + p_other + plot_layout(ncol = 1, heights = c(10, 1))
 
 ## ---- calendar-plot
 library(sugrrants)
@@ -81,14 +94,14 @@ elec_test <- elec_full %>%
 
 elec_fc <- elec_train %>% 
   model(
-    `ARIMA w/ temperature` = ARIMA(log(avg) ~ avg_temp),
-    `ARIMA w/o temperature` = ARIMA(log(avg))
+    `temperature` = ARIMA(log(avg) ~ avg_temp),
+    `w/o temperature` = ARIMA(log(avg))
   ) %>% 
   forecast(new_data = elec_test)
 
 ## ---- elec-forecast
 elec_fc %>% 
-  autoplot(data = filter_index(elec_train, "2013-12-25" ~ .), level = NULL) +
+  autoplot(data = filter_index(elec_train, "2013-12-19" ~ .), level = NULL) +
   geom_line(aes(y = avg), data = elec_test, linetype = "dashed") +
   scale_colour_brewer(palette = "Dark2", direction = -1, name = "") +
   scale_x_datetime(date_breaks = "1 day", date_labels = "%b %d") +
@@ -100,5 +113,5 @@ elec_fc %>%
 accuracy(elec_fc, elec_test) %>% 
   rename(model = .model) %>% 
   select(-.type, -MASE, -ACF1) %>% 
-  knitr::kable(booktabs = TRUE, caption = "(ref:elec-accuracy)", linesep = "") %>%
+  knitr::kable(digits = 3, booktabs = TRUE, caption = "(ref:elec-accuracy)", linesep = "") %>%
   kableExtra::kable_styling(position = "center", latex_options= "hold_position")
