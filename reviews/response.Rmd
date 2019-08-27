@@ -12,7 +12,7 @@ We thank the reviewers for their helpful feedback which has led to many improvem
 
 This manuscript has undergone an overhaul to address reviewer's comments:
 
-1. Section 2.2 (previously 2.3) reviews existing time series and longitudinal data standards in popular statistical software, such as R, Stata, and SAS.
+1. Section 2.2 (previously 2.3) has been extended to include reviews of other software than R (Stata and SAS) time series and longitudinal data standards.
 2. We have rewritten Section 3 "Contextual semantics" to give a definition of tsibble in relation to tidy data, and we expand on the four rules of a tsibble in details.
 3. We have rewritten Section 4 "Temporal data pipelines" to describe a big picture about each module with the focus of temporal data instead of time series before. We have added Section 4.4 to summarise what a fluent pipeline looks like for a tsibble.
 4. We have removed the mosaic plot along with the paragraph from Section 6.1, and added the forecasting example to the smart meter data in Section 6.2 to show tsibble's capability.
