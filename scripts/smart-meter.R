@@ -50,13 +50,13 @@ p_49 <- lumped_na_df %>%
   )
 
 p_other <- lumped_na_df %>% 
-  filter(customer_id == "Rest") %>% 
+  filter(customer_id == "Other") %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to), alpha = 0.1) +
   geom_point(aes(y = .from), size = 1.2, shape = 4, alpha = 0.1) +
   geom_point(aes(y = .to), size = 1.2, shape = 4, alpha = 0.1) +
   coord_flip() +
-  xlab("Others") +
+  xlab("Rest") +
   ylab("Time gaps") +
   theme(
     panel.grid.major.y = element_blank(),
