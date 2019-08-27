@@ -40,7 +40,7 @@ p_49 <- lumped_na_df %>%
   geom_point(aes(y = .from), size = 0.6, shape = 4) +
   geom_point(aes(y = .to), size = 0.6, shape = 4) +
   coord_flip() +
-  xlab("Customer") +
+  xlab("Top customers") +
   ylab("") +
   theme(
     axis.text = element_blank(),
@@ -50,15 +50,16 @@ p_49 <- lumped_na_df %>%
   )
 
 p_other <- lumped_na_df %>% 
-  filter(customer_id == "Other") %>% 
+  filter(customer_id == "Rest") %>% 
   ggplot(aes(x = customer_id)) +
   geom_linerange(aes(ymin = .from, ymax = .to), alpha = 0.1) +
-  geom_point(aes(y = .from), size = 0.6, shape = 4, alpha = 0.1) +
-  geom_point(aes(y = .to), size = 0.6, shape = 4, alpha = 0.1) +
+  geom_point(aes(y = .from), size = 1.2, shape = 4, alpha = 0.1) +
+  geom_point(aes(y = .to), size = 1.2, shape = 4, alpha = 0.1) +
   coord_flip() +
   xlab("Others") +
   ylab("Time gaps") +
   theme(
+    panel.grid.major.y = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     legend.position = "none"
