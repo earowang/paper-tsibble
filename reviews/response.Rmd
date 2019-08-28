@@ -41,7 +41,7 @@ Yes, the calendar plot just requires a data frame. We've added the forecasting e
 
 > Figure 11 with missing data was a great demonstration for tsibble and the data times series pipeline shown in Figure 3. It may be helpful to reduce the opacity of the points as there is a lot of overplotting. The top line which lumps a number of customers together is not particularly informative here. Perhaps it is better replaced with a histogram.
 
-Thanks. We separated the remaining customers to the bottom panel with points of some transparency. We have kept the line range plot for the consistency between two panels.
+Thanks. We separated the remaining customers to the bottom panel with points of some transparency. We have kept the line range plot instead of a histogram. Because the range plot is more informative: individual missings are congregated between January and March with sporadic continuous missings over the rest of the year.
 
 > Authors may like to add/change `spread`/`gather` verbs to `pivot_longer`/`pivot_wider` with the recent move to deprecate the former in tidyr. Likewise authors may like to consider to replace “long data” to “longer data” and “wide data” to “wider data” as long/wide implies absolute terms. <https://tidyr.tidyverse.org/dev/articles/pivot.html>
 
@@ -59,7 +59,7 @@ Thanks for pointing it out. We include a gif version of the animation as supplem
 
 > Have the authors thought about how to deal with mixed time resolutions for index? E.g. some subjects have exact day recorded; some missing day but month & year recorded; some only date range recorded.
 
-We have added the sentence to Section 3.3, "Although tsibble reports one single interval despite data of fixed or mixed intervals, data of mixed intervals should be organized in separate tsibbles instead for well-tailored analysis and models.", to address the mixed time resolutions.
+We have rewritten Section 3.3 to better explain intervals and address the mixed time resolutions.
 
 > The emphasis of the manuscripts is in R but do other languages also tend to define time index implicitly?
 
