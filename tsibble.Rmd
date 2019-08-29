@@ -41,8 +41,8 @@ options("knitr.graphics.auto_pdf" = TRUE)
 library(knitr)
 opts_chunk$set(
   echo = FALSE, warning = FALSE, message = FALSE, comment = "#>",
-  fig.path = 'figure/', fig.align = 'center', fig.show = 'hold', 
-  cache = TRUE, cache.path = 'cache/', 
+  fig.path = 'figure/', fig.align = 'center', fig.show = 'hold',
+  cache = TRUE, cache.path = 'cache/',
   out.width = ifelse(is_html_output(), "100%", "\\textwidth")
 )
 knitr::opts_knit$set(root.dir = here::here())
@@ -77,7 +77,7 @@ The paper is structured as follows. Section \@ref(sec:str) reviews temporal data
 
 ## Comparing time series and longitudinal data {#sec:time-series}
 
-Temporal data problems often fall into two types of analysis, time series and longitudinal. Both of these may have very similar data input, but the representation for modelling is typically different. Time series analysis tends to focus on the dependency with series, and the cross-correlation between series. Longitudinal analysis tends to focus on overall temporal patterns across demographic or experimental treatment strata, that incorporates within subject dependency.
+Temporal data problems often fall into two types of analysis, time series and longitudinal. Both of these may have similar data input, but the representation for modelling is typically different. Time series analysis tends to focus on the dependency with series, and the cross-correlation between series. Longitudinal analysis tends to focus on overall temporal patterns across demographic or experimental treatment strata, that incorporates within subject dependency.
 
 Time series can be univariate or multivariate, and require relatively long lengths (i.e., large $T$) for modeling. With this large $T$ property, the series can be handled as stochastic processes for the primary purpose of forecasting, and characterizing temporal dynamics. Due to an expectation of regularly spaced time, and equal lengths across series, multivariate time series are typically assumed to be in the format where each column contains a single time series, and time is specified implicitly. This also implies that data are columns of homogeneous types: either all numeric or all non-numeric. To wrestle data, in whatever format that it arrives in, to this modeling format can be frustrating. The format could be considered to be model-centric, rather than data-centric, and thus throws the analyst into the deep end of the pool, rather than allowing them to gently wade to the modeling stage from the shallow end. The expectation is that the "model" is at the center of the analytical universe. This is contrary to the **tidyverse** conceptualization (Figure \@ref(fig:tsibble-fit)), which holistically captures the data workflow. More support needs to be provided, in the form of consistent tools and data structures, to transform the data into the analytical cycle.
 
@@ -91,9 +91,9 @@ Stata [@Stata] provides two commands, `tsset` and `xtset`, to declare time serie
 
 ## Tidy data
 
-@wickham2014tidy coined the term "tidy data", to standardize the mapping of the semantics of a dataset to its physical representation. In tidy form, rows correspond to observations and columns to variables. Tidy data is a rephrasing of the second and third normal forms from relational databases, but the explanation in terms of observations and variables is easier to understand because it uses statistical terminology. 
+@wickham2014tidy coined the term "tidy data", to standardize the mapping of the semantics of a dataset to its physical representation. In tidy form, rows correspond to observations and columns to variables. Tidy data is a rephrasing of the second and third normal forms from relational databases, but the explanation in terms of observations and variables is easier to understand because it uses statistical terminology.
 
-Multiple time series, with each column corresponding to a measurement is tidy data when the time index is explicitly stored in a column. The stacked data format used in longitudinal data storage is tidy, and accommodates explicit identification of sub-groups. 
+Multiple time series, with each column corresponding to a measurement is tidy data when the time index is explicitly stored in a column. The stacked data format used in longitudinal data storage is tidy, and accommodates explicit identification of sub-groups.
 
 The tidy data structure is the fundamental unit of the **tidyverse**, which is a collection of R packages designed for data science. The ubiquitous use of the **tidyverse** is testament to the simplicity, practicality and general applicability of the tools. The **tidyverse** provides abstract yet functional grammars to manipulate and visualize data in easier-to-comprehend form. One of the **tidyverse** packages, **dplyr** [@R-dplyr], showcases the value of a grammar as a principled vehicle to transform data for a wide range of data challenges, providing a consistent set of verbs: `mutate()`, `select()`, `filter()`, `summarize()`, and `arrange()`. Each verb focuses on a singular task. Most common data tasks can be rephrased and tackled with these five key verbs, in conjunction with `group_by()` to perform grouped operations.
 
@@ -157,7 +157,7 @@ Since observational units are embedded, modelling and forecasting across units a
 
 > *Each observational unit should be measured at a common interval, if regularly spaced.*
 
-The principal divide of temporal data is regularly versus irregularly spaced data. Event data typically involves irregular time intervals, such as flight schedules or customer transactions. This type of data can flow into event-based data modeling, but would need to be processed, or regularized, to fit models that expect data with a fixed-time interval. 
+The principal divide of temporal data is regularly versus irregularly spaced data. Event data typically involves irregular time intervals, such as flight schedules or customer transactions. This type of data can flow into event-based data modeling, but would need to be processed, or regularized, to fit models that expect data with a fixed-time interval.
 
 There are three possible interval types: a number, unknown, and irregular. To determine the interval for regularly spaced data, tsibble computes the greatest common divisor, and is a number. If only one observation is available for each unit, which may occur after aggregating data, the interval is reported as unknown. When the data arrives with irregular time, like event data, the interval would be specified as irregular, to prevent the tsibble creator attempting to guess an interval.
 
@@ -179,7 +179,7 @@ A fluent data pipeline anticipates a standard data structure. The tsibble data a
 
 The **tsibble** package not only provides a tsibble data object but also a domain specific language in R for transforming temporal data. It takes advantage of the wrangling verbs implemented in the **dplyr** package, and develops a suite of new tools for facilitating temporal manipulation for easing, primarily, two aspects: implicit missingness handlers and time-aware aggregations.
 
-Implicit missingness are values that should be present but are absent. In regularly-spaced temporal data, these are data entries that should be available at certain time points but are missing, leaving gaps in time. These can be detected when computing the interval estimate. It will be a problem for temporal models and operations like lag/lead are applied. A family of verbs are provided to help explore implicit missing values, and convert them into an explicit state, as follows:
+Implicit missingness are values that should be present but are absent. In regularly spaced temporal data, these are data entries that should be available at certain time points but are missing, leaving gaps in time. These can be detected when computing the interval estimate. It will be a problem for temporal models and operations like lag/lead are applied. A family of verbs are provided to help explore implicit missing values, and convert them into an explicit state, as follows:
 
 * `has_gaps()` checks the existence of time gaps.
 * `scan_gaps()` reveals all implicit missing observations.
@@ -333,7 +333,7 @@ include_graphics("img/flight-pipeline3")
 ```{r sel-monthly-plot, fig.cap = "(ref:sel-monthly-plot-cap)", fig.height = 7}
 ```
 
-(ref:sel-monthly-plot-cap) Daily delayed percentages for flight departure, with two-month moving averages overlaid, at five international airports. There are least fluctuations, and relatively fewer delays, observed at KOA airport. 
+(ref:sel-monthly-plot-cap) Daily delayed percentages for flight departure, with two-month moving averages overlaid, at five international airports. There are least fluctuations, and relatively fewer delays, observed at KOA airport.
 
 ```{r flight-pipeline2, fig.cap = "(ref:flight-pipeline2-cap)"}
 include_graphics("img/flight-pipeline2")
@@ -343,7 +343,7 @@ include_graphics("img/flight-pipeline2")
 
 A closer examination of some big airports across the US will give an indication of how well the busiest airports manage the outflow traffic on a daily basis. A subset that contains observations for Houston (IAH), New York (JFK), Kalaoa (KOA), Los Angeles (LAX) and Seattle (SEA) airports is obtained first. The succeeding operations compute delayed percentages every day at each airport, which are shown as grey lines in Figure \@ref(fig:sel-monthly-plot). Winter months tend to fluctuate a lot compared to the summer across all the airports. Superimposed on the plot are two-month moving averages, so the temporal trend is more visible. Since the number of days for each month is variable, moving averages over two months will require a weights input. But the weights specification can be avoided using a pair of commonly used rectangling verbs--`nest()` and `unnest()`, to wrap data frames partitioned by months into list-columns. The sliding operation with a large window size smooths out the fluctuations and gives a stable trend around 25% over the year, for IAH, JFK, LAX and SEA. LAX airport has seen a gradual decline in delays over the year, whereas the SEA airport has a steady delay. The IAH and JFK airports have more delays in the middle of year, while the KOA has the inverse pattern with higher delay percentage in both ends of the year. This pipeline gets the data into the daily series, and shifts the focus to five selected airports.
 
-This case study begins with duplicates fixing, that resolved the issue for constructing the tsibble. A range of temporal transformations can be handled by many free-form combinations of verbs, facilitating exploratory visualization. 
+This case study begins with duplicates fixing, that resolved the issue for constructing the tsibble. A range of temporal transformations can be handled by many free-form combinations of verbs, facilitating exploratory visualization.
 
 ## Smart-grid customer data in Australia
 
@@ -369,7 +369,7 @@ Aggregation across all individuals helps to sketch a big picture of the behavior
 
 (ref:calendar-plot-cap) Half-hourly average electricity use across all customers in the region, organized into calendar format, with color indicating hot days. Energy use of hot days tends to be higher, suggesting air conditioner use. Days in the winter months have a double peak suggesting morning and evening heater use.
 
-A common practice with energy data analysis is load forecasting, because providers need to know they have capacity to supply electricity. To illustrate the pipeline including modeling, here demand is modeled for December 2013, with the usage forecast for the last day (48 steps ahead because the data is half-hourly). The energy data for the last day is not used for modeling. ARIMA models with and without temperature information are fitted using automatic order selection [@autoarima]. The logarithmic transformation is applied to the average demand to ensure the positive forecasts. Figure \@ref(fig:elec-forecast) plots the one-day forecasts from both models against the actual demand, for the last two-week window. ARIMA regressed by average temperatures gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
+A common practice with energy data analysis is load forecasting, because providers need to know they have capacity to supply electricity. To illustrate the pipeline including modeling, here demand is modeled for December 2013, with the usage forecast for the last day (48 steps ahead because the data is half-hourly). The energy data for the last day is not used for modeling. ARIMA models with and without a temperature covariate are fitted using automatic order selection [@autoarima]. The logarithmic transformation is applied to the average demand to ensure the positive forecasts. Figure \@ref(fig:elec-forecast) plots the one-day forecasts from both models against the actual demand, for the last two-week window. ARIMA regressed by average temperatures gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
 
 ```{r elec-model}
 ```
@@ -377,7 +377,7 @@ A common practice with energy data analysis is load forecasting, because provide
 ```{r elec-forecast, fig.height = 3, fig.cap = "(ref:elec-forecast-cap)"}
 ```
 
-(ref:elec-forecast-cap) One-day (48 steps ahead) forecasts generated by ARIMA models, with and without temperatures, plotted against the actual demand. Both nicely capture the temporal dynamics, but ARIMA with temperature performs better than the model without.
+(ref:elec-forecast-cap) One-day (48 steps ahead) forecasts generated by ARIMA models, with and without a temperature covariate, plotted against the actual demand. Both nicely capture the temporal dynamics, but ARIMA with temperature performs better than the model without.
 
 ```{r elec-pipeline2, fig.cap = "(ref:elec-pipeline2-cap)"}
 include_graphics("img/elec-pipeline2")
