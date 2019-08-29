@@ -202,11 +202,11 @@ Line charts are universally accepted for ordered data, such as time series plots
 
 ## Model {#sec:ts-models}
 
-Modeling is crucial to explanatory and predictive analytics, where time series and longitudinal data analysis start to diverge. Nevertheless, tsibble as a model-oriented object can flow into both types of models, with new semantics (index and key) to be internally utilized, to accelerate modelling.
+Modeling is crucial to explanatory and predictive analytics, where time series and longitudinal data analysis diverges. The tsibble, as a model-oriented object, can flow into both types of modelling, and the new semantics (index and key) can be internally utilized to accelerate modelling.
 
-Most time series models are univariate, such as ARIMA and Exponential Smoothing, modelling temporal dynamics for each series independently. The **fable** package [@R-fable] provides a tidy forecasting framework built on top of tsibble, which is under development, with the goal of promoting transparent and human-centered forecasting practices. With the presence of the key, tsibble holds many series. Since models are fundamentally scalable, the `model()` and `forecast()` generics will take care of fitting and forecasting univariate models to each series across time in a tsibble at once.
+Most time series models are univariate, such as ARIMA and Exponential Smoothing, modelling temporal dynamics for each series independently. The **fable** package [@R-fable], currently under development, provides a tidy forecasting framework built on top of tsibble, with the goal of promoting transparent and human-centered forecasting practices. With the presence of the key, a tsibble can hold many series. Since models are fundamentally scalable, the `model()` and `forecast()` generics will take care of fitting and forecasting univariate models to each series across time in a tsibble at once.
 
-Panel data models, however, put emphases on overall, within, and between variations both across individuals and time. Fixed and random effects models can be developed in line with the **fable** design.
+Panel data models, however, put emphases on overall, within, and between variation both across individuals and time. Fixed and random effects models could be developed in line with the **fable** design.
 
 ## Summary
 
