@@ -210,14 +210,14 @@ Panel data models, however, put emphases on overall, within, and between variati
 
 ## Summary
 
-To sum it up, the tsibble abstraction provides a formal organization of forwarding tidy data to model-oriented temporal data. The supporting operations can be chained for sequencing analysis, articulating a data pipeline. As @eopl stated, "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." A mini snippet below glues transformation and forecasting together, to envision the fluent pipeline.
+To sum it up, the tsibble abstraction provides a formal organization of forwarding tidy data to model-oriented temporal data. The supporting operations can be chained for sequencing analysis, articulating a data pipeline. As @eopl stated, "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." A mini snippet below, illustrates how  transformation and forecasting are glued together, to realize the fluent pipeline.
 
 ```{r tsibble-pipeline, eval = FALSE, echo = TRUE}
 ```
 
-The `pedestrian` dataset [@ped] contains hourly tallies of pedestrians at four counting sensors in 2015 and 2016 in inner Melbourne, available in the **tsibble** package. The pipe operator `%>%` introduced in the **magrittr** package [@R-magrittr] chains the verbs, read as "then". A sequence of functions are composed in a way that can be naturally read from left to right, which improves the code readability.
+Here, the `pedestrian` dataset [@ped], available in the **tsibble** package is used. It contains hourly tallies of pedestrians at four counting sensors in 2015 and 2016 in inner Melbourne. The pipe operator `%>%` introduced in the **magrittr** package [@R-magrittr] chains the verbs, read as "then". A sequence of functions are composed in a way that can be naturally read from left to right, which improves the code readability. This code is read as "take the pedestrian data, fill the temporal gaps, filter to 2016 measurements, then apply an arima model and forecast ahead 2 days."
 
-It coordinates a user's analysis making it cleaner to follow, and permits a wider audience to document the data analysis through code without getting lost in a jungle of computational intricacies. It helps (1) break up a big problem to into manageable blocks, (2) generate human readable analysis workflow, (3) avoid introducing mistakes, at least making it possible to trace them through the pipeline.
+Piping coordinates a user's analysis making it cleaner to follow, and permits a wider audience to follow the data analysis from code, without getting lost in a jungle of computational intricacies. It helps to (1) break up a big problem into more manageable blocks, (2) generate human readable analysis workflow, and (3) forestall introducing mistakes or, at least, make it possible to track, and fix, mistakes upstream through the pipeline.
 
 # Software structure and design decisions {#sec:software}
 
