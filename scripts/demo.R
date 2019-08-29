@@ -98,5 +98,5 @@ ggplot() +
 pedestrian %>% 
   fill_gaps() %>% # turn implicit missingness to explicit
   filter(year(Date_Time) == 2016) %>%  # subset data of year 2016
-  model(arima = ARIMA(Count)) %>% # fit arima to each sensor
+  model(arima = ARIMA(Count)) %>% # fit ARIMA to each sensor
   forecast(h = days(2)) # forecast 2 days ahead
