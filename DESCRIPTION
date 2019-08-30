@@ -13,20 +13,21 @@ Depends:
     forcats (>= 0.4.0),
     gganimate (>= 1.0.3),
     lubridate (>= 1.7.4),
-    patchwork,
+    MonashEBSTemplates (>= 0.2),
+    patchwork (>= 0.0.1),
     R (>= 3.2),
     sugrrants (>= 0.2.4),
+    tidyr (>= 0.8.9),
     tidyverse (>= 1.2.1),
-    tsibble (>= 0.8.3),
-    MonashEBSTemplates (>= 0.2)
+    tsibble (>= 0.8.3)
 Imports:
     bookdown (>= 0.9),
-    here,
+    here (>= 0.1),
     knitr (>= 1.22),
     spelling (>= 2.1)
 Remotes:
     robjhyndman/MonashEBSTemplates,
-    tidyverts/fable,
-    thomasp85/patchwork
+    thomasp85/patchwork,
+    tidyverts/fable
 Encoding: UTF-8
 Language: en-US
