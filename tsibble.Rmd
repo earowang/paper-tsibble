@@ -103,12 +103,12 @@ For temporal data, the tidy definition needs additional criteria, that assist in
 
 # Contextual semantics {#sec:semantics}
 
-The choice of tidy representation of temporal data arises from a data- and model-oriented perspective, which can accommodate all of the operations that are to be performed on the data in time-based contexts. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the tidy model, which is referred to as a "tsibble". We adapt the "tidy data" principles in tsibble with the following principles:
+The choice of tidy representation of temporal data arises from a data- and model-oriented perspective, which can accommodate all of the operations that are to be performed on the data in time-based contexts. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the tidy model, which is referred to as a "tsibble". The "tidy data" principles are adapted in tsibble with the following rules:
 
-1. The Index is a variable with inherent ordering from past to present.
-2. The Key is a set of variables that define observational units over time
-3. Each observation should be uniquely identified by Index and Key.
-4. When each observational unit is measured at a common interval, the data set is described as "regularly spaced".
+1. Index is a variable with inherent ordering from past to present.
+2. Key is a set of variables that define observational units over time
+3. Each observation should be uniquely identified by index and key.
+4. Each observational unit should be measured at a common interval, if regularly spaced.
 
 Figure \@ref(fig:tsibble-semantics) sketches out the data form required for a tsibble, an extension of the tidy format to the time domain. Beyond the layout, tsibble gives the contextual meaning to variables in order to construct the temporal data object, as newly introduced "index" and "key" semantics stated in definitions 1 and 2 above. Variables other than index and key are considered as measurements. Definitions 3 and 4 imply that a tsibble is *tidier* than tidy data, positioning itself as a model input that gives rise to more robust and reliable downstream analytics.
 
@@ -125,7 +125,7 @@ To materialize the abstraction of the tsibble, a subset of tuberculosis cases [@
 
 (ref:tb-sub) A small subset of estimates of tuberculosis burden collected by World Health Organization in 2011 and 2012, with 12 observations and 5 variables. The index refers to column `year`, the key to multiple columns: `country` and `gender`, and the measured variable to column `count`.
 
-The new tsibble structure bridges the gap between raw data and the rigorous state of temporal data analysis. The proposed contextual semantics is the new add-on to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series and panel model inputs. The Index, Key and time interval are the three pillars to this new semantically structured temporal data. Each is now described in more detail.
+The new tsibble structure bridges the gap between raw data and the rigorous state of temporal data analysis. The proposed contextual semantics is the new add-on to tidy data in order to support more intuitive time-related manipulations and enlighten new perspectives for time series and panel model inputs. Index, key and time interval form the three pillars to this new semantically structured temporal data. Each is now described in more detail.
 
 ## Index {#sec:index}
 
@@ -210,7 +210,7 @@ Panel data models, however, put emphases on overall, within, and between variati
 
 ## Summary
 
-To sum up, the tsibble abstraction provides a formal organization of forwarding tidy data to model-oriented temporal data. The supporting operations can be chained for sequencing analysis, articulating a data pipeline. As @eopl stated, "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." A mini snippet below, illustrates how  transformation and forecasting are glued together, to realize the fluent pipeline.
+To sum up, the tsibble abstraction provides a formal organization of forwarding tidy data to model-oriented temporal data. The supporting operations can be chained for sequencing analysis, articulating a data pipeline. As @eopl stated, "No matter how complex and polished the individual operations are, it is often the quality of the glue that most directly determines the power of the system." A mini snippet below, illustrates how transformation and forecasting are glued together, to realize the fluent pipeline.
 
 ```{r tsibble-pipeline, eval = FALSE, echo = TRUE}
 ```
@@ -369,7 +369,7 @@ Aggregation across all individuals helps to sketch a big picture of the behavior
 
 (ref:calendar-plot-cap) Half-hourly average electricity use across all customers in the region, organized into calendar format, with color indicating hot days. Energy use of hot days tends to be higher, suggesting air conditioner use. Days in the winter months have a double peak suggesting morning and evening heater use.
 
-A common practice with energy data analysis is load forecasting, because providers need to know they have capacity to supply electricity. To illustrate the pipeline including modeling, we model demand for December 2013, with the usage forecast for the last day (48 steps ahead because the data is half-hourly). The energy data for the last day is not used for modeling. ARIMA models with and without a temperature covariate are fitted using automatic order selection [@autoarima]. The logarithmic transformation is applied to the average demand to ensure positive forecasts. Figure \@ref(fig:elec-forecast) plots one-day forecasts from both models against the actual demand, for the last two-week window. The ARIMA model which includes the average temperature covariate gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
+A common practice with energy data analysis is load forecasting, because providers need to know they have capacity to supply electricity. To illustrate the pipeline including modeling, here demand is modeled for December 2013, with the usage forecast for the last day (48 steps ahead because the data is half-hourly). The energy data for the last day is not used for modeling. ARIMA models with and without a temperature covariate are fitted using automatic order selection [@autoarima]. The logarithmic transformation is applied to the average demand to ensure positive forecasts. Figure \@ref(fig:elec-forecast) plots one-day forecasts from both models against the actual demand, for the last two-week window. The ARIMA model which includes the average temperature covariate gives a better fit than the one without, although both tend to underestimate the night demand. The forecasting performance is reported in Table \@ref(tab:elec-accuracy), consistent with the findings in Figure \@ref(fig:elec-forecast).
 
 ```{r elec-model}
 ```
