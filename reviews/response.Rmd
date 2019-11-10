@@ -14,7 +14,7 @@ We thank the reviewers for their comments which has improved this paper. The poi
 
 > Bottom of page 8: "Figure 3 peels the tidy module with" I'm not sure about the use of the word peels there?
 
-We rephrased "peels" to "demonstrates".
+We rephrased "peels" to "reveals".
 
 > Top of page 9: "The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage." Should "warrants" be replaced with "ensures" and perhaps replace "temporal data analysis for the later stage" with "subsequent temporal data analysis".
 
