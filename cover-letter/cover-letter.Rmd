@@ -14,10 +14,6 @@ spacing: 1.4
 output: MonashEBSTemplates::letter
 ---
 
-We have undertaken major revision on our manuscript titled, "A new tidy data structure to support exploration and modeling of temporal data," based on reviewers' comments.
+We have addressed minor issues that the referees have pointed out on our manuscript titled, "A new tidy data structure to support exploration and modeling of temporal data,".
 
-We have rewritten Section 3 "Contextual semantics" and Section 4 "Temporal data pipelines". Now Section 3 gives a definition of tsibble in relation to tidy data. Section 4 describes a big picture about each module with the focus of temporal data instead of time series before.
-
-A detailed response letter to reviewers has been provided.
-
-We believe that this manuscript has been significantly improved, that is a good fit for the Journal of Computational and Graphical Statistics.
+Two zip files are attached with this submission:

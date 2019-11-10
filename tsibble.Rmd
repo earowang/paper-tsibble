@@ -3,7 +3,7 @@ title: "A new tidy data structure to support exploration and modeling of tempora
 author:
   - familyname: Wang
     othernames: Earo
-    address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia.
+    address: Department of Econometrics and Business Statistics, \newline Monash University, VIC 3800 \newline Australia. \newline \newline CSIRO Data61, \newline Private Bag 10, South Clayton, VIC 3169
     email : earo.wang@monash.edu
     correspondingauthor: true
   - familyname: Cook
@@ -248,7 +248,7 @@ Figure \@ref(fig:animate) shows animations of rolling windows for sliding, tilin
 ```{r animate, fig.show = "animate", fig.height = 7, fig.cap = "(ref:animate-cap)", interval = 0.5, aniopts = c("autoplay", "controls", "loop")}
 ```
 
-(ref:animate-cap) An illustration of a window of size 5 to compute rolling averages over annual tuberculosis cases in Australia using sliding, tiling and stretching. The animations are available with the supplementary materials online, and can be viewed at <https://github.com/earowang/paper-tsibble/blob/master/img/animate-1.gif>.
+(ref:animate-cap) An illustration of a window of size 5 to compute rolling averages over annual tuberculosis cases in Australia using sliding, tiling and stretching. The animations are available with the supplementary materials online, and can also be viewed directly at <https://github.com/earowang/paper-tsibble/blob/master/img/animate-1.gif>.
 
 Rolling windows adapt to functional programming, for which the **purrr** package [@R-purrr] sets a good example. These functions accept and return arbitrary inputs and outputs, with arbitrary methods. For example, moving averages anticipate numerics and produce averaged numerics via `mean()`. However, rolling window regression feeds a data frame into a linear regression method like `lm()`, and generates a complex object that contains coefficients, fitted values, and etc.
 
