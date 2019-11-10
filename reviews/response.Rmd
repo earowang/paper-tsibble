@@ -8,13 +8,13 @@ output:
 fontfamily: mathpazo
 ---
 
-We thank the reviewers for their comments which has improved this paper. The point by point description of changes are below: the reviewers' comments are in red and our response is in black.
+We thank the Editor, Associate editor and reviewers for their comments which have improved this paper. The point by point description of changes are below: the reviewers' comments are in red and our response is in black.
 
 # Reviewer 1 comments {-}
 
 > Bottom of page 8: "Figure 3 peels the tidy module with" I'm not sure about the use of the word peels there?
 
-We rephrased "peels" to "reveals".
+We replaced "peels" with "reveals".
 
 > Top of page 9: "The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage." Should "warrants" be replaced with "ensures" and perhaps replace "temporal data analysis for the later stage" with "subsequent temporal data analysis".
 
@@ -32,11 +32,11 @@ Done.
 
 > I think for Figure 4, you should mention that supplementary figure contains the gif if the animation does not work or perhaps include a link to a working animation.
 
-Thanks. We added a sentence in Figure 4 caption "The animations are available with the supplementary materials online, and can be viewed at <https://github.com/earowang/paper-tsibble/blob/master/img/animate-1.gif>."
+Thanks. We added a sentence in Figure 4 caption "The animations are available with the supplementary materials online, and can also be viewed directly at <https://github.com/earowang/paper-tsibble/blob/master/img/animate-1.gif>."
 
 > P15 L58. Mention `future_*` is from `furrr` package.
 
-Done. We also mentioned the **future** package.
+Done. 
 
 > P16 L24. Missing reference for `lubridate`.
 
