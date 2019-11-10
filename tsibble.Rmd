@@ -85,7 +85,7 @@ Longitudinal data (or panel data) typically assumes fewer measurements (small $T
 
 ## Existing data standards
 
-In R [@R-base], time series and longitudinal data are of different representations. The native `ts` object and the enhancements of **zoo** [@zoo2005] and **xts** [@R-xts], assemble time series into wide matrices with implicit time indexes. If there are multiple sub-groups, such as country or product type, these would be kept in different data objects. A relatively new R package **tibbletime** [@R-tibbletime] proposed a data class of *time tibble* to represent time series in heterogeneous long format. It only requires an index variable to be declared. However, this is insufficient, and a more rigid data structure is required for temporal analytics and modeling. The **plm** [@plm2008] and **panelr** [@R-panelr] packages both manage longitudinal data in long format.
+In R [@R-base], time series and longitudinal data are of different representations. The native `ts` object and the enhancements by **zoo** [@zoo2005] and **xts** [@R-xts], assemble time series into wide matrices with implicit time indexes. If there are multiple sub-groups, such as country or product type, these would be kept in different data objects. A relatively new R package **tibbletime** [@R-tibbletime] proposed a data class of *time tibble* to represent time series in heterogeneous long format. It only requires an index variable to be declared. However, this is insufficient, and a more rigid data structure is required for temporal analytics and modeling. The **plm** [@plm2008] and **panelr** [@R-panelr] packages both manage longitudinal data in long format.
 
 Stata [@Stata] provides two commands, `tsset` and `xtset`, to declare time series and panels respectively, both of which require explicit panel id and time index specification. Different variables would be stored in multiple columns. The underlying data arrangement is only long form, for both types of data. Both groups of functions can be applied interchangeably to whether the data is declared for time series or longitudinal data. The SAS software [@SAS-STAT] also handles both types of data in the same way as Stata.
 
@@ -106,7 +106,7 @@ For temporal data, the tidy definition needs additional criteria, that assist in
 The choice of tidy representation of temporal data arises from a data- and model-oriented perspective, which can accommodate all of the operations that are to be performed on the data in time-based contexts. Figure \@ref(fig:tsibble-fit) marks where this new abstraction is placed in the tidy model, which is referred to as a "tsibble". The "tidy data" principles are adapted in tsibble with the following rules:
 
 1. Index is a variable with inherent ordering from past to present.
-2. Key is a set of variables that define observational units over time
+2. Key is a set of variables that define observational units over time.
 3. Each observation should be uniquely identified by index and key.
 4. Each observational unit should be measured at a common interval, if regularly spaced.
 
@@ -143,7 +143,7 @@ What subjects/entities are to be observed over time, leads to the second compone
 
 > *Each observation should be uniquely identified by index and key.*
 
-Inspired by a "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, the tsibble key also uniquely identifies each observational unit over time. When constructing a tsibble, any duplicates of key-index (i.e. key-value) pairs will fail, because duplicates signal a data quality issue, which would likely affect subsequent analyses and hence decision making. For example, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. Analysts are encouraged to better understand the data, or reason about the process of data cleaning when handling duplicates. Figure \@ref(fig:tsibble-tidy) peels the tidy module with clear routes required for a tsibble. The rigidity of tsibble, as the fundamental data infrastructure, warrants the validity of temporal data analysis for the later stage.
+Inspired by a "primary key" [@codd_relational_1970], a unique identifier for each observation in a relational database, the tsibble key also uniquely identifies each observational unit over time. When constructing a tsibble, any duplicates of key-index (i.e. key-value) pairs will fail, because duplicates signal a data quality issue, which would likely affect subsequent analyses and hence decision making. For example, either `gender` or `country` alone is not enough to be the key for the tuberculosis data. Analysts are encouraged to better understand the data, or reason about the process of data cleaning when handling duplicates. Figure \@ref(fig:tsibble-tidy) demonstrates the tidy module with clear routes required for a tsibble. The rigidity of tsibble, as the fundamental data infrastructure, ensures the validity of subsequent temporal data analysis.
 
 ```{r tsibble-tidy, fig.cap = "(ref:tsibble-tidy-cap)"}
 include_graphics("img/tsibble-tidy.png")
@@ -248,17 +248,17 @@ Figure \@ref(fig:animate) shows animations of rolling windows for sliding, tilin
 ```{r animate, fig.show = "animate", fig.height = 7, fig.cap = "(ref:animate-cap)", interval = 0.5, aniopts = c("autoplay", "controls", "loop")}
 ```
 
-(ref:animate-cap) An illustration of a window of size 5 to compute rolling averages over annual tuberculosis cases in Australia using sliding, tiling and stretching. (Animation needs to be viewed with Adobe Acrobat Reader.)
+(ref:animate-cap) An illustration of a window of size 5 to compute rolling averages over annual tuberculosis cases in Australia using sliding, tiling and stretching. The animations are available with the supplementary materials online, and can be viewed at <https://github.com/earowang/paper-tsibble/blob/master/img/animate-1.gif>.
 
 Rolling windows adapt to functional programming, for which the **purrr** package [@R-purrr] sets a good example. These functions accept and return arbitrary inputs and outputs, with arbitrary methods. For example, moving averages anticipate numerics and produce averaged numerics via `mean()`. However, rolling window regression feeds a data frame into a linear regression method like `lm()`, and generates a complex object that contains coefficients, fitted values, and etc.
 
-Rolling windows not only iterate but roll over a sequence of elements of a fixed window. A complete and consistent set of tools are available for facilitating window-related operations, a family of `slide()`, `tile()`, `stretch()`, and their variants. `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. For type stability, the functions always return lists. Other variants including `*_lgl()`, `*_int()`, `*_dbl()`, `*_chr()` return vectors of the corresponding types, as well as `*_dfr()` and `*_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_*()` enable rolling in parallel [@R-future; @R-furrr].
+Rolling windows not only iterate but roll over a sequence of elements of a fixed window. A complete and consistent set of tools are available for facilitating window-related operations, a family of `slide()`, `tile()`, `stretch()`, and their variants. `slide()` expects one input, `slide2()` two inputs, and `pslide()` multiple inputs. For type stability, the functions always return lists. Other variants including `*_lgl()`, `*_int()`, `*_dbl()`, `*_chr()` return vectors of the corresponding types, as well as `*_dfr()` and `*_dfc()` for row-binding and column-binding data frames respectively. Their multiprocessing equivalents prefixed by `future_*()` enable rolling in parallel, via **future** [@R-future] and **furrr** [@R-furrr].
 
 ## Modularity
 
 Modular programming is adopted in the design of the **tsibble** package. Modularity benefits users by providing small focused and cleaner chunks, and provides developers with simpler maintenance.
 
-All user-facing functions can be roughly organized into three major chunks according to their functionality: vector functions (1d), table verbs (2d), and window family. Each chunk is an independent module, but works interdependently. Vector functions in the package mostly operate on time. The atomic functions (such as `yearmonth()` and `yearquarter()`) can be embedded in the `index_by()` verb to collapse a tsibble to a less granular interval. Since they are not tied to a tsibble, they can be used in a broader range of data applications not constrained to tsibble. On the other hand, the table verbs can incorporate many other vector functions from a third party, like the **lubridate** package.
+All user-facing functions can be roughly organized into three major chunks according to their functionality: vector functions (1d), table verbs (2d), and window family. Each chunk is an independent module, but works interdependently. Vector functions in the package mostly operate on time. The atomic functions (such as `yearmonth()` and `yearquarter()`) can be embedded in the `index_by()` verb to collapse a tsibble to a less granular interval. Since they are not tied to a tsibble, they can be used in a broader range of data applications not constrained to tsibble. On the other hand, the table verbs can incorporate many other vector functions from a third party, like the **lubridate** package [@R-lubridate].
 
 ## Extensibility
 
