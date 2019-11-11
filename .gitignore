@@ -9,7 +9,6 @@ data-raw/airports.dat
 data-raw/customer.csv
 arxiv*
 cover-letter/signature.png
-figure/
 tsibble.tex
 *\.log
 *\.aux
