@@ -270,7 +270,7 @@ The class of tsibble is an underpinning for temporal data, and sub-classing a ts
 
 ## Tidy evaluation
 
-The **tsibble** packages leverages the **tidyverse** grammars and pipelines through tidy evaluation [@tidy-eval] via the **rlang** package [@R-rlang]. In particular, the table verbs extensively use tidy evaluation to evaluate computation in the context of tsibble data and spotlight the "tidy" interface that is compatible with the **tidyverse**. This not only saves a few keystrokes without explicitly repeating references to the data source, but the resulting code is typically cleaner and more expressive, when doing interactive data analysis.
+The **tsibble** package leverages the **tidyverse** grammars and pipelines through tidy evaluation [@tidy-eval] via the **rlang** package [@R-rlang]. In particular, the table verbs extensively use tidy evaluation to evaluate computation in the context of tsibble data and spotlight the "tidy" interface that is compatible with the **tidyverse**. This not only saves a few keystrokes without explicitly repeating references to the data source, but the resulting code is typically cleaner and more expressive, when doing interactive data analysis.
 
 # Case studies {#sec:cases}
 
